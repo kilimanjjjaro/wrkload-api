@@ -13,7 +13,12 @@ export const manageValidationErrors = (req, res, next) => {
 
 // CREATE VALIDATIONS FOR DATA TYPES
 export const registryDataValidations = [
-  body("username").trim().notEmpty().withMessage("Username are required"),
+  body("username")
+    .trim()
+    .notEmpty()
+    .withMessage("Username are required")
+    .escape()
+    .withMessage("Invalid username format"),
   body("role")
     .trim()
     .notEmpty()
@@ -67,10 +72,14 @@ export const loginDataValidations = [
 ];
 
 export const taskDataValidations = [
-  body("name").trim().notEmpty().withMessage("Name are required"),
-  body("project").trim().notEmpty().withMessage("Project are required"),
-  body("timing").trim().notEmpty().withMessage("Timing are required"),
-  body("month").trim().notEmpty().withMessage("Date are required"),
+  body("name").trim().notEmpty().withMessage("Name are required").escape(),
+  body("project")
+    .trim()
+    .notEmpty()
+    .withMessage("Project are required")
+    .escape(),
+  body("timing").trim().notEmpty().withMessage("Timing are required").escape(),
+  body("month").trim().notEmpty().withMessage("Date are required").escape(),
   body("delivered")
     .trim()
     .notEmpty()
@@ -80,7 +89,7 @@ export const taskDataValidations = [
     .withMessage("Invalid date format. ISO8601 required")
     .bail()
     .toDate(),
-  body("description").trim(),
+  body("description").trim().escape(),
   manageValidationErrors,
 ];
 
@@ -92,5 +101,16 @@ export const idParamValidations = [
     .bail()
     .escape()
     .withMessage("Invalid ID param format"),
+  manageValidationErrors,
+];
+
+export const confirmationTokenParamValidations = [
+  param("confirmation_token")
+    .trim()
+    .notEmpty()
+    .withMessage("Confirmation token are required")
+    .bail()
+    .escape()
+    .withMessage("Invalid confirmation token param format"),
   manageValidationErrors,
 ];

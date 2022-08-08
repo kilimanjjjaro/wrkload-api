@@ -31,6 +31,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  confirmation_token: {
+    type: String,
+    default: null,
+  },
+  confirmation_status: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // MAKE A PRE STEP TO ENCRYPT USER PASSWORD BEFORE SAVE DATA.

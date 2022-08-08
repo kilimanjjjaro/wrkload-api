@@ -45,7 +45,17 @@ export const getUser = async (req, res) => {
       });
     }
 
-    return res.json(user);
+    if (req.role === 1) {
+      return res.json(user);
+    } else {
+      const public_user = {
+        username: user.username,
+        email: user.email,
+        avatar: user.avatar,
+      };
+
+      return res.json(public_user);
+    }
   } catch (error) {
     console.error(error);
 
