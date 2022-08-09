@@ -1,10 +1,12 @@
 import { Router } from "express";
 import {
   confirmAccount,
+  forgotPassword,
   login,
   logout,
   refreshAccessToken,
   register,
+  resetPassword,
 } from "../controllers/auth.controller.js";
 import {
   confirmationTokenParamValidations,
@@ -19,6 +21,8 @@ router.post("/register", registryDataValidations, register);
 router.post("/login", loginDataValidations, login);
 router.get("/token", requireRefreshToken, refreshAccessToken);
 router.get("/logout", logout);
+router.patch("/forgot-password", forgotPassword);
+router.patch("/reset-password/:reset_password_token", resetPassword);
 router.get(
   "/confirm-account/:confirmation_token",
   confirmationTokenParamValidations,

@@ -1,9 +1,11 @@
 import "dotenv/config";
-import { v4 as uuidv4 } from "uuid";
-import nodemailer from "nodemailer";
+import jwt from "jsonwebtoken";
+import transporter from "../helpers/transporter.js";
 import { User } from "../models/User.js";
 import {
+  confirmationTokenGenerator,
   refreshTokenGenerator,
+  tokenErrors,
   tokenGenerator,
 } from "../helpers/tokenManager.js";
 
@@ -26,19 +28,10 @@ export const register = async (req, res) => {
       email: email,
       avatar: avatar,
       password: password,
-      confirmation_token: uuidv4(),
+      confirmation_token: confirmationTokenGenerator(email),
     });
 
     await user.save();
-
-    const transporter = nodemailer.createTransport({
-      host: "smtp.mailtrap.io",
-      port: 2525,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
 
     await transporter.sendMail({
       from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
@@ -126,7 +119,14 @@ export const confirmAccount = async (req, res) => {
     const { confirmation_token } = req.params;
     let user = await User.findOne({ confirmation_token });
 
-    if (!user) throw new Error("Invalid token");
+    if (!user) throw new Error("User not found");
+
+    const { email } = jwt.verify(
+      confirmation_token,
+      process.env.CONFIRMATION_KEY
+    );
+
+    if (email !== user.email) throw new Error("Invalid token");
 
     user.confirmation_status = true;
     user.confirmation_token = null;
@@ -137,6 +137,59 @@ export const confirmAccount = async (req, res) => {
   } catch (error) {
     console.error(error);
 
+    return res.status(401).send({ error: tokenErrors[error.message] });
+  }
+};
+
+// MAKE A CONTROLLER TO FORGOT PASSWORD.
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    let user = await User.findOne({ email });
+
+    if (!user) throw new Error("Check your email for reset your password.");
+
+    const { access_token } = tokenGenerator(user._id);
+
+    await transporter.sendMail({
+      from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
+      to: user.email,
+      subject: "Reset your password",
+      html: `<a href="http://localhost:5000/api/v1/auth/reset-password/${access_token}">Click to reset your password</a>`,
+    });
+
+    res.status(200).json({ status: "Link sended" });
+  } catch (error) {
+    console.error(error);
+
     return res.status(500).json({ error: "Server error" });
+  }
+};
+
+// MAKE A CONTROLLER TO RESET PASSWORD.
+export const resetPassword = async (req, res) => {
+  try {
+    const { reset_password_token } = req.params;
+    const { password } = req.body;
+
+    if (!reset_password_token) throw new Error("Invalid reset password link.");
+
+    if (!password) throw new Error("New password is required.");
+
+    const { uid } = jwt.verify(reset_password_token, process.env.ACCESS_KEY);
+
+    let user = await User.findOne({ _id: uid });
+
+    if (!user) throw new Error("User not found.");
+
+    user.password = password;
+
+    await user.save();
+
+    res.status(200).json({ status: "Password reset" });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(401).send({ error: tokenErrors[error.message] });
   }
 };
