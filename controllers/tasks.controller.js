@@ -1,51 +1,36 @@
 import { Task } from "../models/Task.js";
 
-export const getTasks = async (req, res) => {
+export const getTasks = async (req, res, next) => {
   try {
     const tasks = await Task.find({ id: req.uid });
-    return res.json(tasks);
+
+    if (tasks.length < 1) throw new Error("Tasks not found");
+
+    res.status(200).json(tasks);
   } catch (error) {
     console.error(error);
-
-    return res.status(500).send({ error: "Server error" });
+    next(error);
   }
 };
 
-export const getTask = async (req, res) => {
+export const getTask = async (req, res, next) => {
   try {
     const { id } = req.params;
     const task = await Task.findById(id);
 
-    if (!task) {
-      return res.status(404).send({
-        code: "tasks/task-not-found",
-        message: "Task not found",
-      });
-    }
+    if (!task) throw new Error("Task not found");
 
-    if (!task.author_id.equals(req.uid)) {
-      return res.status(401).send({
-        code: "tasks/permission-denied",
-        message: "Can't read other authors tasks",
-      });
-    }
+    if (!task.author_id.equals(req.uid))
+      throw new Error("Can't read other authors tasks");
 
-    return res.json(task);
+    res.status(200).json(task);
   } catch (error) {
     console.error(error);
-
-    if (error.kind === "ObjectId") {
-      return res.status(403).send({
-        code: "tasks/id-not-valid",
-        message: "Task ID not valid",
-      });
-    }
-
-    return res.status(500).send({ error: "Server error" });
+    next(error);
   }
 };
 
-export const createTask = async (req, res) => {
+export const createTask = async (req, res, next) => {
   try {
     const { name, project, timing, month, delivered, description } = req.body;
 
@@ -61,15 +46,14 @@ export const createTask = async (req, res) => {
 
     await task.save();
 
-    return res.status(201).json(task);
+    res.status(201).json({ status: "ok" });
   } catch (error) {
     console.error(error);
-
-    return res.status(500).send({ error: "Server error" });
+    next(error);
   }
 };
 
-export const deleteTask = async (req, res) => {
+export const deleteTask = async (req, res, next) => {
   try {
     const { id } = req.params;
     const task = await Task.findById(id);
@@ -90,61 +74,32 @@ export const deleteTask = async (req, res) => {
 
     await task.remove();
 
-    return res.status(200).json({ status: "Task deleted" });
+    res.status(200).json({ status: "Task deleted" });
   } catch (error) {
     console.error(error);
-
-    if (error.kind === "ObjectId") {
-      return res.status(403).send({
-        code: "tasks/id-not-valid",
-        message: "Task ID not valid",
-      });
-    }
-
-    return res.status(500).send({ error: "Server error" });
+    next(error);
   }
 };
 
-export const updateTask = async (req, res) => {
+export const updateTask = async (req, res, next) => {
   try {
     const reqTask = req.body;
     const { id } = req.params;
     let task = await Task.findById(id);
 
-    if (!task) {
-      return res.status(404).send({
-        code: "tasks/task-not-found",
-        message: "Task not found",
-      });
-    }
+    if (!task) throw new Error("Task not found");
 
-    if (!task.author_id.equals(req.uid)) {
-      return res.status(401).send({
-        code: "tasks/permission-denied",
-        message: "Can't update other authors tasks",
-      });
-    }
+    if (!task.author_id.equals(req.uid))
+      throw new Error("Can't update other authors tasks");
 
-    if (reqTask.author_id || reqTask.id || reqTask._id) {
-      return res.status(401).send({
-        code: "tasks/permission-denied",
-        message: "Can't update ID data",
-      });
-    }
+    if (reqTask.author_id || reqTask.id || reqTask._id)
+      throw new Error("Can't update ID data");
 
     await task.updateOne(reqTask);
 
-    return res.status(200).json({ status: "Task updated" });
+    res.status(200).json({ status: "ok" });
   } catch (error) {
     console.error(error);
-
-    if (error.kind === "ObjectId") {
-      return res.status(403).send({
-        code: "tasks/id-not-valid",
-        message: "Task ID not valid",
-      });
-    }
-
-    return res.status(500).send({ error: "Server error" });
+    next(error);
   }
 };

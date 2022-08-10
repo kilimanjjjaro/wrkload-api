@@ -5,22 +5,16 @@ import { User } from "../models/User.js";
 import {
   confirmationTokenGenerator,
   refreshTokenGenerator,
-  tokenErrors,
   tokenGenerator,
 } from "../helpers/tokenManager.js";
 
 // MAKE A CONTRROLLER TO REGISTRY A USER ON DATABASE AND GENERATE AN ACCESS & REFRESH TOKEN.
-export const register = async (req, res) => {
+export const register = async (req, res, next) => {
   try {
     const { username, role, email, avatar, password } = req.body;
     let user = await User.findOne({ email });
 
-    if (user) {
-      return res.status(403).json({
-        code: "auth/email-already-exists",
-        message: "User already exists",
-      });
-    }
+    if (user) throw new Error("User already exists");
 
     user = new User({
       username: username,
@@ -46,75 +40,57 @@ export const register = async (req, res) => {
     res.status(201).json({ access_token, expiresIn });
   } catch (error) {
     console.error(error);
-
-    return res.status(500).json({ error: "Server error" });
+    next(error);
   }
 };
 
 // MAKE A CONTROLLER TO LOGIN AND GENERATE AN ACCESS & REFRESH TOKEN.
-export const login = async (req, res) => {
+export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     let user = await User.findOne({ email });
 
-    if (!user) {
-      return res.status(403).json({
-        code: "auth/user-not-found",
-        message: "Wrong email or password",
-      });
-    }
+    if (!user) throw new Error("User not found");
 
-    if (!user.confirmation_status) {
-      return res.status(401).send({
-        code: "auth/account-not-confirmed",
-        message: "Please check your email to confirm account",
-      });
-    }
+    if (!user.confirmation_status) throw new Error("Account not confirmed");
 
     const reqPass = await user.comparePassword(password);
 
-    if (!reqPass) {
-      return res.status(403).json({
-        code: "auth/invalid-password",
-        message: "Wrong email or password",
-      });
-    }
+    if (!reqPass) throw new Error("Wrong password");
 
     const { access_token, expiresIn } = tokenGenerator(user._id, user.role);
     refreshTokenGenerator(user._id, user.role, res);
 
-    res.status(201).json({ access_token, expiresIn });
+    res.status(200).json({ access_token, expiresIn });
   } catch (error) {
     console.error(error);
-
-    return res.status(500).json({ error: "Server error" });
+    next(error);
   }
 };
 
 // CREATE A CONTROLLER TO GET A NEW ACCESS TOKEN FROM AN EXISTING REFRESH TOKEN SENDED FROM requireRefreshToken MIDDLEWARE.
-export const refreshAccessToken = (req, res) => {
+export const refreshAccessToken = (req, res, next) => {
   try {
     const { access_token, expiresIn } = tokenGenerator(
       req.user._id,
       req.user.role
     );
 
-    return res.json({ access_token, expiresIn });
+    res.status(201).json({ access_token, expiresIn });
   } catch (error) {
     console.error(error);
-
-    return res.status(500).send({ error: "Server error" });
+    next(error);
   }
 };
 
 // CREATE A CONTROLLER TO LOGOUT DELETING THE REFRESH TOKEN.
 export const logout = (req, res) => {
   res.clearCookie("refresh_token");
-  res.json({ status: "ok" });
+  res.status(200).json({ status: "ok" });
 };
 
 // MAKE A CONTROLLER TO CONFIRM ACCOUNT.
-export const confirmAccount = async (req, res) => {
+export const confirmAccount = async (req, res, next) => {
   try {
     const { confirmation_token } = req.params;
     let user = await User.findOne({ confirmation_token });
@@ -133,21 +109,20 @@ export const confirmAccount = async (req, res) => {
 
     await user.save();
 
-    res.status(200).json({ status: "Account confirmed" });
+    res.status(201).json({ status: "ok" });
   } catch (error) {
     console.error(error);
-
-    return res.status(401).send({ error: tokenErrors[error.message] });
+    next(error);
   }
 };
 
 // MAKE A CONTROLLER TO FORGOT PASSWORD.
-export const forgotPassword = async (req, res) => {
+export const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
     let user = await User.findOne({ email });
 
-    if (!user) throw new Error("Check your email for reset your password.");
+    if (!user) throw new Error("Reset your password");
 
     const { access_token } = tokenGenerator(user._id);
 
@@ -158,38 +133,36 @@ export const forgotPassword = async (req, res) => {
       html: `<a href="http://localhost:5000/api/v1/auth/reset-password/${access_token}">Click to reset your password</a>`,
     });
 
-    res.status(200).json({ status: "Link sended" });
+    res.status(200).json({ status: "ok" });
   } catch (error) {
     console.error(error);
-
-    return res.status(500).json({ error: "Server error" });
+    next(error);
   }
 };
 
 // MAKE A CONTROLLER TO RESET PASSWORD.
-export const resetPassword = async (req, res) => {
+export const resetPassword = async (req, res, next) => {
   try {
     const { reset_password_token } = req.params;
     const { password } = req.body;
 
-    if (!reset_password_token) throw new Error("Invalid reset password link.");
+    if (!reset_password_token) throw new Error("Invalid reset link");
 
-    if (!password) throw new Error("New password is required.");
+    if (!password) throw new Error("New password is required");
 
     const { uid } = jwt.verify(reset_password_token, process.env.ACCESS_KEY);
 
     let user = await User.findOne({ _id: uid });
 
-    if (!user) throw new Error("User not found.");
+    if (!user) throw new Error("User not found");
 
     user.password = password;
 
     await user.save();
 
-    res.status(200).json({ status: "Password reset" });
+    res.status(201).json({ status: "ok" });
   } catch (error) {
     console.error(error);
-
-    return res.status(401).send({ error: tokenErrors[error.message] });
+    next(error);
   }
 };

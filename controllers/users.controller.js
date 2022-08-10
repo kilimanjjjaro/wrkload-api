@@ -1,49 +1,29 @@
 import { User } from "../models/User.js";
 
-export const getUsers = async (req, res) => {
+export const getUsers = async (req, res, next) => {
   try {
-    if (req.role !== 1) {
-      return res.status(401).send({
-        code: "users/permission-denied",
-        message: "Permission denied",
-      });
-    }
+    if (req.role !== 1) throw new Error("Permission denied");
 
     const users = await User.find();
 
-    if (!users) {
-      return res.status(404).send({
-        code: "users/users-not-found",
-        message: "Users not found",
-      });
-    }
+    if (users.length < 1) throw new Error("Users not found");
 
-    return res.json(users);
+    res.status(200).json(users);
   } catch (error) {
     console.error(error);
-
-    return res.status(500).send({ error: "Server error" });
+    next(error);
   }
 };
 
-export const getUser = async (req, res) => {
+export const getUser = async (req, res, next) => {
   try {
     const { id } = req.params;
     const user = await User.findById(id);
 
-    if (!user) {
-      return res.status(404).send({
-        code: "users/task-not-found",
-        message: "Task not found",
-      });
-    }
+    if (!user) throw new Error("User not found");
 
-    if (!user._id.equals(req.uid) && req.role !== 1) {
-      return res.status(401).send({
-        code: "users/permission-denied",
-        message: "Can't read other users data",
-      });
-    }
+    if (!user._id.equals(req.uid) && req.role !== 1)
+      throw new Error("Permission denied");
 
     if (req.role === 1) {
       return res.json(user);
@@ -54,100 +34,54 @@ export const getUser = async (req, res) => {
         avatar: user.avatar,
       };
 
-      return res.json(public_user);
+      return res.status(200).json(public_user);
     }
   } catch (error) {
     console.error(error);
-
-    if (error.kind === "ObjectId") {
-      return res.status(403).send({
-        code: "users/id-not-valid",
-        message: "User ID not valid",
-      });
-    }
-
-    return res.status(500).send({ error: "Server error" });
+    next(error);
   }
 };
 
-export const deleteUser = async (req, res) => {
+export const deleteUser = async (req, res, next) => {
   try {
-    if (req.role !== 1) {
-      return res.status(401).send({
-        code: "users/permission-denied",
-        message: "Permission denied",
-      });
-    }
+    if (req.role !== 1) throw new Error("Permission denied");
 
     const { id } = req.params;
     const user = await User.findById(id);
 
-    if (!user) {
-      return res.status(404).send({
-        code: "users/user-not-found",
-        message: "User not found",
-      });
-    }
+    if (!user) throw new Error("User not found");
 
     await user.remove();
 
-    return res.status(200).json({ status: "User deleted" });
+    res.status(200).json({ status: "ok" });
   } catch (error) {
     console.error(error);
-
-    if (error.kind === "ObjectId") {
-      return res.status(403).send({
-        code: "users/id-not-valid",
-        message: "User ID not valid",
-      });
-    }
-
-    return res.status(500).send({ error: "Server error" });
+    next(error);
   }
 };
 
-export const updateUser = async (req, res) => {
+export const updateUser = async (req, res, next) => {
   try {
     const reqUser = req.body;
     const { id } = req.params;
     let user = await User.findById(id);
 
-    if (!user) {
-      return res.status(404).send({
-        code: "users/user-not-found",
-        message: "User not found",
-      });
-    }
+    if (!user) throw new Error("User not found");
 
-    if (!user._id.equals(req.uid) || reqUser.id || reqUser._id) {
-      return res.status(401).send({
-        code: "users/permission-denied",
-        message: "Can't update ID data",
-      });
-    }
+    if (!user._id.equals(req.uid) || reqUser.id || reqUser._id)
+      throw new Error("Permission denied");
 
     if (req.role !== 1) {
       if (reqUser.role) {
-        return res.status(401).send({
-          code: "users/permission-denied",
-          message: "Can't update your role",
-        });
+        throw new Error("Permission denied");
       }
     }
 
     await user.updateOne(reqUser);
 
-    return res.status(200).json({ status: "User updated" });
+    res.status(200).json({ status: "ok" });
   } catch (error) {
     console.error(error);
-
-    if (error.kind === "ObjectId") {
-      return res.status(403).send({
-        code: "users/id-not-valid",
-        message: "User ID not valid",
-      });
-    }
-
-    return res.status(500).send({ error: "Server error" });
+    next(error);
   }
 };

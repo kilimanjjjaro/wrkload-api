@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth.route.js";
 import tasksRouter from "./routes/tasks.route.js";
 import usersRouter from "./routes/users.route.js";
+import errorsHandler from "./middlewares/errorsHandler.js";
 
 const app = express();
 
@@ -29,6 +30,8 @@ app.use(cookieParser());
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/tasks", tasksRouter);
 app.use("/api/v1/users", usersRouter);
+
+app.use(errorsHandler);
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {

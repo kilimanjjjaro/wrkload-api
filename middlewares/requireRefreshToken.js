@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken";
-import { tokenErrors } from "../helpers/tokenManager.js";
 
 // MAKE A MIDDLEWARE TO REQUIRE A REFRESH TOKEN.
 export const requireRefreshToken = (req, res, next) => {
@@ -16,7 +15,6 @@ export const requireRefreshToken = (req, res, next) => {
     next();
   } catch (error) {
     console.error(error);
-
-    return res.status(401).send({ error: tokenErrors[error.message] });
+    next(error);
   }
 };

@@ -45,27 +45,3 @@ export const confirmationTokenGenerator = (email) => {
     console.error(error);
   }
 };
-
-// MAKE RESPONSE FOR TOKEN ERRORS
-export const tokenErrors = {
-  "invalid signature": {
-    code: "auth/invalid-signature",
-    message: "Invalid token signature",
-  },
-  "jwt expired": {
-    code: "auth/token-expired",
-    message: "Token expired",
-  },
-  "jwt malformed": {
-    code: "auth/invalid-token-format",
-    message: "Invalid bearer token format",
-  },
-  "invalid token": {
-    code: "auth/invalid-token",
-    message: "Invalid token",
-  },
-  "Token not found": {
-    code: "auth/token-not-found",
-    message: "Token not found",
-  },
-};
