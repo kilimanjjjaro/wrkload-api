@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  changePassword,
   confirmAccount,
   forgotPassword,
   login,
@@ -10,24 +11,36 @@ import {
   resetPassword,
 } from "../controllers/auth.controller.js";
 import {
-  confirmationTokenParamValidations,
+  changePassDataValidations,
+  confirmationTokenValidations,
+  emailValidations,
   loginDataValidations,
   registryDataValidations,
+  resetPassTokenValidations,
 } from "../middlewares/validateData.js";
 import { requireRefreshToken } from "../middlewares/requireRefreshToken.js";
 const router = Router();
 
 //CREATE ROUTES WITH METHODS TYPES ALLOWED.
-router.post("/register", registryDataValidations, register);
-router.post("/login", loginDataValidations, login);
 router.get("/token", requireRefreshToken, refreshAccessToken);
 router.get("/logout", logout);
-router.patch("/forgot-password", forgotPassword);
-router.patch("/reset-password/:reset_password_token", resetPassword);
-router.post("/resend-confirm-account", reSendConfirmAccountLink);
-router.get(
+router.post("/register", registryDataValidations, register);
+router.post("/login", loginDataValidations, login);
+router.post("/forgot-password", emailValidations, forgotPassword);
+router.post(
+  "/resend-confirm-account",
+  emailValidations,
+  reSendConfirmAccountLink
+);
+router.patch("/change-password", changePassDataValidations, changePassword);
+router.patch(
+  "/reset-password/:reset_password_token",
+  resetPassTokenValidations,
+  resetPassword
+);
+router.patch(
   "/confirm-account/:confirmation_token",
-  confirmationTokenParamValidations,
+  confirmationTokenValidations,
   confirmAccount
 );
 

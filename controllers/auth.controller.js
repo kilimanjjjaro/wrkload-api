@@ -139,23 +139,29 @@ export const reSendConfirmAccountLink = async (req, res, next) => {
   }
 };
 
-export const forgotPassword = async (req, res, next) => {
+export const changePassword = async (req, res, next) => {
   try {
-    const { email } = req.body;
+    const { email, old_password, new_password } = req.body;
+
+    if (!(email, old_password, new_password)) throw new Error("Empty fields");
+
     let user = await User.findOne({ email });
 
-    if (!user) throw new Error("Reset your password");
+    if (!user) throw new Error("User not found");
 
-    const { access_token } = tokenGenerator(user._id);
+    let reqPass = await user.comparePassword(old_password);
 
-    await transporter.sendMail({
-      from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
-      to: user.email,
-      subject: "Reset your password",
-      html: `<a href="http://localhost:5000/api/v1/auth/reset-password/${access_token}">Click to reset your password</a>`,
-    });
+    if (!reqPass) throw new Error("Wrong password");
 
-    res.status(200).json({ status: "ok" });
+    reqPass = await user.comparePassword(new_password);
+
+    if (reqPass) throw new Error("Same new password");
+
+    user.password = new_password;
+
+    await user.save();
+
+    res.status(201).json({ status: "ok" });
   } catch (error) {
     console.error(error);
     next(error);
@@ -182,6 +188,29 @@ export const resetPassword = async (req, res, next) => {
     await user.save();
 
     res.status(201).json({ status: "ok" });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    let user = await User.findOne({ email });
+
+    if (!user) throw new Error("Reset your password");
+
+    const { access_token } = tokenGenerator(user._id);
+
+    await transporter.sendMail({
+      from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
+      to: user.email,
+      subject: "Reset your password",
+      html: `<a href="http://localhost:5000/api/v1/auth/reset-password/${access_token}">Click to reset your password</a>`,
+    });
+
+    res.status(200).json({ status: "ok" });
   } catch (error) {
     console.error(error);
     next(error);

@@ -84,7 +84,15 @@ const errorsHandler = (err, req, res, next) => {
     case "Wrong password":
       return res.status(403).json({
         error: {
-          code: "auth/invalid-password",
+          code: "auth/invalid-credentials",
+          message: "Wrong email or password",
+        },
+      });
+
+    case "Same new password":
+      return res.status(403).json({
+        error: {
+          code: "auth/invalid-credentials",
           message: "Wrong email or password",
         },
       });
@@ -93,7 +101,15 @@ const errorsHandler = (err, req, res, next) => {
       return res.status(403).json({
         error: {
           code: "auth/user-not-found",
-          message: "Check your email for reset your password.",
+          message: "Check your email for reset your password",
+        },
+      });
+
+    case "Empty fields":
+      return res.status(403).json({
+        error: {
+          code: "auth/empty-fields",
+          message: "All fields are required",
         },
       });
 

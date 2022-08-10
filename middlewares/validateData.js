@@ -1,4 +1,4 @@
-import { body, param, validationResult } from "express-validator";
+import { check, param, validationResult } from "express-validator";
 
 export const manageValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
@@ -11,13 +11,13 @@ export const manageValidationErrors = (req, res, next) => {
 };
 
 export const registryDataValidations = [
-  body("username")
+  check("username")
     .trim()
     .notEmpty()
     .withMessage("Username are required")
     .escape()
     .withMessage("Invalid username format"),
-  body("role")
+  check("role")
     .trim()
     .notEmpty()
     .withMessage("Role are required")
@@ -25,7 +25,7 @@ export const registryDataValidations = [
     .isNumeric()
     .withMessage("A data type number is expected")
     .replace(["1"], "2"),
-  body("email")
+  check("email")
     .trim()
     .notEmpty()
     .withMessage("Email are required")
@@ -33,14 +33,14 @@ export const registryDataValidations = [
     .isEmail()
     .withMessage("Incorrect email format")
     .normalizeEmail(),
-  body("avatar")
+  check("avatar")
     .trim()
     .notEmpty()
     .withMessage("Avatar are required")
     .bail()
     .isURL()
     .withMessage("Invalid URL avatar"),
-  body("password")
+  check("password")
     .trim()
     .notEmpty()
     .withMessage("Password are required")
@@ -51,13 +51,13 @@ export const registryDataValidations = [
 ];
 
 export const updateDataValidations = [
-  body("username")
+  check("username")
     .trim()
     .notEmpty()
     .withMessage("Username are required")
     .escape()
     .withMessage("Invalid username format"),
-  body("avatar")
+  check("avatar")
     .trim()
     .notEmpty()
     .withMessage("Avatar are required")
@@ -67,7 +67,7 @@ export const updateDataValidations = [
 ];
 
 export const loginDataValidations = [
-  body("email")
+  check("email")
     .trim()
     .notEmpty()
     .withMessage("Email are required")
@@ -75,7 +75,7 @@ export const loginDataValidations = [
     .isEmail()
     .withMessage("Incorrect email format")
     .normalizeEmail(),
-  body("password")
+  check("password")
     .trim()
     .notEmpty()
     .withMessage("Password are required")
@@ -85,16 +85,53 @@ export const loginDataValidations = [
   manageValidationErrors,
 ];
 
+export const changePassDataValidations = [
+  check("email")
+    .trim()
+    .notEmpty()
+    .withMessage("Email are required")
+    .bail()
+    .isEmail()
+    .withMessage("Incorrect email format")
+    .normalizeEmail(),
+  check("old_password")
+    .trim()
+    .notEmpty()
+    .withMessage("Password are required")
+    .bail()
+    .isLength({ min: 8 })
+    .withMessage("Password must have a minimum of 6 characters"),
+  check("new_password")
+    .trim()
+    .notEmpty()
+    .withMessage("New password are required")
+    .bail()
+    .isLength({ min: 8 })
+    .withMessage("New password must have a minimum of 6 characters"),
+  manageValidationErrors,
+];
+
+export const emailValidations = [
+  check("email")
+    .trim()
+    .notEmpty()
+    .withMessage("Email are required")
+    .bail()
+    .isEmail()
+    .withMessage("Incorrect email format"),
+  manageValidationErrors,
+];
+
 export const taskDataValidations = [
-  body("name").trim().notEmpty().withMessage("Name are required").escape(),
-  body("project")
+  check("name").trim().notEmpty().withMessage("Name are required").escape(),
+  check("project")
     .trim()
     .notEmpty()
     .withMessage("Project are required")
     .escape(),
-  body("timing").trim().notEmpty().withMessage("Timing are required").escape(),
-  body("month").trim().notEmpty().withMessage("Date are required").escape(),
-  body("delivered")
+  check("timing").trim().notEmpty().withMessage("Timing are required").escape(),
+  check("month").trim().notEmpty().withMessage("Date are required").escape(),
+  check("delivered")
     .trim()
     .notEmpty()
     .withMessage("Delivery are required")
@@ -103,7 +140,7 @@ export const taskDataValidations = [
     .withMessage("Invalid date format. ISO8601 required")
     .bail()
     .toDate(),
-  body("description").trim().escape(),
+  check("description").trim().escape(),
   manageValidationErrors,
 ];
 
@@ -118,7 +155,7 @@ export const idParamValidations = [
   manageValidationErrors,
 ];
 
-export const confirmationTokenParamValidations = [
+export const confirmationTokenValidations = [
   param("confirmation_token")
     .trim()
     .notEmpty()
@@ -126,5 +163,16 @@ export const confirmationTokenParamValidations = [
     .bail()
     .escape()
     .withMessage("Invalid confirmation token param format"),
+  manageValidationErrors,
+];
+
+export const resetPassTokenValidations = [
+  param("reset_password_token")
+    .trim()
+    .notEmpty()
+    .withMessage("Reset password token are required")
+    .bail()
+    .escape()
+    .withMessage("Invalid reset password token param format"),
   manageValidationErrors,
 ];
