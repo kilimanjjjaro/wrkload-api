@@ -65,6 +65,14 @@ const errorsHandler = (err, req, res, next) => {
         },
       });
 
+    case "Account already confirmed":
+      return res.status(401).json({
+        error: {
+          code: "auth/account-already-confirmed",
+          message: "This account is already confirmed",
+        },
+      });
+
     case "Account not confirmed":
       return res.status(401).json({
         error: {
@@ -146,9 +154,12 @@ const errorsHandler = (err, req, res, next) => {
         error: { code: "users/users-not-found", message: "Users not found" },
       });
 
-    case "User not found":
+    case "User doesn't exist":
       return res.status(404).json({
-        error: { code: "users/user-not-found", message: "User not found" },
+        error: {
+          code: "users/user-not-found",
+          message: "This user doesn't exist",
+        },
       });
 
     // UNTRACKED ERRORS

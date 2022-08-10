@@ -20,7 +20,7 @@ export const getUser = async (req, res, next) => {
     const { id } = req.params;
     const user = await User.findById(id);
 
-    if (!user) throw new Error("User not found");
+    if (!user) throw new Error("User doesn't exist");
 
     if (!user._id.equals(req.uid) && req.role !== 1)
       throw new Error("Permission denied");

@@ -26,12 +26,12 @@ export const register = async (req, res, next) => {
 
     await user.save();
 
-    // await transporter.sendMail({
-    //   from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
-    //   to: user.email,
-    //   subject: "Confirm your account",
-    //   html: `<a href="http://localhost:5000/api/v1/auth/confirm-account/${user.confirmation_token}">Click to confirm account</a>`,
-    // });
+    await transporter.sendMail({
+      from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
+      to: user.email,
+      subject: "Confirm your account",
+      html: `<a href="http://localhost:5000/api/v1/auth/confirm-account/${user.confirmation_token}">Click to confirm account</a>`,
+    });
 
     const { access_token, expiresIn } = tokenGenerator(user._id, user.role);
     refreshTokenGenerator(user._id, user.role, res);
@@ -88,9 +88,10 @@ export const logout = (req, res) => {
 export const confirmAccount = async (req, res, next) => {
   try {
     const { confirmation_token } = req.params;
+
     let user = await User.findOne({ confirmation_token });
 
-    if (!user) throw new Error("User not found");
+    if (!user) throw new Error("Account already confirmed");
 
     const { email } = jwt.verify(
       confirmation_token,
@@ -103,6 +104,33 @@ export const confirmAccount = async (req, res, next) => {
     user.confirmation_token = null;
 
     await user.save();
+
+    res.status(201).json({ status: "ok" });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+export const reSendConfirmAccountLink = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    let user = await User.findOne({ email });
+
+    if (!user) throw new Error("User not found");
+
+    if (user.confirmation_status) throw new Error("Account already confirmed");
+
+    user.confirmation_token = confirmationTokenGenerator(email);
+
+    await user.save();
+
+    await transporter.sendMail({
+      from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
+      to: user.email,
+      subject: "Confirm your account",
+      html: `<a href="http://localhost:5000/api/v1/auth/confirm-account/${user.confirmation_token}">Click to confirm account</a>`,
+    });
 
     res.status(201).json({ status: "ok" });
   } catch (error) {

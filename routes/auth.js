@@ -6,6 +6,7 @@ import {
   logout,
   refreshAccessToken,
   register,
+  reSendConfirmAccountLink,
   resetPassword,
 } from "../controllers/auth.controller.js";
 import {
@@ -23,6 +24,7 @@ router.get("/token", requireRefreshToken, refreshAccessToken);
 router.get("/logout", logout);
 router.patch("/forgot-password", forgotPassword);
 router.patch("/reset-password/:reset_password_token", resetPassword);
+router.post("/resend-confirm-account", reSendConfirmAccountLink);
 router.get(
   "/confirm-account/:confirmation_token",
   confirmationTokenParamValidations,

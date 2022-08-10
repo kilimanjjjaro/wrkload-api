@@ -34,7 +34,7 @@ export const refreshTokenGenerator = (uid, role, res) => {
 };
 
 export const confirmationTokenGenerator = (email) => {
-  const expiresIn = 60 * 15;
+  const expiresIn = 60;
 
   try {
     const access_token = jwt.sign({ email }, process.env.CONFIRMATION_KEY, {
