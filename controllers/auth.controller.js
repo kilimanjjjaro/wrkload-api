@@ -8,7 +8,6 @@ import {
   tokenGenerator,
 } from "../helpers/tokenManager.js";
 
-// MAKE A CONTRROLLER TO REGISTRY A USER ON DATABASE AND GENERATE AN ACCESS & REFRESH TOKEN.
 export const register = async (req, res, next) => {
   try {
     const { username, role, email, avatar, password } = req.body;
@@ -27,12 +26,12 @@ export const register = async (req, res, next) => {
 
     await user.save();
 
-    await transporter.sendMail({
-      from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
-      to: user.email,
-      subject: "Confirm your account",
-      html: `<a href="http://localhost:5000/api/v1/auth/confirm-account/${user.confirmation_token}">Click to confirm account</a>`,
-    });
+    // await transporter.sendMail({
+    //   from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
+    //   to: user.email,
+    //   subject: "Confirm your account",
+    //   html: `<a href="http://localhost:5000/api/v1/auth/confirm-account/${user.confirmation_token}">Click to confirm account</a>`,
+    // });
 
     const { access_token, expiresIn } = tokenGenerator(user._id, user.role);
     refreshTokenGenerator(user._id, user.role, res);
@@ -44,7 +43,6 @@ export const register = async (req, res, next) => {
   }
 };
 
-// MAKE A CONTROLLER TO LOGIN AND GENERATE AN ACCESS & REFRESH TOKEN.
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -68,7 +66,6 @@ export const login = async (req, res, next) => {
   }
 };
 
-// CREATE A CONTROLLER TO GET A NEW ACCESS TOKEN FROM AN EXISTING REFRESH TOKEN SENDED FROM requireRefreshToken MIDDLEWARE.
 export const refreshAccessToken = (req, res, next) => {
   try {
     const { access_token, expiresIn } = tokenGenerator(
@@ -83,13 +80,11 @@ export const refreshAccessToken = (req, res, next) => {
   }
 };
 
-// CREATE A CONTROLLER TO LOGOUT DELETING THE REFRESH TOKEN.
 export const logout = (req, res) => {
   res.clearCookie("refresh_token");
   res.status(200).json({ status: "ok" });
 };
 
-// MAKE A CONTROLLER TO CONFIRM ACCOUNT.
 export const confirmAccount = async (req, res, next) => {
   try {
     const { confirmation_token } = req.params;
@@ -116,7 +111,6 @@ export const confirmAccount = async (req, res, next) => {
   }
 };
 
-// MAKE A CONTROLLER TO FORGOT PASSWORD.
 export const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
@@ -140,7 +134,6 @@ export const forgotPassword = async (req, res, next) => {
   }
 };
 
-// MAKE A CONTROLLER TO RESET PASSWORD.
 export const resetPassword = async (req, res, next) => {
   try {
     const { reset_password_token } = req.params;

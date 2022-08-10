@@ -1,6 +1,5 @@
 import { body, param, validationResult } from "express-validator";
 
-// CREATE A MIDDLEWARE TO MANAGE ERRORS FROM DATA VALIDATIONS.
 export const manageValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
 
@@ -11,7 +10,6 @@ export const manageValidationErrors = (req, res, next) => {
   next();
 };
 
-// CREATE VALIDATIONS FOR DATA TYPES
 export const registryDataValidations = [
   body("username")
     .trim()
@@ -50,6 +48,22 @@ export const registryDataValidations = [
     .isLength({ min: 8 })
     .withMessage("Password must have a minimum of 6 characters"),
   manageValidationErrors,
+];
+
+export const updateDataValidations = [
+  body("username")
+    .trim()
+    .notEmpty()
+    .withMessage("Username are required")
+    .escape()
+    .withMessage("Invalid username format"),
+  body("avatar")
+    .trim()
+    .notEmpty()
+    .withMessage("Avatar are required")
+    .bail()
+    .isURL()
+    .withMessage("Invalid URL avatar"),
 ];
 
 export const loginDataValidations = [

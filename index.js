@@ -3,9 +3,9 @@ import "./database/connectdb.js";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import authRouter from "./routes/auth.route.js";
-import tasksRouter from "./routes/tasks.route.js";
-import usersRouter from "./routes/users.route.js";
+import authRouter from "./routes/auth.js";
+import tasksRouter from "./routes/tasks.js";
+import usersRouter from "./routes/users.js";
 import errorsHandler from "./middlewares/errorsHandler.js";
 
 const app = express();

@@ -62,22 +62,30 @@ export const deleteUser = async (req, res, next) => {
 
 export const updateUser = async (req, res, next) => {
   try {
-    const reqUser = req.body;
+    let reqUser;
     const { id } = req.params;
-    let user = await User.findById(id);
+    const user = await User.findById(id);
 
     if (!user) throw new Error("User not found");
 
-    if (!user._id.equals(req.uid) || reqUser.id || reqUser._id)
-      throw new Error("Permission denied");
-
-    if (req.role !== 1) {
-      if (reqUser.role) {
-        throw new Error("Permission denied");
+    for (const key of Object.keys(req.body)) {
+      if (req.body[key]) {
+        reqUser = Object.assign({}, reqUser, {
+          [key]: req.body[key],
+        });
       }
     }
 
-    await user.updateOne(reqUser);
+    if (
+      !user._id.equals(req.uid) ||
+      reqUser.id ||
+      reqUser._id ||
+      reqUser.password ||
+      reqUser.role
+    )
+      throw new Error("Permission denied");
+
+    await user.updateOne({ $set: reqUser });
 
     res.status(200).json({ status: "ok" });
   } catch (error) {

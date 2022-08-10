@@ -83,19 +83,27 @@ export const deleteTask = async (req, res, next) => {
 
 export const updateTask = async (req, res, next) => {
   try {
-    const reqTask = req.body;
+    let reqTask;
     const { id } = req.params;
-    let task = await Task.findById(id);
+    const task = await Task.findById(id);
 
     if (!task) throw new Error("Task not found");
 
     if (!task.author_id.equals(req.uid))
       throw new Error("Can't update other authors tasks");
 
+    for (const key of Object.keys(req.body)) {
+      if (req.body[key]) {
+        reqTask = Object.assign({}, reqTask, {
+          [key]: req.body[key],
+        });
+      }
+    }
+
     if (reqTask.author_id || reqTask.id || reqTask._id)
       throw new Error("Can't update ID data");
 
-    await task.updateOne(reqTask);
+    await task.updateOne({ $set: reqUser });
 
     res.status(200).json({ status: "ok" });
   } catch (error) {

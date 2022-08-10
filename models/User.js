@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import bcryptjs from "bcryptjs";
 
-// MAKE A SCHEMA FOR USER DATA.
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -19,7 +18,6 @@ const userSchema = new mongoose.Schema({
     trim: true,
     unique: true,
     lowercase: true,
-    index: { unique: true },
   },
   avatar: {
     type: String,
@@ -41,7 +39,6 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-// MAKE A PRE STEP TO ENCRYPT USER PASSWORD BEFORE SAVE DATA.
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     return next();
@@ -57,7 +54,6 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-// MAKE A METHOD TO VALIDATE PASSWORD SENDEND BY USER ON LOGIN WITH PASSWORD SAVED ON DATABASE.
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcryptjs.compare(candidatePassword, this.password);
 };

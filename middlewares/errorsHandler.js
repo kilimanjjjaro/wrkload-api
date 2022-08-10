@@ -154,7 +154,7 @@ const errorsHandler = (err, req, res, next) => {
     // UNTRACKED ERRORS
     default:
       return res.status(500).json({
-        error: { code: "server/unknown-error", message: err.message },
+        error: { code: "server/unhandled-error", message: err.message },
       });
   }
 };

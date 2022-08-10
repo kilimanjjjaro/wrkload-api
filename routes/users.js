@@ -9,6 +9,7 @@ import { requireAccessToken } from "../middlewares/requireAccessToken.js";
 import {
   idParamValidations,
   registryDataValidations,
+  updateDataValidations,
 } from "../middlewares/validateData.js";
 const router = Router();
 
@@ -19,7 +20,7 @@ router.patch(
   "/:id",
   requireAccessToken,
   idParamValidations,
-  registryDataValidations,
+  updateDataValidations,
   updateUser
 );
 
