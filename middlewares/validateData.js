@@ -145,7 +145,7 @@ export const taskDataValidations = [
 ];
 
 export const idParamValidations = [
-  param("id")
+  param("uid")
     .trim()
     .notEmpty()
     .withMessage("ID are required")
@@ -166,7 +166,7 @@ export const confirmationTokenValidations = [
   manageValidationErrors,
 ];
 
-export const resetPassTokenValidations = [
+export const resetPassDataValidations = [
   param("reset_password_token")
     .trim()
     .notEmpty()
@@ -174,5 +174,12 @@ export const resetPassTokenValidations = [
     .bail()
     .escape()
     .withMessage("Invalid reset password token param format"),
+  check("new_password")
+    .trim()
+    .notEmpty()
+    .withMessage("New password are required")
+    .bail()
+    .isLength({ min: 8 })
+    .withMessage("New password must have a minimum of 6 characters"),
   manageValidationErrors,
 ];

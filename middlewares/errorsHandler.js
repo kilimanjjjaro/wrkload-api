@@ -97,7 +97,7 @@ const errorsHandler = (err, req, res, next) => {
         },
       });
 
-    case "Reset your password":
+    case "User not found to reset password":
       return res.status(403).json({
         error: {
           code: "auth/user-not-found",

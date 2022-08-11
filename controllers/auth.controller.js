@@ -5,6 +5,7 @@ import { User } from "../models/User.js";
 import {
   confirmationTokenGenerator,
   refreshTokenGenerator,
+  resetPassTokenGenerator,
   tokenGenerator,
 } from "../helpers/tokenManager.js";
 
@@ -95,7 +96,7 @@ export const confirmAccount = async (req, res, next) => {
 
     const { email } = jwt.verify(
       confirmation_token,
-      process.env.CONFIRMATION_KEY
+      process.env.CONFIRMATION_ACCOUNT_KEY
     );
 
     if (email !== user.email) throw new Error("Invalid token");
@@ -168,49 +169,55 @@ export const changePassword = async (req, res, next) => {
   }
 };
 
-export const resetPassword = async (req, res, next) => {
+export const forgotPassword = async (req, res, next) => {
   try {
-    const { reset_password_token } = req.params;
-    const { password } = req.body;
+    const { email } = req.body;
+    let user = await User.findOne({ email });
 
-    if (!reset_password_token) throw new Error("Invalid reset link");
+    if (!user) throw new Error("User not found to reset password");
 
-    if (!password) throw new Error("New password is required");
+    const { reset_password_token } = resetPassTokenGenerator(
+      user._id,
+      user.password
+    );
 
-    const { uid } = jwt.verify(reset_password_token, process.env.ACCESS_KEY);
+    await transporter.sendMail({
+      from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
+      to: user.email,
+      subject: "Reset your password",
+      html: `<a href="http://localhost:5000/api/v1/auth/reset-password/${user._id}/${reset_password_token}">Click to reset your password</a>`,
+    });
 
-    let user = await User.findOne({ _id: uid });
-
-    if (!user) throw new Error("User not found");
-
-    user.password = password;
-
-    await user.save();
-
-    res.status(201).json({ status: "ok" });
+    res.status(200).json({ status: "ok" });
   } catch (error) {
     console.error(error);
     next(error);
   }
 };
 
-export const forgotPassword = async (req, res, next) => {
+export const resetPassword = async (req, res, next) => {
   try {
-    const { email } = req.body;
-    let user = await User.findOne({ email });
+    const { uid, reset_password_token } = req.params;
+    const { new_password } = req.body;
 
-    if (!user) throw new Error("Reset your password");
+    if (!(uid, reset_password_token)) throw new Error("Invalid reset link");
+    if (!new_password) throw new Error("New password is required");
 
-    const { access_token } = tokenGenerator(user._id);
+    let user = await User.findOne({ _id: uid });
 
-    await transporter.sendMail({
-      from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
-      to: user.email,
-      subject: "Reset your password",
-      html: `<a href="http://localhost:5000/api/v1/auth/reset-password/${access_token}">Click to reset your password</a>`,
-    });
+    if (!user) throw new Error("User not found");
 
-    res.status(200).json({ status: "ok" });
+    let token = process.env.RESET_PASSWORD_KEY + user.password;
+
+    const { uid: id } = jwt.verify(reset_password_token, token);
+
+    if (!user._id.equals(id)) throw new Error("Invalid token");
+
+    user.password = new_password;
+
+    await user.save();
+
+    res.status(201).json({ status: "ok" });
   } catch (error) {
     console.error(error);
     next(error);

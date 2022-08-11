@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
 
-// MAKE A HELPER/UTILITY TO GENERATE AN ACCESS TOKEN.
 export const tokenGenerator = (uid, role) => {
   const expiresIn = 60 * 15;
 
@@ -14,7 +13,6 @@ export const tokenGenerator = (uid, role) => {
   }
 };
 
-// MAKE A HELPER/UTILITY TO GENERATE A REFRESH TOKEN.
 export const refreshTokenGenerator = (uid, role, res) => {
   const expiresIn = 60 * 60 * 24 * 30;
 
@@ -37,10 +35,28 @@ export const confirmationTokenGenerator = (email) => {
   const expiresIn = 60 * 15;
 
   try {
-    const access_token = jwt.sign({ email }, process.env.CONFIRMATION_KEY, {
+    const confirmation_token = jwt.sign(
+      { email },
+      process.env.CONFIRMATION_ACCOUNT_KEY,
+      {
+        expiresIn,
+      }
+    );
+    return confirmation_token;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const resetPassTokenGenerator = (uid, password) => {
+  const expiresIn = 60 * 15;
+  let token = process.env.RESET_PASSWORD_KEY + password;
+
+  try {
+    const reset_password_token = jwt.sign({ uid }, token, {
       expiresIn,
     });
-    return access_token;
+    return { reset_password_token, expiresIn };
   } catch (error) {
     console.error(error);
   }

@@ -14,9 +14,10 @@ import {
   changePassDataValidations,
   confirmationTokenValidations,
   emailValidations,
+  idParamValidations,
   loginDataValidations,
   registryDataValidations,
-  resetPassTokenValidations,
+  resetPassDataValidations,
 } from "../middlewares/validateData.js";
 import { requireRefreshToken } from "../middlewares/requireRefreshToken.js";
 const router = Router();
@@ -34,8 +35,9 @@ router.post(
 );
 router.patch("/change-password", changePassDataValidations, changePassword);
 router.patch(
-  "/reset-password/:reset_password_token",
-  resetPassTokenValidations,
+  "/reset-password/:uid/:reset_password_token",
+  idParamValidations,
+  resetPassDataValidations,
   resetPassword
 );
 router.patch(
