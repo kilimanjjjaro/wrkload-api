@@ -145,13 +145,24 @@ export const taskDataValidations = [
 ];
 
 export const idParamValidations = [
-  param("uid")
+  param("id")
     .trim()
     .notEmpty()
     .withMessage("ID are required")
     .bail()
     .escape()
     .withMessage("Invalid ID param format"),
+  manageValidationErrors,
+];
+
+export const uidParamValidations = [
+  param("uid")
+    .trim()
+    .notEmpty()
+    .withMessage("User ID are required")
+    .bail()
+    .escape()
+    .withMessage("Invalid user ID param format"),
   manageValidationErrors,
 ];
 
