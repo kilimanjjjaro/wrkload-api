@@ -22,7 +22,7 @@ wrkload API is a simple, easy-to-use API REST developed to be used as backend by
 
 wrkload API is a simple, easy-to-use API REST developed to be used as backend by an app. It offers the possibility to a user to keep organized and documented the time he was working on his tasks.
 
-**Key features of wrkload API**:
+**Key features of wrkload API**
 
 - Configurable README.md template
 
@@ -30,41 +30,48 @@ wrkload API is a simple, easy-to-use API REST developed to be used as backend by
 
 ## Built With
 
-- [GitHub Flavored Markdown Spec](https://github.github.com/gfm/)
-- [Cookiecutter](https://github.com/cookiecutter/cookiecutter)
-- [GitHub Actions](https://github.com/features/actions)
-- [markdownlint-cli](https://github.com/igorshubovych/markdownlint-cli)
+- [Node.js](https//github.com/nodejs/node)
+- [Express.js](https//github.com/expressjs/express)
+- [Express validator](https//github.com/express-validator/express-validator)
+- [MongoDB](https//www.mongodb.com/)
+- [Mongoose](https//github.com/Automattic/mongoose)
+- [JSON Web Tokens](https//jwt.io/)
+- [bcrypt.js](https//github.com/dcodeIO/bcrypt.js)
+- [cookie-parser](https//github.com/expressjs/cookie-parser)
+- [cors](https//github.com/expressjs/cors)
+- [dotenv](https//github.com/motdotla/dotenv)
+- [Nodemailer](https//github.com/nodemailer/nodemailer)
 
 <br>
 
 ## Quick Start
 
-The quickest way to get started with express is to utilize the executable [`express(1)`](https://github.com/expressjs/generator) to generate an application as shown below:
-Install the executable. The executable's major version will match Express's:
+The quickest way to get started with express is to utilize the executable [`express(1)`](https//github.com/expressjs/generator) to generate an application as shown below
+Install the executable. The executable's major version will match Express's
 
 ```console
 $ npm install -g express-generator@4
 ```
 
-Create the app:
+Create the app
 
 ```console
 $ express /tmp/foo && cd /tmp/foo
 ```
 
-Install dependencies:
+Install dependencies
 
 ```console
 $ npm install
 ```
 
-Start the server:
+Start the server
 
 ```console
 $ npm start
 ```
 
-View the website at: http://localhost:3000
+View the website at http//localhost3000
 
 <br>
 
@@ -84,7 +91,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 ```
 
 | Request body | Type     | Required | Description                        |
-| :----------- | :------- | :------- | :--------------------------------- |
+| ------------ | -------- | -------- | ---------------------------------- |
 | `username`   | `string` | `true`   | Name of the new user.              |
 | `email`      | `string` | `true`   | Valid email of the new user.       |
 | `avatar`     | `string` | `true`   | URL of image.                      |
@@ -99,7 +106,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 ```
 
 | Request body | Type     | Required | Description                        |
-| :----------- | :------- | :------- | :--------------------------------- |
+| ------------ | -------- | -------- | ---------------------------------- |
 | `email`      | `string` | `true`   | Valid email of the new user.       |
 | `password`   | `string` | `true`   | Password of at least 8 characters. |
 
@@ -114,7 +121,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 ```
 
 | Request parameters   | Type     | Required | Description                                                    |
-| :------------------- | :------- | :------- | :------------------------------------------------------------- |
+| -------------------- | -------- | -------- | -------------------------------------------------------------- |
 | `confirmation_token` | `string` | `true`   | Valid JWT token generated at registry and distributed by mail. |
 
 <br>
@@ -126,7 +133,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 ```
 
 | Request body | Type     | Required | Description                  |
-| :----------- | :------- | :------- | :--------------------------- |
+| ------------ | -------- | -------- | ---------------------------- |
 | `email`      | `string` | `true`   | Valid email of the new user. |
 
 <br>
@@ -138,11 +145,11 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 ```
 
 | HTTP Headers    | Type           | Required | Description                                              |
-| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| --------------- | -------------- | -------- | -------------------------------------------------------- |
 | `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
 
 | Request body   | Type     | Required | Description                        |
-| :------------- | :------- | :------- | :--------------------------------- |
+| -------------- | -------- | -------- | ---------------------------------- |
 | `email`        | `string` | `true`   | Valid email of the new user.       |
 | `old_password` | `string` | `true`   | Password of at least 8 characters. |
 | `new_password` | `string` | `true`   | Password of at least 8 characters. |
@@ -156,7 +163,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 ```
 
 | Request body | Type     | Required | Description                  |
-| :----------- | :------- | :------- | :--------------------------- |
+| ------------ | -------- | -------- | ---------------------------- |
 | `email`      | `string` | `true`   | Valid email of the new user. |
 
 <br>
@@ -168,12 +175,12 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 ```
 
 | Request parameters     | Type     | Required | Description                                           |
-| :--------------------- | :------- | :------- | :---------------------------------------------------- |
+| ---------------------- | -------- | -------- | ----------------------------------------------------- |
 | `uid`                  | `string` | `true`   | User ID.                                              |
 | `reset_password_token` | `string` | `true`   | Valid JWT token generated at forgot password request. |
 
 | Request body   | Type     | Required | Description                        |
-| :------------- | :------- | :------- | :--------------------------------- |
+| -------------- | -------- | -------- | ---------------------------------- |
 | `new_password` | `string` | `true`   | Password of at least 8 characters. |
 
 <br>
@@ -185,7 +192,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 ```
 
 | Cookies         | Type       | Required | Description                                                                                 |
-| :-------------- | :--------- | :------- | :------------------------------------------------------------------------------------------ |
+| --------------- | ---------- | -------- | ------------------------------------------------------------------------------------------- |
 | `refresh_token` | `HttpOnly` | `true`   | Valid JWT token generated at login stored in cookie only accessible through https requests. |
 
 <br>
@@ -197,11 +204,11 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 ```
 
 | HTTP Headers    | Type           | Required | Description                                              |
-| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| --------------- | -------------- | -------- | -------------------------------------------------------- |
 | `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
 
 | Cookies         | Type       | Required | Description                                                                                     |
-| :-------------- | :--------- | :------- | :---------------------------------------------------------------------------------------------- |
+| --------------- | ---------- | -------- | ----------------------------------------------------------------------------------------------- |
 | `refresh_token` | `HttpOnly` | `true`   | Valid JWT token generated at login and stored in cookie only accessible through https requests. |
 
 </details>
@@ -222,16 +229,16 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 ```
 
 | HTTP Headers    | Type           | Required | Description                                              |
-| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| --------------- | -------------- | -------- | -------------------------------------------------------- |
 | `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
 
 | Request parameters | Type     | Required | Description                               |
-| :----------------- | :------- | :------- | :---------------------------------------- |
+| ------------------ | -------- | -------- | ----------------------------------------- |
 | `per_page`         | `string` | `false`  | The number of results to return per page. |
 | `page`             | `string` | `false`  | Use this to page through the results.     |
 
 | Response body | Type     | Description                                           |
-| :------------ | :------- | :---------------------------------------------------- |
+| ------------- | -------- | ----------------------------------------------------- |
 | `_id`         | `string` | Task ID.                                              |
 | `name`        | `string` | Name of task.                                         |
 | `author_id`   | `string` | Author ID of task.                                    |
@@ -252,11 +259,11 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 ```
 
 | HTTP Headers    | Type           | Required | Description                                              |
-| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| --------------- | -------------- | -------- | -------------------------------------------------------- |
 | `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
 
 | Request parameters | Type     | Required | Description |
-| :----------------- | :------- | :------- | :---------- |
+| ------------------ | -------- | -------- | ----------- |
 | `id`               | `string` | `true`   | Task ID.    |
 
 <br>
@@ -268,11 +275,11 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 ```
 
 | HTTP Headers    | Type           | Required | Description                                              |
-| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| --------------- | -------------- | -------- | -------------------------------------------------------- |
 | `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
 
 | Request body  | Type     | Required | Description                                           |
-| :------------ | :------- | :------- | :---------------------------------------------------- |
+| ------------- | -------- | -------- | ----------------------------------------------------- |
 | `name`        | `string` | `true`   | Name of task.                                         |
 | `project`     | `string` | `true`   | Task project name.                                    |
 | `timing`      | `string` | `true`   | Time the task was completed.                          |
@@ -291,15 +298,15 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 ```
 
 | HTTP Headers    | Type           | Required | Description                                              |
-| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| --------------- | -------------- | -------- | -------------------------------------------------------- |
 | `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
 
 | Request parameters | Type     | Required | Description |
-| :----------------- | :------- | :------- | :---------- |
+| ------------------ | -------- | -------- | ----------- |
 | `id`               | `string` | `true`   | Task ID.    |
 
 | Request body  | Type     | Required | Description                   |
-| :------------ | :------- | :------- | :---------------------------- |
+| ------------- | -------- | -------- | ----------------------------- |
 | `name`        | `string` | `true`   | Name of task.                 |
 | `project`     | `string` | `true`   | Task project name.            |
 | `timing`      | `string` | `true`   | Time the task was completed.  |
@@ -318,11 +325,11 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 ```
 
 | HTTP Headers    | Type           | Required | Description                                              |
-| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| --------------- | -------------- | -------- | -------------------------------------------------------- |
 | `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
 
 | Request parameters | Type     | Required | Description |
-| :----------------- | :------- | :------- | :---------- |
+| ------------------ | -------- | -------- | ----------- |
 | `id`               | `string` | `true`   | ID task.    |
 
 </details>
@@ -343,16 +350,16 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 ```
 
 | HTTP Headers    | Type           | Required | Description                                              |
-| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| --------------- | -------------- | -------- | -------------------------------------------------------- |
 | `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
 
 | Request parameters | Type     | Required | Description                               |
-| :----------------- | :------- | :------- | :---------------------------------------- |
+| ------------------ | -------- | -------- | ----------------------------------------- |
 | `per_page`         | `string` | `false`  | The number of results to return per page. |
 | `page`             | `string` | `false`  | Use this to page through the results.     |
 
 | Response body         | Type      | Description                            |
-| :-------------------- | :-------- | :------------------------------------- |
+| --------------------- | --------- | -------------------------------------- |
 | `_id`                 | `string`  | User ID.                               |
 | `username`            | `string`  | Name of user.                          |
 | `role`                | `number`  | Role of user.                          |
@@ -372,15 +379,15 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 ```
 
 | HTTP Headers    | Type           | Required | Description                                              |
-| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| --------------- | -------------- | -------- | -------------------------------------------------------- |
 | `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
 
 | Request parameters | Type     | Required | Description |
-| :----------------- | :------- | :------- | :---------- |
+| ------------------ | -------- | -------- | ----------- |
 | `id`               | `string` | `true`   | User ID.    |
 
 | Response body | Type     | Description              |
-| :------------ | :------- | :----------------------- |
+| ------------- | -------- | ------------------------ |
 | `_id`         | `string` | User ID.                 |
 | `username`    | `string` | Name of user.            |
 | `email`       | `string` | Valid email of new user. |
@@ -397,15 +404,15 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 ```
 
 | HTTP Headers    | Type           | Required | Description                                              |
-| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| --------------- | -------------- | -------- | -------------------------------------------------------- |
 | `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
 
 | Request parameters | Type     | Required | Description |
-| :----------------- | :------- | :------- | :---------- |
+| ------------------ | -------- | -------- | ----------- |
 | `id`               | `string` | `true`   | User ID.    |
 
 | Request body | Type     | Required                 | Description |
-| :----------- | :------- | :----------------------- | :---------- |
+| ------------ | -------- | ------------------------ | ----------- |
 | `username`   | `string` | New name of user.        |
 | `email`      | `string` | New valid email of user. |
 | `avatar`     | `string` | URL of new image.        |
@@ -421,11 +428,11 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 ```
 
 | HTTP Headers    | Type           | Required | Description                                              |
-| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| --------------- | -------------- | -------- | -------------------------------------------------------- |
 | `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
 
 | Request parameters | Type     | Required | Description |
-| :----------------- | :------- | :------- | :---------- |
+| ------------------ | -------- | -------- | ----------- |
 | `id`               | `string` | `true`   | User ID.    |
 
 </details>
