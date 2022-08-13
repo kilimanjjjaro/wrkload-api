@@ -15,7 +15,9 @@ wrkload API is a simple, easy-to-use API REST developed to be used as backend by
   - [Users API](#users-api)
 - [Environment variables](#environment-variables)
 - [Roadmap](#roadmap)
+- [Contributing](#contributing)
 - [License](#license)
+- [Acknowledgements](#acknowledgements)
 
 <br>
 
@@ -469,6 +471,33 @@ Obviously, you can suggest new challenges on [GitHub discussions](https://github
 
 <br>
 
+## Contributing
+
+First off, thanks for taking the time to contribute! Contributions are what makes the open-source community such an amazing place to learn, inspire, and create. Any contributions you make will benefit everybody (especially me) else and are **greatly appreciated**.
+
+Please be kind and try to create bug reports that are:
+
+- _Reproducible._ Include steps to reproduce the problem.
+- _Specific._ Include as much detail as possible: which version, what environment, etc.
+- _Unique._ Do not duplicate existing opened issues.
+- _Scoped to a Single Bug._ One bug per report.
+
+<br>
+
 ## License
 
 This project was developed under the **GPL-3.0 license**, see the [LICENSE](./LICENSE.md) file in the project root for the full license text.
+
+<br>
+
+## Acknowledgements
+
+Thanks for these awesome resources that were used during the development:
+
+- <https://mailtrap.io>
+- <https://www.thunderclient.com>
+- <https://www.postman.com>
+- <https://www.grc.com/passwords.htm>
+- <https://unlayer.com/>
+- <https://code.visualstudio.com>
+- <https://yerbaverdeflor.com>
