@@ -1,6 +1,7 @@
-# Wrkload API
+# wrkload API
 
-wrkload API is a simple, easy-to-use API that is focused on the documentation of the time that a user takes to do a task.
+wrkload API is a simple, easy-to-use API used by web app as backend. That is focused on the documentation of the time that a user takes to do a task.
+
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
@@ -16,12 +17,12 @@ wrkload API is a simple, easy-to-use API that is focused on the documentation of
   POST /api/v1/auth/register
 ```
 
-| Request object | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `username`      | `string` | `true` | Name of the new user. |
-| `email`      | `string` | `true` | Valid email of the new user. |
-| `avatar`      | `string` | `true` | URL of image. |
-| `password`      | `string` | `true` | Password of at least 8 characters. |
+| Request body | Type     | Required | Description                        |
+| :----------- | :------- | :------- | :--------------------------------- |
+| `username`   | `string` | `true`   | Name of the new user.              |
+| `email`      | `string` | `true`   | Valid email of the new user.       |
+| `avatar`     | `string` | `true`   | URL of image.                      |
+| `password`   | `string` | `true`   | Password of at least 8 characters. |
 
 <br>
 
@@ -30,23 +31,25 @@ wrkload API is a simple, easy-to-use API that is focused on the documentation of
 ```
   POST /api/v1/auth/login
 ```
-| Request object | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `email`      | `string` | `true` | Valid email of the new user. |
-| `password`      | `string` | `true` | Password of at least 8 characters. |
+
+| Request body | Type     | Required | Description                        |
+| :----------- | :------- | :------- | :--------------------------------- |
+| `email`      | `string` | `true`   | Valid email of the new user.       |
+| `password`   | `string` | `true`   | Password of at least 8 characters. |
 
 <br>
 
 ### Confirm account
+
 #### Link with confirmation token sent by email.
 
 ```
   PATCH /api/v1/auth/confirm-account/${confirmation_token}
 ```
 
-| Request parameters | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `confirmation_token`      | `string` | `true` | Valid JWT token generated at registry and distributed by mail. |
+| Request parameters   | Type     | Required | Description                                                    |
+| :------------------- | :------- | :------- | :------------------------------------------------------------- |
+| `confirmation_token` | `string` | `true`   | Valid JWT token generated at registry and distributed by mail. |
 
 <br>
 
@@ -56,9 +59,9 @@ wrkload API is a simple, easy-to-use API that is focused on the documentation of
   POST /api/v1/auth/resend-confirm-account
 ```
 
-| Request object | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `email`      | `string` | `true` | Valid email of the new user. |
+| Request body | Type     | Required | Description                  |
+| :----------- | :------- | :------- | :--------------------------- |
+| `email`      | `string` | `true`   | Valid email of the new user. |
 
 <br>
 
@@ -68,15 +71,15 @@ wrkload API is a simple, easy-to-use API that is focused on the documentation of
   PATCH /api/v1/auth/change-password
 ```
 
-| HTTP Headers | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `Authorization`      | `bearer token` | `true` | Valid JWT token generated at login and stored in memory. |
+| HTTP Headers    | Type           | Required | Description                                              |
+| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
 
-| Request object | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `email`      | `string` | `true` | Valid email of the new user. |
-| `old_password`      | `string` | `true` | Password of at least 8 characters. |
-| `new_password`      | `string` | `true` | Password of at least 8 characters. |
+| Request body   | Type     | Required | Description                        |
+| :------------- | :------- | :------- | :--------------------------------- |
+| `email`        | `string` | `true`   | Valid email of the new user.       |
+| `old_password` | `string` | `true`   | Password of at least 8 characters. |
+| `new_password` | `string` | `true`   | Password of at least 8 characters. |
 
 <br>
 
@@ -85,9 +88,10 @@ wrkload API is a simple, easy-to-use API that is focused on the documentation of
 ```
   POST /api/v1/auth/forgot-password
 ```
-| Request object | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `email`      | `string` | `true` | Valid email of the new user. |
+
+| Request body | Type     | Required | Description                  |
+| :----------- | :------- | :------- | :--------------------------- |
+| `email`      | `string` | `true`   | Valid email of the new user. |
 
 <br>
 
@@ -97,14 +101,14 @@ wrkload API is a simple, easy-to-use API that is focused on the documentation of
   PATCH /api/v1/auth/reset-password/${uid}/${reset_password_token}
 ```
 
-| Request parameters | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `uid`      | `string` | `true` | User ID. |
-| `reset_password_token`      | `string` | `true` | Valid JWT token generated at forgot password request. |
+| Request parameters     | Type     | Required | Description                                           |
+| :--------------------- | :------- | :------- | :---------------------------------------------------- |
+| `uid`                  | `string` | `true`   | User ID.                                              |
+| `reset_password_token` | `string` | `true`   | Valid JWT token generated at forgot password request. |
 
-| Request object | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `new_password`      | `string` | `true` | Password of at least 8 characters. |
+| Request body   | Type     | Required | Description                        |
+| :------------- | :------- | :------- | :--------------------------------- |
+| `new_password` | `string` | `true`   | Password of at least 8 characters. |
 
 <br>
 
@@ -113,9 +117,10 @@ wrkload API is a simple, easy-to-use API that is focused on the documentation of
 ```
   GET /api/v1/auth/logout
 ```
-| Cookies | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `refresh_token`      | `HttpOnly` | `true` | Valid JWT token generated at login stored in cookie only accessible through https requests. |
+
+| Cookies         | Type       | Required | Description                                                                                 |
+| :-------------- | :--------- | :------- | :------------------------------------------------------------------------------------------ |
+| `refresh_token` | `HttpOnly` | `true`   | Valid JWT token generated at login stored in cookie only accessible through https requests. |
 
 <br>
 
@@ -125,19 +130,15 @@ wrkload API is a simple, easy-to-use API that is focused on the documentation of
   GET /api/v1/auth/token
 ```
 
-| HTTP Headers | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `Authorization`      | `bearer token` | `true` | Valid JWT token generated at login and stored in memory. |
+| HTTP Headers    | Type           | Required | Description                                              |
+| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
 
-| Cookies | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `refresh_token`      | `HttpOnly` | `true` | Valid JWT token generated at login and stored in cookie only accessible through https requests. |
+| Cookies         | Type       | Required | Description                                                                                     |
+| :-------------- | :--------- | :------- | :---------------------------------------------------------------------------------------------- |
+| `refresh_token` | `HttpOnly` | `true`   | Valid JWT token generated at login and stored in cookie only accessible through https requests. |
 
 </details>
-
-
-
-
 
 ## Tasks API References
 
@@ -145,47 +146,50 @@ wrkload API is a simple, easy-to-use API that is focused on the documentation of
 <summary>See all details</summary>
 
 ### Get all tasks
+
 #### Only for users with administrator role.
 
 ```
   GET /api/v1/tasks
 ```
 
-| HTTP Headers | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `Authorization`      | `bearer token` | `true` | Valid JWT token generated at login and stored in memory. |
+| HTTP Headers    | Type           | Required | Description                                              |
+| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
 
-| Request parameters | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `per_page` | `string` | `false` | The number of results to return per page. |
-| `page` | `string` | `false` | Use this to page through the results. |
+| Request parameters | Type     | Required | Description                               |
+| :----------------- | :------- | :------- | :---------------------------------------- |
+| `per_page`         | `string` | `false`  | The number of results to return per page. |
+| `page`             | `string` | `false`  | Use this to page through the results.     |
 
-| Response object | Type     | Description                       |
-| :-------- | :------- | :-------------------------------- |
-| `_id` | `string` | Task ID. |
-| `name`      | `string` | Name of task. |
-| `author_id`      | `string` | Author ID of task. |
-| `project`      | `string` | Task project name. |
-| `timing`      | `string` | Time the task was completed. |
-| `month`      | `string` | Month the task was completed. |
-| `delivered`      | `string` | Date the task was completed. ISO8601 format required. |
-| `description`      | `string` | Description of the task. |
+| Response body | Type     | Description                                           |
+| :------------ | :------- | :---------------------------------------------------- |
+| `_id`         | `string` | Task ID.                                              |
+| `name`        | `string` | Name of task.                                         |
+| `author_id`   | `string` | Author ID of task.                                    |
+| `project`     | `string` | Task project name.                                    |
+| `timing`      | `string` | Time the task was completed.                          |
+| `month`       | `string` | Month the task was completed.                         |
+| `delivered`   | `string` | Date the task was completed. ISO8601 format required. |
+| `description` | `string` | Description of the task.                              |
 
 <br>
 
 ### Get task
+
 #### You can only read own tasks.
 
 ```
   GET /api/v1/tasks/${id}
 ```
-| HTTP Headers | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `Authorization`      | `bearer token` | `true` | Valid JWT token generated at login and stored in memory. |
 
-| Request parameters | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `id`      | `string` | `true` | Task ID. |
+| HTTP Headers    | Type           | Required | Description                                              |
+| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
+
+| Request parameters | Type     | Required | Description |
+| :----------------- | :------- | :------- | :---------- |
+| `id`               | `string` | `true`   | Task ID.    |
 
 <br>
 
@@ -194,62 +198,66 @@ wrkload API is a simple, easy-to-use API that is focused on the documentation of
 ```
   POST /api/v1/tasks
 ```
-| HTTP Headers | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `Authorization`      | `bearer token` | `true` | Valid JWT token generated at login and stored in memory. |
 
-| Request object | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `name`      | `string` | `true` | Name of task. |
-| `project`      | `string` | `true` | Task project name. |
-| `timing`      | `string` | `true` | Time the task was completed. |
-| `month`      | `string` | `true` | Month the task was completed. |
-| `delivered`      | `string` | `false` | Date the task was completed. ISO8601 format required. |
-| `description`      | `string` | `false` | Description of the task. |
+| HTTP Headers    | Type           | Required | Description                                              |
+| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
+
+| Request body  | Type     | Required | Description                                           |
+| :------------ | :------- | :------- | :---------------------------------------------------- |
+| `name`        | `string` | `true`   | Name of task.                                         |
+| `project`     | `string` | `true`   | Task project name.                                    |
+| `timing`      | `string` | `true`   | Time the task was completed.                          |
+| `month`       | `string` | `true`   | Month the task was completed.                         |
+| `delivered`   | `string` | `false`  | Date the task was completed. ISO8601 format required. |
+| `description` | `string` | `false`  | Description of the task.                              |
 
 <br>
 
 ### Update task
+
 #### You can only update own tasks, even the admin can't update yours either.
 
 ```
   PATCH /api/v1/tasks/${id}
 ```
-| HTTP Headers | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `Authorization`      | `bearer token` | `true` | Valid JWT token generated at login and stored in memory. |
 
-| Request parameters | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `id`      | `string` | `true` | Task ID. |
+| HTTP Headers    | Type           | Required | Description                                              |
+| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
 
-| Request object | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `name`      | `string` | `true` | Name of task. |
-| `project`      | `string` | `true` | Task project name. |
-| `timing`      | `string` | `true` | Time the task was completed. |
-| `month`      | `string` | `true` | Month the task was completed. |
-| `delivered`      | `string` | `false` | Date the task was completed. |
-| `description`      | `string` | `false` | Description of the task. |
+| Request parameters | Type     | Required | Description |
+| :----------------- | :------- | :------- | :---------- |
+| `id`               | `string` | `true`   | Task ID.    |
+
+| Request body  | Type     | Required | Description                   |
+| :------------ | :------- | :------- | :---------------------------- |
+| `name`        | `string` | `true`   | Name of task.                 |
+| `project`     | `string` | `true`   | Task project name.            |
+| `timing`      | `string` | `true`   | Time the task was completed.  |
+| `month`       | `string` | `true`   | Month the task was completed. |
+| `delivered`   | `string` | `false`  | Date the task was completed.  |
+| `description` | `string` | `false`  | Description of the task.      |
 
 <br>
 
 ### Delete task
+
 #### You can only delete own tasks.
 
 ```
   DELETE /api/v1/tasks/${id}
 ```
-| HTTP Headers | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `Authorization`      | `bearer token` | `true` | Valid JWT token generated at login and stored in memory. |
 
-| Request parameters | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `id`      | `string` | `true` | ID task. |
+| HTTP Headers    | Type           | Required | Description                                              |
+| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
+
+| Request parameters | Type     | Required | Description |
+| :----------------- | :------- | :------- | :---------- |
+| `id`               | `string` | `true`   | ID task.    |
 
 </details>
-
 
 ## Users API References
 
@@ -257,90 +265,97 @@ wrkload API is a simple, easy-to-use API that is focused on the documentation of
 <summary>See all details</summary>
 
 ### Get all users
+
 #### Only for users with administrator role.
 
 ```
   GET /api/v1/users
 ```
 
-| HTTP Headers | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `Authorization`      | `bearer token` | `true` | Valid JWT token generated at login and stored in memory. |
+| HTTP Headers    | Type           | Required | Description                                              |
+| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
 
-| Request parameters | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `per_page` | `string` | `false` | The number of results to return per page. |
-| `page` | `string` | `false` | Use this to page through the results. |
+| Request parameters | Type     | Required | Description                               |
+| :----------------- | :------- | :------- | :---------------------------------------- |
+| `per_page`         | `string` | `false`  | The number of results to return per page. |
+| `page`             | `string` | `false`  | Use this to page through the results.     |
 
-| Response object | Type     | Description                       |
-| :-------- | :------- | :-------------------------------- |
-| `_id` | `string` | User ID. |
-| `username`      | `string` | Name of user. |
-| `role`      | `number` | Role of user. |
-| `email`      | `string` | Valid email of new user. |
-| `avatar`      | `string` | URL of image. |
-| `confirmation_token`      | `string` | Valid JWT token generated at registry. |
-| `confirmation_status`      | `boolean` | Account status. |
+| Response body         | Type      | Description                            |
+| :-------------------- | :-------- | :------------------------------------- |
+| `_id`                 | `string`  | User ID.                               |
+| `username`            | `string`  | Name of user.                          |
+| `role`                | `number`  | Role of user.                          |
+| `email`               | `string`  | Valid email of new user.               |
+| `avatar`              | `string`  | URL of image.                          |
+| `confirmation_token`  | `string`  | Valid JWT token generated at registry. |
+| `confirmation_status` | `boolean` | Account status.                        |
 
 <br>
 
 ### Get user
+
 #### You can only read your own data. Full response for users with administrator role.
 
 ```
   GET /api/v1/users/${id}
 ```
-| HTTP Headers | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `Authorization`      | `bearer token` | `true` | Valid JWT token generated at login and stored in memory. |
 
-| Request parameters | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `id`      | `string` | `true` | User ID. |
-  
-| Response object | Type     | Description                       |
-| :-------- | :------- | :-------------------------------- |
-| `_id` | `string` | User ID. |
-| `username`      | `string` | Name of user. |
-| `email`      | `string` | Valid email of new user. |
-| `avatar`      | `string` | URL of image. |
+| HTTP Headers    | Type           | Required | Description                                              |
+| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
+
+| Request parameters | Type     | Required | Description |
+| :----------------- | :------- | :------- | :---------- |
+| `id`               | `string` | `true`   | User ID.    |
+
+| Response body | Type     | Description              |
+| :------------ | :------- | :----------------------- |
+| `_id`         | `string` | User ID.                 |
+| `username`    | `string` | Name of user.            |
+| `email`       | `string` | Valid email of new user. |
+| `avatar`      | `string` | URL of image.            |
 
 <br>
 
 ### Update user
+
 #### You can only update your data, even the admin can't update you either.
 
 ```
   PATCH /api/v1/users/${id}
 ```
-| HTTP Headers | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `Authorization`      | `bearer token` | `true` | Valid JWT token generated at login and stored in memory. |
 
-| Request parameters | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `id`      | `string` | `true` | User ID. |
+| HTTP Headers    | Type           | Required | Description                                              |
+| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
 
-| Request object | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `username`      | `string` | New name of user. |
+| Request parameters | Type     | Required | Description |
+| :----------------- | :------- | :------- | :---------- |
+| `id`               | `string` | `true`   | User ID.    |
+
+| Request body | Type     | Required                 | Description |
+| :----------- | :------- | :----------------------- | :---------- |
+| `username`   | `string` | New name of user.        |
 | `email`      | `string` | New valid email of user. |
-| `avatar`      | `string` | URL of new image. |
+| `avatar`     | `string` | URL of new image.        |
 
 <br>
 
 ### Delete user
+
 #### Only for users with administrator role.
 
 ```
   DELETE /api/v1/users/${id}
 ```
-| HTTP Headers | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `Authorization`      | `bearer token` | `true` | Valid JWT token generated at login and stored in memory. |
 
-| Request parameters | Type     | Required     | Description                       |
-| :-------- | :------- | :------- | :-------------------------------- |
-| `id`      | `string` | `true` | User ID. |
+| HTTP Headers    | Type           | Required | Description                                              |
+| :-------------- | :------------- | :------- | :------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
+
+| Request parameters | Type     | Required | Description |
+| :----------------- | :------- | :------- | :---------- |
+| `id`               | `string` | `true`   | User ID.    |
 
 </details>
