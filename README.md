@@ -463,6 +463,7 @@ To generate base64 secret keys you can use [_GeneratePlus_](https://generate.plu
 
 Keeping in mind that the reason of to be of this project is to learn, I want to continue expanding it and these are the next challenges.
 
+- [x] Items per page and pagination params to GET requests.
 - [ ] Refactor the code to use Postgres Database with Supabase instead of MongoDB and Google Firebase.
 - [ ] Automatically calculate earned objectives based on the time it takes to complete a task.
 - [ ] Stateful sessions (maybe?).
@@ -473,7 +474,7 @@ Obviously, you can suggest new challenges on [GitHub discussions](https://github
 
 ## Contributing
 
-First off, thanks for taking the time to contribute! Contributions are what makes the open-source community such an amazing place to learn, inspire, and create. Any contributions you make will benefit everybody (especially me) else and are **greatly appreciated**.
+First off, thanks for taking the time to contribute! Any contributions you make will benefit everybody else (especially me) and are **greatly appreciated**.
 
 Please be kind and try to create bug reports that are:
 
@@ -498,6 +499,6 @@ Thanks for these awesome resources that were used during the development:
 - <https://www.thunderclient.com>
 - <https://www.postman.com>
 - <https://www.grc.com/passwords.htm>
-- <https://unlayer.com/>
+- <https://unlayer.com>
 - <https://code.visualstudio.com>
 - <https://yerbaverdeflor.com>
