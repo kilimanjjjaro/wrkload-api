@@ -8,10 +8,12 @@ wrkload API is a simple, easy-to-use API REST developed to be used as backend by
 
 - [About](#about)
   - [Built With](#built-with)
+- [Quick Start](#quick-start)
 - [API References](#api-references)
   - [Auth API](#auth-api)
   - [Tasks API](#tasks-api)
   - [Users API](#users-api)
+- [Environment variables](#environment-variables)
 - [License](#license)
 
 <br>
@@ -32,6 +34,37 @@ wrkload API is a simple, easy-to-use API REST developed to be used as backend by
 - [Cookiecutter](https://github.com/cookiecutter/cookiecutter)
 - [GitHub Actions](https://github.com/features/actions)
 - [markdownlint-cli](https://github.com/igorshubovych/markdownlint-cli)
+
+<br>
+
+## Quick Start
+
+The quickest way to get started with express is to utilize the executable [`express(1)`](https://github.com/expressjs/generator) to generate an application as shown below:
+Install the executable. The executable's major version will match Express's:
+
+```console
+$ npm install -g express-generator@4
+```
+
+Create the app:
+
+```console
+$ express /tmp/foo && cd /tmp/foo
+```
+
+Install dependencies:
+
+```console
+$ npm install
+```
+
+Start the server:
+
+```console
+$ npm start
+```
+
+View the website at: http://localhost:3000
 
 <br>
 
@@ -396,6 +429,12 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 | `id`               | `string` | `true`   | User ID.    |
 
 </details>
+
+<br>
+
+## Environment variables
+
+The quickest way to get started with express is to utilize the executable
 
 <br>
 
