@@ -14,6 +14,7 @@ wrkload API is a simple, easy-to-use API REST developed to be used as backend by
   - [Tasks API](#tasks-api)
   - [Users API](#users-api)
 - [Environment variables](#environment-variables)
+- [Roadmap](#roadmap)
 - [License](#license)
 
 <br>
@@ -453,6 +454,18 @@ To run this server, you must create an .env file in the root of your project wit
 | `MODE`                     | `string` | Dev or Prod.                                          |
 
 To generate base64 secret keys you can use [_GeneratePlus_](https://generate.plus/en/base64).
+
+<br>
+
+## Roadmap
+
+Keeping in mind that the reason of to be of this project is to learn, I want to continue expanding it and these are the next challenges.
+
+- [ ] Refactor the code to use Postgres Database with Supabase instead of MongoDB and Google Firebase.
+- [ ] Automatically calculate earned objectives based on the time it takes to complete a task.
+- [ ] Stateful sessions (maybe?).
+
+Obviously, you can suggest new challenges on [GitHub discussions](https://github.com/kilimanjjjaro/wrkload-api/discussions) or via email (located in [Github profile page](https://github.com/kilimanjjjaro)).
 
 <br>
 
