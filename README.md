@@ -41,24 +41,13 @@ wrkload API is a simple, easy-to-use API REST developed to be used as backend by
 - [cors](https://github.com/expressjs/cors)
 - [dotenv](https://github.com/motdotla/dotenv)
 - [Nodemailer](https://github.com/nodemailer/nodemailer)
-- [Perfect Passwords for secret keys](https://www.grc.com/passwords.htm)
+- [nodemon](https://github.com/remy/nodemon)
 
 <br>
 
 ## Quick Start
 
-The quickest way to get started with express is to utilize the executable [`express(1)`](https//github.com/expressjs/generator) to generate an application as shown below
-Install the executable. The executable's major version will match Express's
-
-```console
-$ npm install -g express-generator@4
-```
-
-Create the app
-
-```console
-$ express /tmp/foo && cd /tmp/foo
-```
+The quickest way to run this server on your localhost is execute the following commands:
 
 Install dependencies
 
@@ -66,13 +55,19 @@ Install dependencies
 $ npm install
 ```
 
-Start the server
+Start the server with nodemon
 
 ```console
-$ npm start
+$ npm run dev
 ```
 
-View the website at http//localhost3000
+Start the server with node
+
+```console
+$ npm run start
+```
+
+View the server at `http://localhost:PORT`
 
 <br>
 
@@ -448,14 +443,16 @@ To run this server, you must create an .env file in the root of your project wit
 | -------------------------- | -------- | ----------------------------------------------------- |
 | `DATABASE`                 | `string` | Link to your MongoDB connection.                      |
 | `PORT`                     | `number` | Port of your server.                                  |
-| `ACCESS_KEY`               | `string` | Secret key for token generators.                      |
-| `REFRESH_KEY`              | `string` | Secret key for token generators.                      |
-| `CONFIRMATION_ACCOUNT_KEY` | `string` | Secret key for token generators.                      |
-| `RESET_PASSWORD_KEY`       | `string` | Secret key for token generators.                      |
+| `ACCESS_KEY`               | `string` | Secret key to sign your access tokens.                |
+| `REFRESH_KEY`              | `string` | Secret key to sign your refresh tokens.               |
+| `CONFIRMATION_ACCOUNT_KEY` | `string` | Secret key to sign your confirmation account tokens.  |
+| `RESET_PASSWORD_KEY`       | `string` | Secret key to sign your reset password tokens.        |
 | `EMAIL_USER`               | `string` | Email account to be used with nodemailer.             |
 | `EMAIL_PASS`               | `string` | Password of email account to be used with nodemailer. |
 | `FRONTEND`                 | `string` | Link to your client side.                             |
 | `MODE`                     | `string` | Dev or Prod.                                          |
+
+To generate base64 secret keys you can use [_GeneratePlus_](https://generate.plus/en/base64).
 
 <br>
 
