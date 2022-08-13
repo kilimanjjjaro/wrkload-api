@@ -25,8 +25,8 @@ export const getTasks = async (req, res, next) => {
       pagination: {
         totalResults: tasks.totalDocs,
         resultsPerPage: tasks.limit,
-        page: tasks.page,
         prevPage: tasks.prevPage,
+        page: tasks.page,
         nextPage: tasks.nextPage,
       },
       results: tasks.docs,
@@ -42,12 +42,27 @@ export const getTasks = async (req, res, next) => {
 export const getTask = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const task = await Task.findById(id);
+    let task = await Task.findById(id);
 
     if (!task) throw new Error("Task not found");
 
-    if (!task.author_id.equals(req.uid))
+    if (req.role !== 1 && !task.author_id.equals(req.uid)) {
       throw new Error("Can't read other authors tasks");
+    }
+
+    task = {
+      status: "ok",
+      result: {
+        _id: task._id,
+        title: task.name,
+        author_id: task.author_id,
+        project: task.project,
+        timing: task.timing,
+        month: task.month,
+        delivered: task.delivered,
+        description: task.description,
+      },
+    };
 
     res.status(200).json(task);
   } catch (error) {

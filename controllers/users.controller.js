@@ -23,8 +23,8 @@ export const getUsers = async (req, res, next) => {
       pagination: {
         totalResults: users.totalDocs,
         resultsPerPage: users.limit,
-        page: users.page,
         prevPage: users.prevPage,
+        page: users.page,
         nextPage: users.nextPage,
       },
       results: users.docs,
@@ -48,11 +48,16 @@ export const getUser = async (req, res, next) => {
       throw new Error("Permission denied");
 
     user = {
-      username: user.username,
-      email: user.email,
-      avatar: user.avatar,
-      confirmation_token: user.confirmation_token,
-      confirmation_status: user.confirmation_status,
+      status: "ok",
+      result: {
+        _id: user._id,
+        username: user.username,
+        role: user.role,
+        email: user.email,
+        avatar: user.avatar,
+        confirmation_token: user.confirmation_token,
+        confirmation_status: user.confirmation_status,
+      },
     };
 
     return res.status(200).json(user);
