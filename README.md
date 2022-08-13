@@ -1,17 +1,50 @@
-# wrkload API
+# wrkload API [![license](https://img.shields.io/github/license/dec0dOS/amazing-github-template.svg?style=flat-square)](LICENSE)
+wrkload API is a simple, easy-to-use API used by web app as backend. That is focused on the documentation of the time that a user takes to do a task.
+
+<br>
+
+
+## Table of Contents
+
+- [About](#about)
+  - [Built With](#built-with)
+- [API References](#api-references)
+  - [Auth API](#auth-api)
+  - [Tasks API](#tasks-api)
+  - [Users API](#users-api)
+- [License](#license)
+
+<br>
+
+## About
 
 wrkload API is a simple, easy-to-use API used by web app as backend. That is focused on the documentation of the time that a user takes to do a task.
 
-## License
+**Key features of wrkload API**:
 
-[MIT](https://choosealicense.com/licenses/mit/)
+- Configurable README.md template
 
-## Auth API References
+<br>
+
+## Built With
+
+- [GitHub Flavored Markdown Spec](https://github.github.com/gfm/)
+- [Cookiecutter](https://github.com/cookiecutter/cookiecutter)
+- [GitHub Actions](https://github.com/features/actions)
+- [markdownlint-cli](https://github.com/igorshubovych/markdownlint-cli)
+
+<br>
+
+## API References
+
+### Auth API
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis sit amet lacus porta elementum id id mi. Aenean sed dui sit amet risus euismod feugiat sit amet at dolor. Sed tristique volutpat ullamcorper.
 
 <details>
 <summary>See all details</summary>
 
-### Register
+#### Register
 
 ```
   POST /api/v1/auth/register
@@ -26,7 +59,7 @@ wrkload API is a simple, easy-to-use API used by web app as backend. That is foc
 
 <br>
 
-### Login
+#### Login
 
 ```
   POST /api/v1/auth/login
@@ -39,9 +72,9 @@ wrkload API is a simple, easy-to-use API used by web app as backend. That is foc
 
 <br>
 
-### Confirm account
+#### Confirm account
 
-#### Link with confirmation token sent by email.
+##### Link with confirmation token sent by email.
 
 ```
   PATCH /api/v1/auth/confirm-account/${confirmation_token}
@@ -53,7 +86,7 @@ wrkload API is a simple, easy-to-use API used by web app as backend. That is foc
 
 <br>
 
-### Resend confirm account link
+#### Resend confirm account link
 
 ```
   POST /api/v1/auth/resend-confirm-account
@@ -65,7 +98,7 @@ wrkload API is a simple, easy-to-use API used by web app as backend. That is foc
 
 <br>
 
-### Change password
+#### Change password
 
 ```
   PATCH /api/v1/auth/change-password
@@ -83,7 +116,7 @@ wrkload API is a simple, easy-to-use API used by web app as backend. That is foc
 
 <br>
 
-### Forgot password
+#### Forgot password
 
 ```
   POST /api/v1/auth/forgot-password
@@ -95,7 +128,7 @@ wrkload API is a simple, easy-to-use API used by web app as backend. That is foc
 
 <br>
 
-### Reset password
+#### Reset password
 
 ```
   PATCH /api/v1/auth/reset-password/${uid}/${reset_password_token}
@@ -112,7 +145,7 @@ wrkload API is a simple, easy-to-use API used by web app as backend. That is foc
 
 <br>
 
-### Logout
+#### Logout
 
 ```
   GET /api/v1/auth/logout
@@ -124,7 +157,7 @@ wrkload API is a simple, easy-to-use API used by web app as backend. That is foc
 
 <br>
 
-### Access token re-generator
+#### Access token re-generator
 
 ```
   GET /api/v1/auth/token
@@ -140,14 +173,16 @@ wrkload API is a simple, easy-to-use API used by web app as backend. That is foc
 
 </details>
 
-## Tasks API References
+### Tasks API
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis sit amet lacus porta elementum id id mi. Aenean sed dui sit amet risus euismod feugiat sit amet at dolor. Sed tristique volutpat ullamcorper.
 
 <details>
 <summary>See all details</summary>
 
-### Get all tasks
+#### Get all tasks
 
-#### Only for users with administrator role.
+##### Only for users with administrator role.
 
 ```
   GET /api/v1/tasks
@@ -175,9 +210,9 @@ wrkload API is a simple, easy-to-use API used by web app as backend. That is foc
 
 <br>
 
-### Get task
+#### Get task
 
-#### You can only read own tasks.
+##### You can only read own tasks.
 
 ```
   GET /api/v1/tasks/${id}
@@ -193,7 +228,7 @@ wrkload API is a simple, easy-to-use API used by web app as backend. That is foc
 
 <br>
 
-### Create task
+#### Create task
 
 ```
   POST /api/v1/tasks
@@ -214,9 +249,9 @@ wrkload API is a simple, easy-to-use API used by web app as backend. That is foc
 
 <br>
 
-### Update task
+#### Update task
 
-#### You can only update own tasks, even the admin can't update yours either.
+##### You can only update own tasks, even the admin can't update yours either.
 
 ```
   PATCH /api/v1/tasks/${id}
@@ -241,9 +276,9 @@ wrkload API is a simple, easy-to-use API used by web app as backend. That is foc
 
 <br>
 
-### Delete task
+#### Delete task
 
-#### You can only delete own tasks.
+##### You can only delete own tasks.
 
 ```
   DELETE /api/v1/tasks/${id}
@@ -259,14 +294,16 @@ wrkload API is a simple, easy-to-use API used by web app as backend. That is foc
 
 </details>
 
-## Users API References
+### Users API
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis sit amet lacus porta elementum id id mi. Aenean sed dui sit amet risus euismod feugiat sit amet at dolor. Sed tristique volutpat ullamcorper.
 
 <details>
 <summary>See all details</summary>
 
-### Get all users
+#### Get all users
 
-#### Only for users with administrator role.
+##### Only for users with administrator role.
 
 ```
   GET /api/v1/users
@@ -293,9 +330,9 @@ wrkload API is a simple, easy-to-use API used by web app as backend. That is foc
 
 <br>
 
-### Get user
+#### Get user
 
-#### You can only read your own data. Full response for users with administrator role.
+##### You can only read your own data. Full response for users with administrator role.
 
 ```
   GET /api/v1/users/${id}
@@ -318,9 +355,9 @@ wrkload API is a simple, easy-to-use API used by web app as backend. That is foc
 
 <br>
 
-### Update user
+#### Update user
 
-#### You can only update your data, even the admin can't update you either.
+##### You can only update your data, even the admin can't update you either.
 
 ```
   PATCH /api/v1/users/${id}
@@ -342,9 +379,9 @@ wrkload API is a simple, easy-to-use API used by web app as backend. That is foc
 
 <br>
 
-### Delete user
+#### Delete user
 
-#### Only for users with administrator role.
+##### Only for users with administrator role.
 
 ```
   DELETE /api/v1/users/${id}
@@ -359,3 +396,9 @@ wrkload API is a simple, easy-to-use API used by web app as backend. That is foc
 | `id`               | `string` | `true`   | User ID.    |
 
 </details>
+
+<br>
+
+## License
+
+This project is licensed under the **MIT license**. Feel free to edit and distribute this template as you like.
