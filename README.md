@@ -96,9 +96,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 | `avatar`     | `string` | `true`   | URL of image.                      |
 | `password`   | `string` | `true`   | Password of at least 8 characters. |
 
-| Response body | Type     | Description                                                                                                                             |
-| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `status`      | `string` | If the request was successful or not. Options: `ok`, `error`. In the case of `error` a `code` and `message` property will be populated. |
+| Response body | Type     | Description                                                                               |
+| ------------- | -------- | ----------------------------------------------------------------------------------------- |
+| `status`      | `string` | Request status. In the case of `error` a `code` and `message` property will be populated. |
 
 <br>
 
@@ -113,9 +113,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 | `email`      | `string` | `true`   | Valid email of the new user.       |
 | `password`   | `string` | `true`   | Password of at least 8 characters. |
 
-| Response body | Type     | Description                                                                                                                             |
-| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `status`      | `string` | If the request was successful or not. Options: `ok`, `error`. In the case of `error` a `code` and `message` property will be populated. |
+| Response body | Type     | Description                                                                               |
+| ------------- | -------- | ----------------------------------------------------------------------------------------- |
+| `status`      | `string` | Request status. In the case of `error` a `code` and `message` property will be populated. |
 
 <br>
 
@@ -131,9 +131,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 | ------------------- | -------- | -------- | -------------------------------------------------------------- |
 | `confirmationToken` | `string` | `true`   | Valid JWT token generated at registry and distributed by mail. |
 
-| Response body | Type     | Description                                                                                                                             |
-| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `status`      | `string` | If the request was successful or not. Options: `ok`, `error`. In the case of `error` a `code` and `message` property will be populated. |
+| Response body | Type     | Description                                                                               |
+| ------------- | -------- | ----------------------------------------------------------------------------------------- |
+| `status`      | `string` | Request status. In the case of `error` a `code` and `message` property will be populated. |
 
 <br>
 
@@ -147,9 +147,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 | ------------ | -------- | -------- | ---------------------------- |
 | `email`      | `string` | `true`   | Valid email of the new user. |
 
-| Response body | Type     | Description                                                                                                                             |
-| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `status`      | `string` | If the request was successful or not. Options: `ok`, `error`. In the case of `error` a `code` and `message` property will be populated. |
+| Response body | Type     | Description                                                                               |
+| ------------- | -------- | ----------------------------------------------------------------------------------------- |
+| `status`      | `string` | Request status. In the case of `error` a `code` and `message` property will be populated. |
 
 <br>
 
@@ -169,9 +169,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 | `oldPassword` | `string` | `true`   | Password of at least 8 characters. |
 | `newPassword` | `string` | `true`   | Password of at least 8 characters. |
 
-| Response body | Type     | Description                                                                                                                             |
-| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `status`      | `string` | If the request was successful or not. Options: `ok`, `error`. In the case of `error` a `code` and `message` property will be populated. |
+| Response body | Type     | Description                                                                               |
+| ------------- | -------- | ----------------------------------------------------------------------------------------- |
+| `status`      | `string` | Request status. In the case of `error` a `code` and `message` property will be populated. |
 
 <br>
 
@@ -185,9 +185,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 | ------------ | -------- | -------- | ---------------------------- |
 | `email`      | `string` | `true`   | Valid email of the new user. |
 
-| Response body | Type     | Description                                                                                                                             |
-| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `status`      | `string` | If the request was successful or not. Options: `ok`, `error`. In the case of `error` a `code` and `message` property will be populated. |
+| Response body | Type     | Description                                                                               |
+| ------------- | -------- | ----------------------------------------------------------------------------------------- |
+| `status`      | `string` | Request status. In the case of `error` a `code` and `message` property will be populated. |
 
 <br>
 
@@ -206,9 +206,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 | ------------- | -------- | -------- | ---------------------------------- |
 | `newPassword` | `string` | `true`   | Password of at least 8 characters. |
 
-| Response body | Type     | Description                                                                                                                             |
-| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `status`      | `string` | If the request was successful or not. Options: `ok`, `error`. In the case of `error` a `code` and `message` property will be populated. |
+| Response body | Type     | Description                                                                               |
+| ------------- | -------- | ----------------------------------------------------------------------------------------- |
+| `status`      | `string` | Request status. In the case of `error` a `code` and `message` property will be populated. |
 
 <br>
 
@@ -222,9 +222,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 | -------------- | ---------- | -------- | ------------------------------------------------------------------------------------------- |
 | `refreshToken` | `HttpOnly` | `true`   | Valid JWT token generated at login stored in cookie only accessible through https requests. |
 
-| Response body | Type     | Description                                                                                                                             |
-| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `status`      | `string` | If the request was successful or not. Options: `ok`, `error`. In the case of `error` a `code` and `message` property will be populated. |
+| Response body | Type     | Description                                                                               |
+| ------------- | -------- | ----------------------------------------------------------------------------------------- |
+| `status`      | `string` | Request status. In the case of `error` a `code` and `message` property will be populated. |
 
 <br>
 
@@ -242,9 +242,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 | -------------- | ---------- | -------- | ----------------------------------------------------------------------------------------------- |
 | `refreshToken` | `HttpOnly` | `true`   | Valid JWT token generated at login and stored in cookie only accessible through https requests. |
 
-| Response body | Type     | Description                                                                                                                             |
-| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `status`      | `string` | If the request was successful or not. Options: `ok`, `error`. In the case of `error` a `code` and `message` property will be populated. |
+| Response body | Type     | Description                                                                               |
+| ------------- | -------- | ----------------------------------------------------------------------------------------- |
+| `status`      | `string` | Request status. In the case of `error` a `code` and `message` property will be populated. |
 
 </details>
 
@@ -272,24 +272,24 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 | `per_page`         | `string` | `false`  | The number of results to return per page. |
 | `page`             | `string` | `false`  | Use this to page through the results.     |
 
-| Response body                 | Type     | Description                                                                                                                             |
-| ----------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `status`                      | `string` | If the request was successful or not. Options: `ok`, `error`. In the case of `error` a `code` and `message` property will be populated. |
-| `pagination`                  | `object` | Pagination data object with following propierties.                                                                                      |
-| `pagination`.`totalResults`   | `number` | The total number of results available for your request.                                                                                 |
-| `pagination`.`resultsPerPage` | `number` | The number of results available per page.                                                                                               |
-| `pagination`.`prevPage`       | `number` | The number of previous page.                                                                                                            |
-| `pagination`.`page`           | `number` | The number of actual page.                                                                                                              |
-| `pagination`.`nextPage`       | `number` | The number of next page.                                                                                                                |
-| `results`                     | `array`  | The results of the request.                                                                                                             |
-| `results`.`_id`               | `string` | Task ID.                                                                                                                                |
-| `results`.`name`              | `string` | Name of task.                                                                                                                           |
-| `results`.`authorId`          | `string` | Author ID of task.                                                                                                                      |
-| `results`.`project`           | `string` | Task project name.                                                                                                                      |
-| `results`.`timing`            | `string` | Time the task was completed.                                                                                                            |
-| `results`.`month`             | `string` | Month the task was completed.                                                                                                           |
-| `results`.`delivered`         | `string` | Date the task was completed. ISO8601 format required.                                                                                   |
-| `results`.`description`       | `string` | Description of the task.                                                                                                                |
+| Response body                 | Type     | Description                                                                               |
+| ----------------------------- | -------- | ----------------------------------------------------------------------------------------- |
+| `status`                      | `string` | Request status. In the case of `error` a `code` and `message` property will be populated. |
+| `pagination`                  | `object` | Pagination data object with following propierties.                                        |
+| `pagination`.`totalResults`   | `number` | The total number of results available for your request.                                   |
+| `pagination`.`resultsPerPage` | `number` | The number of results available per page.                                                 |
+| `pagination`.`prevPage`       | `number` | The number of previous page.                                                              |
+| `pagination`.`page`           | `number` | The number of actual page.                                                                |
+| `pagination`.`nextPage`       | `number` | The number of next page.                                                                  |
+| `results`                     | `array`  | The results of the request.                                                               |
+| `results`.`_id`               | `string` | Task ID.                                                                                  |
+| `results`.`name`              | `string` | Name of task.                                                                             |
+| `results`.`authorId`          | `string` | Author ID of task.                                                                        |
+| `results`.`project`           | `string` | Task project name.                                                                        |
+| `results`.`timing`            | `string` | Time the task was completed.                                                              |
+| `results`.`month`             | `string` | Month the task was completed.                                                             |
+| `results`.`delivered`         | `string` | Date the task was completed. ISO8601 format required.                                     |
+| `results`.`description`       | `string` | Description of the task.                                                                  |
 
 <br>
 
@@ -309,18 +309,18 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 | ------------------ | -------- | -------- | ----------- |
 | `id`               | `string` | `true`   | Task ID.    |
 
-| Response body          | Type     | Description                                                                                                                             |
-| ---------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `status`               | `string` | If the request was successful or not. Options: `ok`, `error`. In the case of `error` a `code` and `message` property will be populated. |
-| `result`               | `object` | The result of the request.                                                                                                              |
-| `result`.`_id`         | `string` | Task ID.                                                                                                                                |
-| `result`.`name`        | `string` | Name of task.                                                                                                                           |
-| `result`.`authorId`    | `string` | Author ID of task.                                                                                                                      |
-| `result`.`project`     | `string` | Task project name.                                                                                                                      |
-| `result`.`timing`      | `string` | Time the task was completed.                                                                                                            |
-| `result`.`month`       | `string` | Month the task was completed.                                                                                                           |
-| `result`.`delivered`   | `string` | Date the task was completed. ISO8601 format required.                                                                                   |
-| `result`.`description` | `string` | Description of the task.                                                                                                                |
+| Response body          | Type     | Description                                                                               |
+| ---------------------- | -------- | ----------------------------------------------------------------------------------------- |
+| `status`               | `string` | Request status. In the case of `error` a `code` and `message` property will be populated. |
+| `result`               | `object` | The result of the request.                                                                |
+| `result`.`_id`         | `string` | Task ID.                                                                                  |
+| `result`.`name`        | `string` | Name of task.                                                                             |
+| `result`.`authorId`    | `string` | Author ID of task.                                                                        |
+| `result`.`project`     | `string` | Task project name.                                                                        |
+| `result`.`timing`      | `string` | Time the task was completed.                                                              |
+| `result`.`month`       | `string` | Month the task was completed.                                                             |
+| `result`.`delivered`   | `string` | Date the task was completed. ISO8601 format required.                                     |
+| `result`.`description` | `string` | Description of the task.                                                                  |
 
 <br>
 
@@ -343,9 +343,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 | `delivered`   | `string` | `false`  | Date the task was completed. ISO8601 format required. |
 | `description` | `string` | `false`  | Description of the task.                              |
 
-| Response body | Type     | Description                                                                                                                             |
-| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `status`      | `string` | If the request was successful or not. Options: `ok`, `error`. In the case of `error` a `code` and `message` property will be populated. |
+| Response body | Type     | Description                                                                               |
+| ------------- | -------- | ----------------------------------------------------------------------------------------- |
+| `status`      | `string` | Request status. In the case of `error` a `code` and `message` property will be populated. |
 
 <br>
 
@@ -374,9 +374,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 | `delivered`   | `string` | `false`  | Date the task was completed.  |
 | `description` | `string` | `false`  | Description of the task.      |
 
-| Response body | Type     | Description                                                                                                                             |
-| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `status`      | `string` | If the request was successful or not. Options: `ok`, `error`. In the case of `error` a `code` and `message` property will be populated. |
+| Response body | Type     | Description                                                                               |
+| ------------- | -------- | ----------------------------------------------------------------------------------------- |
+| `status`      | `string` | Request status. In the case of `error` a `code` and `message` property will be populated. |
 
 <br>
 
@@ -396,9 +396,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 | ------------------ | -------- | -------- | ----------- |
 | `id`               | `string` | `true`   | ID task.    |
 
-| Response body | Type     | Description                                                                                                                             |
-| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `status`      | `string` | If the request was successful or not. Options: `ok`, `error`. In the case of `error` a `code` and `message` property will be populated. |
+| Response body | Type     | Description                                                                               |
+| ------------- | -------- | ----------------------------------------------------------------------------------------- |
+| `status`      | `string` | Request status. In the case of `error` a `code` and `message` property will be populated. |
 
 </details>
 
@@ -426,23 +426,23 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 | `per_page`         | `string` | `false`  | The number of results to return per page. |
 | `page`             | `string` | `false`  | Use this to page through the results.     |
 
-| Response body                   | Type      | Description                                                                                                                             |
-| ------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `status`                        | `string`  | If the request was successful or not. Options: `ok`, `error`. In the case of `error` a `code` and `message` property will be populated. |
-| `pagination`                    | `object`  | Pagination data object with following propierties.                                                                                      |
-| `pagination`.`totalResults`     | `number`  | The total number of results available for your request.                                                                                 |
-| `pagination`.`resultsPerPage`   | `number`  | The number of results available per page.                                                                                               |
-| `pagination`.`prevPage`         | `number`  | The number of previous page.                                                                                                            |
-| `pagination`.`page`             | `number`  | The number of actual page.                                                                                                              |
-| `pagination`.`nextPage`         | `number`  | The number of next page.                                                                                                                |
-| `results`                       | `array`   | The results of the request.                                                                                                             |
-| `results`.`_id`                 | `string`  | User ID.                                                                                                                                |
-| `results`.`username`            | `string`  | Name of user.                                                                                                                           |
-| `results`.`role`                | `number`  | Role of user.                                                                                                                           |
-| `results`.`email`               | `string`  | Valid email of new user.                                                                                                                |
-| `results`.`avatar`              | `string`  | URL of image.                                                                                                                           |
-| `results`.`confirmation_token`  | `string`  | Valid JWT token generated at registry.                                                                                                  |
-| `results`.`confirmation_status` | `boolean` | Account status.                                                                                                                         |
+| Response body                   | Type      | Description                                                                               |
+| ------------------------------- | --------- | ----------------------------------------------------------------------------------------- |
+| `status`                        | `string`  | Request status. In the case of `error` a `code` and `message` property will be populated. |
+| `pagination`                    | `object`  | Pagination data object with following propierties.                                        |
+| `pagination`.`totalResults`     | `number`  | The total number of results available for your request.                                   |
+| `pagination`.`resultsPerPage`   | `number`  | The number of results available per page.                                                 |
+| `pagination`.`prevPage`         | `number`  | The number of previous page.                                                              |
+| `pagination`.`page`             | `number`  | The number of actual page.                                                                |
+| `pagination`.`nextPage`         | `number`  | The number of next page.                                                                  |
+| `results`                       | `array`   | The results of the request.                                                               |
+| `results`.`_id`                 | `string`  | User ID.                                                                                  |
+| `results`.`username`            | `string`  | Name of user.                                                                             |
+| `results`.`role`                | `number`  | Role of user.                                                                             |
+| `results`.`email`               | `string`  | Valid email of new user.                                                                  |
+| `results`.`avatar`              | `string`  | URL of image.                                                                             |
+| `results`.`confirmation_token`  | `string`  | Valid JWT token generated at registry.                                                    |
+| `results`.`confirmation_status` | `boolean` | Account status.                                                                           |
 
 <br>
 
@@ -462,17 +462,17 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 | ------------------ | -------- | -------- | ----------- |
 | `id`               | `string` | `true`   | User ID.    |
 
-| Response body                  | Type      | Description                                                                                                                             |
-| ------------------------------ | --------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `status`                       | `string`  | If the request was successful or not. Options: `ok`, `error`. In the case of `error` a `code` and `message` property will be populated. |
-| `result`                       | `object`  | The result of the request.                                                                                                              |
-| `result`.`_id`                 | `string`  | User ID.                                                                                                                                |
-| `result`.`username`            | `string`  | Name of user.                                                                                                                           |
-| `result`.`role`                | `number`  | Role of user.                                                                                                                           |
-| `result`.`email`               | `string`  | Valid email of new user.                                                                                                                |
-| `result`.`avatar`              | `string`  | URL of image.                                                                                                                           |
-| `result`.`confirmation_token`  | `string`  | Valid JWT token generated at registry.                                                                                                  |
-| `result`.`confirmation_status` | `boolean` | Account status.                                                                                                                         |
+| Response body                  | Type      | Description                                                                               |
+| ------------------------------ | --------- | ----------------------------------------------------------------------------------------- |
+| `status`                       | `string`  | Request status. In the case of `error` a `code` and `message` property will be populated. |
+| `result`                       | `object`  | The result of the request.                                                                |
+| `result`.`_id`                 | `string`  | User ID.                                                                                  |
+| `result`.`username`            | `string`  | Name of user.                                                                             |
+| `result`.`role`                | `number`  | Role of user.                                                                             |
+| `result`.`email`               | `string`  | Valid email of new user.                                                                  |
+| `result`.`avatar`              | `string`  | URL of image.                                                                             |
+| `result`.`confirmation_token`  | `string`  | Valid JWT token generated at registry.                                                    |
+| `result`.`confirmation_status` | `boolean` | Account status.                                                                           |
 
 <br>
 
@@ -498,9 +498,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 | `email`      | `string` | New valid email of user. |
 | `avatar`     | `string` | URL of new image.        |
 
-| Response body | Type     | Description                                                                                                                             |
-| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `status`      | `string` | If the request was successful or not. Options: `ok`, `error`. In the case of `error` a `code` and `message` property will be populated. |
+| Response body | Type     | Description                                                                               |
+| ------------- | -------- | ----------------------------------------------------------------------------------------- |
+| `status`      | `string` | Request status. In the case of `error` a `code` and `message` property will be populated. |
 
 <br>
 
@@ -520,9 +520,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 | ------------------ | -------- | -------- | ----------- |
 | `id`               | `string` | `true`   | User ID.    |
 
-| Response body | Type     | Description                                                                                                                             |
-| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `status`      | `string` | If the request was successful or not. Options: `ok`, `error`. In the case of `error` a `code` and `message` property will be populated. |
+| Response body | Type     | Description                                                                               |
+| ------------- | -------- | ----------------------------------------------------------------------------------------- |
+| `status`      | `string` | Request status. In the case of `error` a `code` and `message` property will be populated. |
 
 </details>
 
