@@ -1,4 +1,4 @@
-# wrkload API [![license](https://img.shields.io/github/license/dec0dOS/amazing-github-template.svg?style=flat-square)](LICENSE)
+# wrkload API
 
 wrkload API is a simple, easy-to-use API REST used by a web app as backend. It's focused on the documentation and organization of the time it took a user to finish a task.
 
@@ -401,4 +401,4 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 
 ## License
 
-This project is licensed under the **MIT license**. Feel free to edit and distribute this template as you like.
+This project is licensed under the **GPL-3.0 license**, see the [LICENSE](./LICENSE) file in the project root for the full license text.
