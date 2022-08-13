@@ -2,6 +2,9 @@
 
 wrkload API is a simple, easy-to-use API REST used by a web app as backend. It's focused on the documentation and organization of the time it took a user to finish a task.
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+
 <br>
 
 ## Table of Contents
