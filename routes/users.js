@@ -8,12 +8,12 @@ import {
 import { requireAccessToken } from "../middlewares/requireAccessToken.js";
 import {
   idParamValidations,
-  registryDataValidations,
+  paginationParamsValidations,
   updateDataValidations,
 } from "../middlewares/validateData.js";
 const router = Router();
 
-router.get("/", requireAccessToken, getUsers);
+router.get("/", requireAccessToken, paginationParamsValidations, getUsers);
 router.get("/:id", requireAccessToken, idParamValidations, getUser);
 router.delete("/:id", requireAccessToken, idParamValidations, deleteUser);
 router.patch(

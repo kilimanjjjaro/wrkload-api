@@ -1,4 +1,4 @@
-import { check, param, validationResult } from "express-validator";
+import { check, param, query, validationResult } from "express-validator";
 
 export const manageValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
@@ -192,5 +192,11 @@ export const resetPassDataValidations = [
     .bail()
     .isLength({ min: 8 })
     .withMessage("New password must have a minimum of 6 characters"),
+  manageValidationErrors,
+];
+
+export const paginationParamsValidations = [
+  query("page").trim().escape().default(1),
+  query("limit").trim().escape().default(8),
   manageValidationErrors,
 ];

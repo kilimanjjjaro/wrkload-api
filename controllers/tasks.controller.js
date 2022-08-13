@@ -2,9 +2,35 @@ import { Task } from "../models/Task.js";
 
 export const getTasks = async (req, res, next) => {
   try {
-    const tasks = await Task.find({ id: req.uid });
+    let tasks;
+    const page = req.query.page;
+    const limit = req.query.limit;
 
-    if (tasks.length < 1) throw new Error("Tasks not found");
+    const paginationOptions = {
+      select: "name author_id project timing month delivered description",
+      page: page,
+      limit: limit,
+    };
+
+    if (req.role === 1) {
+      tasks = await Task.paginate({}, paginationOptions);
+    } else {
+      tasks = await Task.paginate({ author_id: req.uid }, paginationOptions);
+    }
+
+    if (tasks.docs.length < 1) throw new Error("Tasks not found");
+
+    tasks = {
+      status: "ok",
+      pagination: {
+        totalResults: tasks.totalDocs,
+        resultsPerPage: tasks.limit,
+        page: tasks.page,
+        prevPage: tasks.prevPage,
+        nextPage: tasks.nextPage,
+      },
+      results: tasks.docs,
+    };
 
     res.status(200).json(tasks);
   } catch (error) {

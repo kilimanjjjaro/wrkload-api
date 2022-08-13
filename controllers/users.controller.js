@@ -4,9 +4,31 @@ export const getUsers = async (req, res, next) => {
   try {
     if (req.role !== 1) throw new Error("Permission denied");
 
-    const users = await User.find();
+    const page = req.query.page;
+    const limit = req.query.limit;
 
-    if (users.length < 1) throw new Error("Users not found");
+    const paginationOptions = {
+      select:
+        "username role email avatar confirmation_token confirmation_status",
+      page: page,
+      limit: limit,
+    };
+
+    let users = await User.paginate({}, paginationOptions);
+
+    if (users.docs.length < 1) throw new Error("Users not found");
+
+    users = {
+      status: "ok",
+      pagination: {
+        totalResults: users.totalDocs,
+        resultsPerPage: users.limit,
+        page: users.page,
+        prevPage: users.prevPage,
+        nextPage: users.nextPage,
+      },
+      results: users.docs,
+    };
 
     res.status(200).json(users);
   } catch (error) {
@@ -18,24 +40,22 @@ export const getUsers = async (req, res, next) => {
 export const getUser = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const user = await User.findById(id);
+    let user = await User.findById(id);
 
     if (!user) throw new Error("User doesn't exist");
 
     if (!user._id.equals(req.uid) && req.role !== 1)
       throw new Error("Permission denied");
 
-    if (req.role === 1) {
-      return res.json(user);
-    } else {
-      const public_user = {
-        username: user.username,
-        email: user.email,
-        avatar: user.avatar,
-      };
+    user = {
+      username: user.username,
+      email: user.email,
+      avatar: user.avatar,
+      confirmation_token: user.confirmation_token,
+      confirmation_status: user.confirmation_status,
+    };
 
-      return res.status(200).json(public_user);
-    }
+    return res.status(200).json(user);
   } catch (error) {
     console.error(error);
     next(error);

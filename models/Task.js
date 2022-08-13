@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";
 
 // MAKE A SCHEMA FOR TASK DATA.
 const taskSchema = new mongoose.Schema({
@@ -36,5 +37,7 @@ const taskSchema = new mongoose.Schema({
     trim: true,
   },
 });
+
+taskSchema.plugin(mongoosePaginate);
 
 export const Task = mongoose.model("Task", taskSchema);

@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcryptjs from "bcryptjs";
+import mongoosePaginate from "mongoose-paginate-v2";
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -53,6 +54,8 @@ userSchema.pre("save", async function (next) {
     throw new Error("Hash password failed");
   }
 });
+
+userSchema.plugin(mongoosePaginate);
 
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcryptjs.compare(candidatePassword, this.password);
