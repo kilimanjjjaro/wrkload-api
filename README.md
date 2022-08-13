@@ -1,6 +1,6 @@
 # wrkload API
 
-wrkload API is a simple, easy-to-use API REST developed to be used as backend by an app. It's focused on the documentation and organization of the time it took a user to finish a task.
+wrkload API is a simple, easy-to-use API REST developed to be used as backend by an app. It offers the possibility to a user to keep organized and documented the time he was working on his tasks.
 
 <br>
 
@@ -18,7 +18,7 @@ wrkload API is a simple, easy-to-use API REST developed to be used as backend by
 
 ## About
 
-wrkload API is a simple, easy-to-use API REST developed to be used as backend by an app. It's focused on the documentation and organization of the time it took a user to finish a task.
+wrkload API is a simple, easy-to-use API REST developed to be used as backend by an app. It offers the possibility to a user to keep organized and documented the time he was working on his tasks.
 
 **Key features of wrkload API**:
 
