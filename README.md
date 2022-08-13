@@ -1,6 +1,6 @@
 # wrkload API [![license](https://img.shields.io/github/license/dec0dOS/amazing-github-template.svg?style=flat-square)](LICENSE)
 
-wrkload API is a simple, easy-to-use API used by web app as backend. That is focused on the documentation of the time that a user takes to do a task.
+wrkload API is a simple, easy-to-use API REST used by a web app as backend. It's focused on the documentation and organization of the time it took a user to finish a task.
 
 <br>
 
@@ -18,7 +18,7 @@ wrkload API is a simple, easy-to-use API used by web app as backend. That is foc
 
 ## About
 
-wrkload API is a simple, easy-to-use API used by web app as backend. That is focused on the documentation of the time that a user takes to do a task.
+wrkload API is a simple, easy-to-use API REST used by a web app as backend. It's focused on the documentation and organization of the time it took a user to finish a task.
 
 **Key features of wrkload API**:
 
