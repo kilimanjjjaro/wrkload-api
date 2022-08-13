@@ -1,5 +1,5 @@
 {
-  "name": "web-wrkload-backend",
+  "name": "wrkload-api",
   "type": "module",
   "version": "1.0.0",
   "description": "",
