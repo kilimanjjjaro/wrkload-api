@@ -30,17 +30,17 @@ wrkload API is a simple, easy-to-use API REST developed to be used as backend by
 
 ## Built With
 
-- [Node.js](https//github.com/nodejs/node)
-- [Express.js](https//github.com/expressjs/express)
-- [Express validator](https//github.com/express-validator/express-validator)
-- [MongoDB](https//www.mongodb.com/)
-- [Mongoose](https//github.com/Automattic/mongoose)
-- [JSON Web Tokens](https//jwt.io/)
-- [bcrypt.js](https//github.com/dcodeIO/bcrypt.js)
-- [cookie-parser](https//github.com/expressjs/cookie-parser)
-- [cors](https//github.com/expressjs/cors)
-- [dotenv](https//github.com/motdotla/dotenv)
-- [Nodemailer](https//github.com/nodemailer/nodemailer)
+- [Node.js](https://github.com/nodejs/node)
+- [Express.js](https://github.com/expressjs/express)
+- [Express validator](https://github.com/express-validator/express-validator)
+- [MongoDB](https://www.mongodb.com/)
+- [Mongoose](https://github.com/Automattic/mongoose)
+- [JSON Web Tokens](https://jwt.io/)
+- [bcrypt.js](https://github.com/dcodeIO/bcrypt.js)
+- [cookie-parser](https://github.com/expressjs/cookie-parser)
+- [cors](https://github.com/expressjs/cors)
+- [dotenv](https://github.com/motdotla/dotenv)
+- [Nodemailer](https://github.com/nodemailer/nodemailer)
 
 <br>
 
