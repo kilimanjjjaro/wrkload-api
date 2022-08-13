@@ -41,6 +41,7 @@ wrkload API is a simple, easy-to-use API REST developed to be used as backend by
 - [cors](https://github.com/expressjs/cors)
 - [dotenv](https://github.com/motdotla/dotenv)
 - [Nodemailer](https://github.com/nodemailer/nodemailer)
+- [Perfect Passwords for secret keys](https://www.grc.com/passwords.htm)
 
 <br>
 
@@ -441,7 +442,20 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 
 ## Environment variables
 
-The quickest way to get started with express is to utilize the executable
+To run this server, you must create an .env file in the root of your project with the following variables. Remember to also set these on your hosting when you go to production mode:
+
+| Key                        | Type     | Description                                           |
+| -------------------------- | -------- | ----------------------------------------------------- |
+| `DATABASE`                 | `string` | Link to your MongoDB connection.                      |
+| `PORT`                     | `number` | Port of your server.                                  |
+| `ACCESS_KEY`               | `string` | Secret key for token generators.                      |
+| `REFRESH_KEY`              | `string` | Secret key for token generators.                      |
+| `CONFIRMATION_ACCOUNT_KEY` | `string` | Secret key for token generators.                      |
+| `RESET_PASSWORD_KEY`       | `string` | Secret key for token generators.                      |
+| `EMAIL_USER`               | `string` | Email account to be used with nodemailer.             |
+| `EMAIL_PASS`               | `string` | Password of email account to be used with nodemailer. |
+| `FRONTEND`                 | `string` | Link to your client side.                             |
+| `MODE`                     | `string` | Dev or Prod.                                          |
 
 <br>
 
