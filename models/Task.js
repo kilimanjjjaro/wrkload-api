@@ -1,14 +1,13 @@
 import mongoose from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 
-// MAKE A SCHEMA FOR TASK DATA.
 const taskSchema = new mongoose.Schema({
-  name: {
+  title: {
     type: String,
     required: true,
     trim: true,
   },
-  author_id: {
+  authorId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     require: true,

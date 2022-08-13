@@ -102,7 +102,7 @@ export const updateUser = async (req, res, next) => {
     }
 
     if (
-      !user._id.equals(req.uid) ||
+      !user._id.equals(req._id) ||
       reqUser.id ||
       reqUser._id ||
       reqUser.password ||

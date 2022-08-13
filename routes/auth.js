@@ -34,13 +34,13 @@ router.post(
 );
 router.patch("/change-password", changePassDataValidations, changePassword);
 router.patch(
-  "/reset-password/:uid/:reset_password_token",
+  "/reset-password/:uid/:resetPasswordToken",
   uidParamValidations,
   resetPassDataValidations,
   resetPassword
 );
 router.patch(
-  "/confirm-account/:confirmation_token",
+  "/confirm-account/:confirmationToken",
   confirmationTokenValidations,
   confirmAccount
 );

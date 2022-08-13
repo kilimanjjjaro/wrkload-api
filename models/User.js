@@ -30,11 +30,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  confirmation_token: {
+  confirmationToken: {
     type: String,
     default: null,
   },
-  confirmation_status: {
+  confirmationStatus: {
     type: Boolean,
     default: false,
   },

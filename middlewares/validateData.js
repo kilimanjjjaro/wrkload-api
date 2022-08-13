@@ -94,14 +94,14 @@ export const changePassDataValidations = [
     .isEmail()
     .withMessage("Incorrect email format")
     .normalizeEmail(),
-  check("old_password")
+  check("oldPassword")
     .trim()
     .notEmpty()
     .withMessage("Password are required")
     .bail()
     .isLength({ min: 8 })
     .withMessage("Password must have a minimum of 6 characters"),
-  check("new_password")
+  check("newPassword")
     .trim()
     .notEmpty()
     .withMessage("New password are required")
@@ -123,7 +123,7 @@ export const emailValidations = [
 ];
 
 export const taskDataValidations = [
-  check("name").trim().notEmpty().withMessage("Name are required").escape(),
+  check("title").trim().notEmpty().withMessage("Title are required").escape(),
   check("project")
     .trim()
     .notEmpty()
@@ -167,7 +167,7 @@ export const uidParamValidations = [
 ];
 
 export const confirmationTokenValidations = [
-  param("confirmation_token")
+  param("confirmationToken")
     .trim()
     .notEmpty()
     .withMessage("Confirmation token are required")
@@ -178,14 +178,14 @@ export const confirmationTokenValidations = [
 ];
 
 export const resetPassDataValidations = [
-  param("reset_password_token")
+  param("resetPasswordToken")
     .trim()
     .notEmpty()
     .withMessage("Reset password token are required")
     .bail()
     .escape()
     .withMessage("Invalid reset password token param format"),
-  check("new_password")
+  check("newPassword")
     .trim()
     .notEmpty()
     .withMessage("New password are required")
@@ -197,6 +197,6 @@ export const resetPassDataValidations = [
 
 export const paginationParamsValidations = [
   query("page").trim().escape().default(1),
-  query("limit").trim().escape().default(8),
+  query("limit").trim().escape().default(6),
   manageValidationErrors,
 ];

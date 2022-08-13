@@ -7,7 +7,7 @@ export const getTasks = async (req, res, next) => {
     const limit = req.query.limit;
 
     const paginationOptions = {
-      select: "name author_id project timing month delivered description",
+      select: "title authorId project timing month delivered description",
       page: page,
       limit: limit,
     };
@@ -15,7 +15,7 @@ export const getTasks = async (req, res, next) => {
     if (req.role === 1) {
       tasks = await Task.paginate({}, paginationOptions);
     } else {
-      tasks = await Task.paginate({ author_id: req.uid }, paginationOptions);
+      tasks = await Task.paginate({ authorId: req._id }, paginationOptions);
     }
 
     if (tasks.docs.length < 1) throw new Error("Tasks not found");
@@ -46,7 +46,7 @@ export const getTask = async (req, res, next) => {
 
     if (!task) throw new Error("Task not found");
 
-    if (req.role !== 1 && !task.author_id.equals(req.uid)) {
+    if (req.role !== 1 && !task.authorId.equals(req._id)) {
       throw new Error("Can't read other authors tasks");
     }
 
@@ -54,8 +54,8 @@ export const getTask = async (req, res, next) => {
       status: "ok",
       result: {
         _id: task._id,
-        title: task.name,
-        author_id: task.author_id,
+        title: task.title,
+        authorId: task.authorId,
         project: task.project,
         timing: task.timing,
         month: task.month,
@@ -73,11 +73,11 @@ export const getTask = async (req, res, next) => {
 
 export const createTask = async (req, res, next) => {
   try {
-    const { name, project, timing, month, delivered, description } = req.body;
+    const { title, project, timing, month, delivered, description } = req.body;
 
     const task = new Task({
-      name,
-      author_id: req.uid,
+      title,
+      authorId: req._id,
       project,
       timing,
       month,
@@ -106,7 +106,7 @@ export const deleteTask = async (req, res, next) => {
       });
     }
 
-    if (!task.author_id.equals(req.uid)) {
+    if (!task.authorId.equals(req._id)) {
       return res.status(401).send({
         code: "tasks/permission-denied",
         message: "Can't read other authors tasks",
@@ -115,7 +115,7 @@ export const deleteTask = async (req, res, next) => {
 
     await task.remove();
 
-    res.status(200).json({ status: "Task deleted" });
+    res.status(200).json({ status: "ok" });
   } catch (error) {
     console.error(error);
     next(error);
@@ -130,7 +130,7 @@ export const updateTask = async (req, res, next) => {
 
     if (!task) throw new Error("Task not found");
 
-    if (!task.author_id.equals(req.uid))
+    if (!task.authorId.equals(req._id))
       throw new Error("Can't update other authors tasks");
 
     for (const key of Object.keys(req.body)) {
@@ -141,10 +141,10 @@ export const updateTask = async (req, res, next) => {
       }
     }
 
-    if (reqTask.author_id || reqTask.id || reqTask._id)
+    if (reqTask.authorId || reqTask.id || reqTask._id)
       throw new Error("Can't update ID data");
 
-    await task.updateOne({ $set: reqUser });
+    await task.updateOne({ $set: reqTask });
 
     res.status(200).json({ status: "ok" });
   } catch (error) {

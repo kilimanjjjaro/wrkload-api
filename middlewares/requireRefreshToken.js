@@ -3,13 +3,13 @@ import jwt from "jsonwebtoken";
 // MAKE A MIDDLEWARE TO REQUIRE A REFRESH TOKEN.
 export const requireRefreshToken = (req, res, next) => {
   try {
-    const refresh_token = req.cookies.refresh_token;
+    const refreshToken = req.cookies.refreshToken;
 
-    if (!refresh_token) throw new Error("Token not found");
+    if (!refreshToken) throw new Error("Token not found");
 
-    const { uid, role } = jwt.verify(refresh_token, process.env.REFRESH_KEY);
+    const { _id, role } = jwt.verify(refreshToken, process.env.REFRESH_KEY);
 
-    req.uid = uid;
+    req._id = _id;
     req.role = role;
 
     next();

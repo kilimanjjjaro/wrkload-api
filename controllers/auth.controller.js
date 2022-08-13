@@ -22,7 +22,7 @@ export const register = async (req, res, next) => {
       email: email,
       avatar: avatar,
       password: password,
-      confirmation_token: confirmationTokenGenerator(email),
+      confirmationToken: confirmationTokenGenerator(email),
     });
 
     await user.save();
@@ -31,13 +31,13 @@ export const register = async (req, res, next) => {
       from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
       to: user.email,
       subject: "Confirm your account",
-      html: `<a href="http://localhost:5000/api/v1/auth/confirm-account/${user.confirmation_token}">Click to confirm account</a>`,
+      html: `<a href="http://localhost:5000/api/v1/auth/confirm-account/${user.confirmationToken}">Click to confirm account</a>`,
     });
 
-    const { access_token, expiresIn } = tokenGenerator(user._id, user.role);
+    const { accessToken, expiresIn } = tokenGenerator(user._id, user.role);
     refreshTokenGenerator(user._id, user.role, res);
 
-    res.status(201).json({ access_token, expiresIn });
+    res.status(201).json({ accessToken, expiresIn });
   } catch (error) {
     console.error(error);
     next(error);
@@ -51,16 +51,16 @@ export const login = async (req, res, next) => {
 
     if (!user) throw new Error("User not found");
 
-    if (!user.confirmation_status) throw new Error("Account not confirmed");
+    if (!user.confirmationStatus) throw new Error("Account not confirmed");
 
     const reqPass = await user.comparePassword(password);
 
     if (!reqPass) throw new Error("Wrong password");
 
-    const { access_token, expiresIn } = tokenGenerator(user._id, user.role);
+    const { accessToken, expiresIn } = tokenGenerator(user._id, user.role);
     refreshTokenGenerator(user._id, user.role, res);
 
-    res.status(200).json({ access_token, expiresIn });
+    res.status(200).json({ accessToken, expiresIn });
   } catch (error) {
     console.error(error);
     next(error);
@@ -69,12 +69,9 @@ export const login = async (req, res, next) => {
 
 export const refreshAccessToken = (req, res, next) => {
   try {
-    const { access_token, expiresIn } = tokenGenerator(
-      req.user._id,
-      req.user.role
-    );
+    const { accessToken, expiresIn } = tokenGenerator(req._id, req.role);
 
-    res.status(201).json({ access_token, expiresIn });
+    res.status(201).json({ accessToken, expiresIn });
   } catch (error) {
     console.error(error);
     next(error);
@@ -82,27 +79,27 @@ export const refreshAccessToken = (req, res, next) => {
 };
 
 export const logout = (req, res) => {
-  res.clearCookie("refresh_token");
+  res.clearCookie("refreshToken");
   res.status(200).json({ status: "ok" });
 };
 
 export const confirmAccount = async (req, res, next) => {
   try {
-    const { confirmation_token } = req.params;
+    const { confirmationToken } = req.params;
 
-    let user = await User.findOne({ confirmation_token });
+    let user = await User.findOne({ confirmationToken });
 
     if (!user) throw new Error("Account already confirmed");
 
     const { email } = jwt.verify(
-      confirmation_token,
+      confirmationToken,
       process.env.CONFIRMATION_ACCOUNT_KEY
     );
 
     if (email !== user.email) throw new Error("Invalid token");
 
-    user.confirmation_status = true;
-    user.confirmation_token = null;
+    user.confirmationStatus = true;
+    user.confirmationToken = null;
 
     await user.save();
 
@@ -120,9 +117,9 @@ export const reSendConfirmAccountLink = async (req, res, next) => {
 
     if (!user) throw new Error("User not found");
 
-    if (user.confirmation_status) throw new Error("Account already confirmed");
+    if (user.confirmationStatus) throw new Error("Account already confirmed");
 
-    user.confirmation_token = confirmationTokenGenerator(email);
+    user.confirmationToken = confirmationTokenGenerator(email);
 
     await user.save();
 
@@ -130,7 +127,7 @@ export const reSendConfirmAccountLink = async (req, res, next) => {
       from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
       to: user.email,
       subject: "Confirm your account",
-      html: `<a href="http://localhost:5000/api/v1/auth/confirm-account/${user.confirmation_token}">Click to confirm account</a>`,
+      html: `<a href="http://localhost:5000/api/v1/auth/confirm-account/${user.confirmationToken}">Click to confirm account</a>`,
     });
 
     res.status(201).json({ status: "ok" });
@@ -142,23 +139,23 @@ export const reSendConfirmAccountLink = async (req, res, next) => {
 
 export const changePassword = async (req, res, next) => {
   try {
-    const { email, old_password, new_password } = req.body;
+    const { email, oldPassword, newPassword } = req.body;
 
-    if (!(email, old_password, new_password)) throw new Error("Empty fields");
+    if (!(email, oldPassword, newPassword)) throw new Error("Empty fields");
 
     let user = await User.findOne({ email });
 
     if (!user) throw new Error("User not found");
 
-    let reqPass = await user.comparePassword(old_password);
+    let reqPass = await user.comparePassword(oldPassword);
 
     if (!reqPass) throw new Error("Wrong password");
 
-    reqPass = await user.comparePassword(new_password);
+    reqPass = await user.comparePassword(newPassword);
 
     if (reqPass) throw new Error("Same new password");
 
-    user.password = new_password;
+    user.password = newPassword;
 
     await user.save();
 
@@ -176,7 +173,7 @@ export const forgotPassword = async (req, res, next) => {
 
     if (!user) throw new Error("User not found to reset password");
 
-    const { reset_password_token } = resetPassTokenGenerator(
+    const { resetPasswordToken } = resetPassTokenGenerator(
       user._id,
       user.password
     );
@@ -185,7 +182,7 @@ export const forgotPassword = async (req, res, next) => {
       from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
       to: user.email,
       subject: "Reset your password",
-      html: `<a href="http://localhost:5000/api/v1/auth/reset-password/${user._id}/${reset_password_token}">Click to reset your password</a>`,
+      html: `<a href="http://localhost:5000/api/v1/auth/reset-password/${user._id}/${resetPasswordToken}">Click to reset your password</a>`,
     });
 
     res.status(200).json({ status: "ok" });
@@ -197,11 +194,11 @@ export const forgotPassword = async (req, res, next) => {
 
 export const resetPassword = async (req, res, next) => {
   try {
-    const { uid, reset_password_token } = req.params;
-    const { new_password } = req.body;
+    const { uid, resetPasswordToken } = req.params;
+    const { newPassword } = req.body;
 
-    if (!(uid, reset_password_token)) throw new Error("Invalid reset link");
-    if (!new_password) throw new Error("New password is required");
+    if (!(uid, resetPasswordToken)) throw new Error("Invalid reset link");
+    if (!newPassword) throw new Error("New password is required");
 
     let user = await User.findOne({ _id: uid });
 
@@ -209,11 +206,11 @@ export const resetPassword = async (req, res, next) => {
 
     let token = process.env.RESET_PASSWORD_KEY + user.password;
 
-    const { uid: id } = jwt.verify(reset_password_token, token);
+    const { _id } = jwt.verify(resetPasswordToken, token);
 
-    if (!user._id.equals(id)) throw new Error("Invalid token");
+    if (!user._id.equals(_id)) throw new Error("Invalid token");
 
-    user.password = new_password;
+    user.password = newPassword;
 
     await user.save();
 

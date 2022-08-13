@@ -18,6 +18,12 @@ router.get("/", requireAccessToken, paginationParamsValidations, getTasks);
 router.get("/:id", requireAccessToken, idParamValidations, getTask);
 router.post("/", requireAccessToken, taskDataValidations, createTask);
 router.delete("/:id", requireAccessToken, idParamValidations, deleteTask);
-router.patch("/:id", requireAccessToken, idParamValidations, updateTask);
+router.patch(
+  "/:id",
+  requireAccessToken,
+  idParamValidations,
+  taskDataValidations,
+  updateTask
+);
 
 export default router;
