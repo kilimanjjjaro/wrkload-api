@@ -401,4 +401,4 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 
 ## License
 
-This project was developed under the **GPL-3.0 license**, see the [LICENSE](./LICENSE) file in the project root for the full license text.
+This project was developed under the **GPL-3.0 license**, see the [LICENSE](./LICENSE.md) file in the project root for the full license text.
