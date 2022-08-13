@@ -1,8 +1,8 @@
 # wrkload API [![license](https://img.shields.io/github/license/dec0dOS/amazing-github-template.svg?style=flat-square)](LICENSE)
+
 wrkload API is a simple, easy-to-use API used by web app as backend. That is focused on the documentation of the time that a user takes to do a task.
 
 <br>
-
 
 ## Table of Contents
 
