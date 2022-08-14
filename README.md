@@ -1,13 +1,13 @@
 # wrkload API
 
-wrkload API is a simple, easy-to-use API REST developed to be used as backend by an app. It offers the possibility to a user to keep organized and documented the time he was working on his tasks.
+wrkload API is an easy-to-use API REST developed to be implemented as backend by an app. Gives the possibility to a user to keep organized and documented the time he was working on his tasks.
 
 <br>
 
 ## Table of Contents
 
-- [About](#about)
-  - [Built With](#built-with)
+- [Features](#features)
+- [Built With](#built-with)
 - [Quick Start](#quick-start)
 - [API References](#api-references)
   - [Auth API](#auth-api)
@@ -21,13 +21,20 @@ wrkload API is a simple, easy-to-use API REST developed to be used as backend by
 
 <br>
 
-## About
+## Features
 
-wrkload API is a simple, easy-to-use API REST developed to be used as backend by an app. It offers the possibility to a user to keep organized and documented the time he was working on his tasks.
-
-**Key features of wrkload API**
-
-- Configurable README.md template
+- `Stateless authentication`. Server will loves you ;)
+- Restricted requests using `JSON Web Token authorization`.
+- `Access tokens` are generated at authentication and they are **signed with the user ID** (in some cases with email or role user) and a **base64 secret key**. Each token are **unique** and **belongs to a single user**. These access tokens are sent by client on the request **via HTTP headers** and the server **verifies that they are valid** and **belong to the owner of the request** before sending a response.
+- Access tokens have a **short life cycle**, they expire each 15 minutes. Here the `refresh tokens` make his job, they **generate new access tokens in the same way as expired access tokens was generated** but in **client side background**.
+- Refresh tokens are used **only for generate new access tokens**, not for authorization. This is why they **expire after 30 days**, to ensure that user doesn't have to login every 15 minutes.
+- Access tokens are **not stored in cookies or local storage**, they **live in memory** for 15 minutes. Refresh tokens are **stored but in secure cookies**, they are `Http-only, same-site and secure type` and can only be accessed by the browser through `HTTPS requests`, not with Javascript.
+- `Confirmation of accounts and reset passwords` by email with `unique`, `one-time use` and `expiration times` links.
+- `Request responses filtered based on user role`.
+- `User role system`, this opens the way for a lot of frontend-side implementations, like querying registered users, non-sensitive user data, types of uploaded projects, tasks by users, create role permissions, etc.
+- Users **only can read, update or delete own tasks**, even users with administration role.
+- They can **create and store** useful information about their tasks such as: timing, project, delivery day, task type, a short description that can be used as a note book.
+- With this information, the frontend can show them **how many hours per month they spend on a project**. What **kind of tasks** they do more. If the **budget of each project is known**, the **objectives earned can be calculated** according to the number of hours invested.
 
 <br>
 
@@ -78,7 +85,7 @@ View the server at `http://localhost:PORT`
 
 ### Auth API
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis sit amet lacus porta elementum id id mi. Aenean sed dui sit amet risus euismod feugiat sit amet at dolor. Sed tristique volutpat ullamcorper.
+This API provides an authentication and authorization system designed to validate the requests to the other APIs. In addition to functions as register, login or logout, can confirm an account by email, reset or change a password, generate new access tokens. Please, check the details to know its implementation.
 
 <details>
 <summary>See all details</summary>
@@ -250,7 +257,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 
 ### Tasks API
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis sit amet lacus porta elementum id id mi. Aenean sed dui sit amet risus euismod feugiat sit amet at dolor. Sed tristique volutpat ullamcorper.
+This API provides a tasks management system. You can request all tasks or a single tasks, also you can create, edit, update or delete tasks. Please, check the details to know its implementation.
 
 <details>
 <summary>See all details</summary>
@@ -404,7 +411,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 
 ### Users API
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis sit amet lacus porta elementum id id mi. Aenean sed dui sit amet risus euismod feugiat sit amet at dolor. Sed tristique volutpat ullamcorper.
+This API provides an users management system. You can request all users or a single user, also you can update or delete users. Please, check the details to know its implementation.
 
 <details>
 <summary>See all details</summary>
@@ -554,6 +561,7 @@ To generate base64 secret keys you can use [_GeneratePlus_](https://generate.plu
 Keeping in mind that the reason of to be of this project is to learn, I want to continue expanding it and these are the next challenges.
 
 - [x] Items per page and pagination params to GET requests.
+- [x] Unique access and refresh tokens per user.
 - [ ] Refactor the code to use Postgres Database with Supabase instead of MongoDB and Google Firebase.
 - [ ] Automatically calculate earned objectives based on the time it takes to complete a task and the budget that the project has to pay this.
 - [ ] Stateful sessions (maybe?).
@@ -583,7 +591,7 @@ This project was developed under the **GPL-3.0 license**, see the [LICENSE](./LI
 
 ## Acknowledgements
 
-Thanks for these awesome resources that were used during the development:
+I am grateful to these incredible resources and people who directly or indirectly helped me in the development of this project:
 
 - <https://mailtrap.io>
 - <https://www.thunderclient.com>
@@ -593,3 +601,7 @@ Thanks for these awesome resources that were used during the development:
 - <https://code.visualstudio.com>
 - <https://stackoverflow.com>
 - <https://yerbaverdeflor.com>
+- <https://github.com/midudev>
+- <https://github.com/bluuweb>
+- <https://github.com/Walterisimo>
+- <https://github.com/domini-code>
