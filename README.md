@@ -29,9 +29,9 @@ wrkload API is an easy-to-use API REST developed to be implemented as backend by
 - Access tokens have a **short life cycle**, they expire each 15 minutes. Here the `refresh tokens` make his job, they **generate new access tokens in the same way as expired access tokens was generated** but in **client side background**.
 - Refresh tokens are used **only for generate new access tokens**, not for authorization. This is why they **expire after 30 days**, to ensure that user doesn't have to login every 15 minutes.
 - Access tokens are **not stored in cookies or local storage**, they **live in memory** for 15 minutes. Refresh tokens are **stored but in secure cookies**, they are `Http-only, same-site and secure type` and can only be accessed by the browser through `HTTPS requests`, not with Javascript.
-- `Confirmation of accounts and reset passwords` by email with `unique`, `one-time use` and `expiration times` links.
+- `Confirmation of accounts` and `reset passwords` by email with **unique**, **one-time use** and **expiration times** links.
 - Request `responses filtered` based on user role.
-- `Paginated APIs` with detailed response, including `number of items per page`, `items in total`, `number of current`, `previous` and `next page`.
+- `Paginated APIs` with detailed responses, including number of **items per page**, **items in total**, **number of current**, **previous** and **next page**.
 - `User role system`, this opens the way for a lot of frontend-side implementations, like querying registered users, non-sensitive user data, types of uploaded projects, tasks by users, create role permissions, etc.
 - Users **only can read, update or delete own tasks**, even users with administration role.
 - They can **create and store** useful information about their tasks such as: timing, project, delivery day, task type, a short description that can be used as a note book.
