@@ -593,15 +593,15 @@ This project was developed under the **GPL-3.0 license**, see the [LICENSE](./LI
 
 I am grateful to these incredible resources and people who directly or indirectly helped me in the development of this project:
 
-- <https://mailtrap.io>
-- <https://www.thunderclient.com>
-- <https://www.postman.com>
+- <https://mailtrap.io/>
+- <https://www.thunderclient.com/>
+- <https://www.postman.com/>
 - <https://www.grc.com/passwords.htm>
-- <https://unlayer.com>
-- <https://code.visualstudio.com>
-- <https://stackoverflow.com>
-- <https://yerbaverdeflor.com>
-- <https://github.com/midudev>
-- <https://github.com/bluuweb>
-- <https://github.com/Walterisimo>
-- <https://github.com/domini-code>
+- <https://unlayer.com/>
+- <https://code.visualstudio.com/>
+- <https://stackoverflow.com/>
+- <https://yerbaverdeflor.com/>
+- <https://github.com/midudev/>
+- <https://github.com/bluuweb/>
+- <https://github.com/Walterisimo/>
+- <https://github.com/domini-code/>
