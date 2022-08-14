@@ -36,7 +36,7 @@ wrkload API is an easy-to-use API REST developed to be implemented as backend by
 - Users **only can read, update or delete own tasks**, even users with administration role.
 - They can **create and store** useful information about their tasks such as: timing, project, delivery day, task type, a short description that can be used as a note book.
 - With this information, the frontend can show them **how many hours per month they spend on a project**. What **kind of tasks** they do more. If the **budget of each project is known**, the **objectives earned can be calculated** according to the number of hours invested.
-- `Passwords are salt and hash with the Blowfish cipher` before being saved on database.
+- `User passwords are salt (10 rounds) and hash with the Blowfish cipher` before being saved on database.
 
 <br>
 
