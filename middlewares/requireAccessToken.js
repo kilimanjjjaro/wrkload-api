@@ -8,9 +8,9 @@ export const requireAccessToken = (req, res, next) => {
 
     accessToken = accessToken.split(" ")[1];
 
-    const { _id, role } = jwt.verify(accessToken, process.env.ACCESS_KEY);
+    const { uid, role } = jwt.verify(accessToken, process.env.ACCESS_KEY);
 
-    req._id = _id;
+    req.uid = uid;
     req.role = role;
 
     next();

@@ -7,9 +7,9 @@ export const requireRefreshToken = (req, res, next) => {
 
     if (!refreshToken) throw new Error("Token not found");
 
-    const { _id, role } = jwt.verify(refreshToken, process.env.REFRESH_KEY);
+    const { uid, role } = jwt.verify(refreshToken, process.env.REFRESH_KEY);
 
-    req._id = _id;
+    req.uid = uid;
     req.role = role;
 
     next();

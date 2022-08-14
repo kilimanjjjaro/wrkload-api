@@ -69,7 +69,7 @@ export const login = async (req, res, next) => {
 
 export const refreshAccessToken = (req, res, next) => {
   try {
-    const { accessToken, expiresIn } = tokenGenerator(req._id, req.role);
+    const { accessToken, expiresIn } = tokenGenerator(req.uid, req.role);
 
     res.status(201).json({ accessToken, expiresIn });
   } catch (error) {
@@ -99,7 +99,7 @@ export const confirmAccount = async (req, res, next) => {
     if (email !== user.email) throw new Error("Invalid token");
 
     user.confirmationStatus = true;
-    user.confirmationToken = null;
+    user.confirmationToken = "";
 
     await user.save();
 
@@ -206,9 +206,9 @@ export const resetPassword = async (req, res, next) => {
 
     let token = process.env.RESET_PASSWORD_KEY + user.password;
 
-    const { _id } = jwt.verify(resetPasswordToken, token);
+    const { uid: id } = jwt.verify(resetPasswordToken, token);
 
-    if (!user._id.equals(_id)) throw new Error("Invalid token");
+    if (!user._id.equals(id)) throw new Error("Invalid token");
 
     user.password = newPassword;
 

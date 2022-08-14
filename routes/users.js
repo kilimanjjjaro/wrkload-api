@@ -7,19 +7,19 @@ import {
 } from "../controllers/users.controller.js";
 import { requireAccessToken } from "../middlewares/requireAccessToken.js";
 import {
-  idParamValidations,
   paginationParamsValidations,
+  uidParamValidations,
   updateDataValidations,
 } from "../middlewares/validateData.js";
 const router = Router();
 
 router.get("/", requireAccessToken, paginationParamsValidations, getUsers);
-router.get("/:id", requireAccessToken, idParamValidations, getUser);
-router.delete("/:id", requireAccessToken, idParamValidations, deleteUser);
+router.get("/:uid", requireAccessToken, uidParamValidations, getUser);
+router.delete("/:uid", requireAccessToken, uidParamValidations, deleteUser);
 router.patch(
-  "/:id",
+  "/:uid",
   requireAccessToken,
-  idParamValidations,
+  uidParamValidations,
   updateDataValidations,
   updateUser
 );

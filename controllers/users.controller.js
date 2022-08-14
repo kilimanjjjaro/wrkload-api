@@ -8,8 +8,7 @@ export const getUsers = async (req, res, next) => {
     const limit = req.query.limit;
 
     const paginationOptions = {
-      select:
-        "username role email avatar confirmation_token confirmation_status",
+      select: "username role email avatar confirmationToken confirmationStatus",
       page: page,
       limit: limit,
     };
@@ -39,8 +38,8 @@ export const getUsers = async (req, res, next) => {
 
 export const getUser = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    let user = await User.findById(id);
+    const { uid } = req.params;
+    let user = await User.findById(uid);
 
     if (!user) throw new Error("User doesn't exist");
 
@@ -55,8 +54,8 @@ export const getUser = async (req, res, next) => {
         role: user.role,
         email: user.email,
         avatar: user.avatar,
-        confirmation_token: user.confirmation_token,
-        confirmation_status: user.confirmation_status,
+        confirmationToken: user.confirmationToken,
+        confirmationStatus: user.confirmationStatus,
       },
     };
 
@@ -71,8 +70,8 @@ export const deleteUser = async (req, res, next) => {
   try {
     if (req.role !== 1) throw new Error("Permission denied");
 
-    const { id } = req.params;
-    const user = await User.findById(id);
+    const { uid } = req.params;
+    const user = await User.findById(uid);
 
     if (!user) throw new Error("User not found");
 
@@ -88,8 +87,8 @@ export const deleteUser = async (req, res, next) => {
 export const updateUser = async (req, res, next) => {
   try {
     let reqUser;
-    const { id } = req.params;
-    const user = await User.findById(id);
+    const { uid } = req.params;
+    const user = await User.findById(uid);
 
     if (!user) throw new Error("User not found");
 
@@ -102,7 +101,7 @@ export const updateUser = async (req, res, next) => {
     }
 
     if (
-      !user._id.equals(req._id) ||
+      !user._id.equals(req.uid) ||
       reqUser.id ||
       reqUser._id ||
       reqUser.password ||

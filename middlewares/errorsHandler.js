@@ -143,6 +143,13 @@ const errorsHandler = (err, req, res, next) => {
         message: "Can't update other authors tasks",
       });
 
+    case "Can't delete other authors tasks":
+      return res.status(401).json({
+        status: "error",
+        code: "tasks/permission-denied",
+        message: "Can't delete other authors tasks",
+      });
+
     case "Can't update ID data":
       return res.status(401).json({
         status: "error",

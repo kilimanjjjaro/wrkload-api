@@ -15,7 +15,7 @@ export const getTasks = async (req, res, next) => {
     if (req.role === 1) {
       tasks = await Task.paginate({}, paginationOptions);
     } else {
-      tasks = await Task.paginate({ authorId: req._id }, paginationOptions);
+      tasks = await Task.paginate({ authorId: req.uid }, paginationOptions);
     }
 
     if (tasks.docs.length < 1) throw new Error("Tasks not found");
@@ -46,7 +46,7 @@ export const getTask = async (req, res, next) => {
 
     if (!task) throw new Error("Task not found");
 
-    if (req.role !== 1 && !task.authorId.equals(req._id)) {
+    if (req.role !== 1 && !task.authorId.equals(req.uid)) {
       throw new Error("Can't read other authors tasks");
     }
 
@@ -77,7 +77,7 @@ export const createTask = async (req, res, next) => {
 
     const task = new Task({
       title,
-      authorId: req._id,
+      authorId: req.uid,
       project,
       timing,
       month,
@@ -99,19 +99,10 @@ export const deleteTask = async (req, res, next) => {
     const { id } = req.params;
     const task = await Task.findById(id);
 
-    if (!task) {
-      return res.status(404).send({
-        code: "tasks/task-not-found",
-        message: "Task not found",
-      });
-    }
+    if (!task) throw new Error("Task not found");
 
-    if (!task.authorId.equals(req._id)) {
-      return res.status(401).send({
-        code: "tasks/permission-denied",
-        message: "Can't read other authors tasks",
-      });
-    }
+    if (!task.authorId.equals(req.uid))
+      throw new Error("Can't delete other authors tasks");
 
     await task.remove();
 
@@ -127,10 +118,11 @@ export const updateTask = async (req, res, next) => {
     let reqTask;
     const { id } = req.params;
     const task = await Task.findById(id);
+    console.log(task);
 
     if (!task) throw new Error("Task not found");
 
-    if (!task.authorId.equals(req._id))
+    if (!task.authorId.equals(req.uid))
       throw new Error("Can't update other authors tasks");
 
     for (const key of Object.keys(req.body)) {

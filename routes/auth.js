@@ -20,6 +20,7 @@ import {
   uidParamValidations,
 } from "../middlewares/validateData.js";
 import { requireRefreshToken } from "../middlewares/requireRefreshToken.js";
+import { requireAccessToken } from "../middlewares/requireAccessToken.js";
 const router = Router();
 
 router.get("/token", requireRefreshToken, refreshAccessToken);
@@ -32,7 +33,12 @@ router.post(
   emailValidations,
   reSendConfirmAccountLink
 );
-router.patch("/change-password", changePassDataValidations, changePassword);
+router.patch(
+  "/change-password",
+  requireAccessToken,
+  changePassDataValidations,
+  changePassword
+);
 router.patch(
   "/reset-password/:uid/:resetPasswordToken",
   uidParamValidations,

@@ -194,12 +194,12 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 #### Reset password
 
 ```
-  PATCH /api/v1/auth/reset-password/${id}/${resetPasswordToken}
+  PATCH /api/v1/auth/reset-password/${uid}/${resetPasswordToken}
 ```
 
 | Request parameters   | Type     | Required | Description                                           |
 | -------------------- | -------- | -------- | ----------------------------------------------------- |
-| `id`                 | `string` | `true`   | User ID.                                              |
+| `uid`                | `string` | `true`   | User ID.                                              |
 | `resetPasswordToken` | `string` | `true`   | Valid JWT token generated at forgot password request. |
 
 | Request body  | Type     | Required | Description                        |
@@ -288,7 +288,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 | `results`.`project`           | `string` | Task project name.                                                      |
 | `results`.`timing`            | `string` | Time the task was completed.                                            |
 | `results`.`month`             | `string` | Month the task was completed.                                           |
-| `results`.`delivered`         | `date`   | Date the task was completed. ISO8601 format required.                   |
+| `results`.`delivered`         | `string` | Date the task was completed. ISO8601 format required.                   |
 | `results`.`description`       | `string` | Description of the task.                                                |
 
 <br>
@@ -319,7 +319,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 | `result`.`project`     | `string` | Task project name.                                                      |
 | `result`.`timing`      | `string` | Time the task was completed.                                            |
 | `result`.`month`       | `string` | Month the task was completed.                                           |
-| `result`.`delivered`   | `date`   | Date the task was completed. ISO8601 format required.                   |
+| `result`.`delivered`   | `string` | Date the task was completed. ISO8601 format required.                   |
 | `result`.`description` | `string` | Description of the task.                                                |
 
 <br>
@@ -451,16 +451,16 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 ##### You can only read your own data. Full response for users with administrator role.
 
 ```
-  GET /api/v1/users/${id}
+  GET /api/v1/users/${uid}
 ```
 
-| HTTP Headers    | Type           | Required | Description                                              |
-| --------------- | -------------- | -------- | -------------------------------------------------------- |
-| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
+| HTTP Headers    | Type           | Required | Description                                             |
+| --------------- | -------------- | -------- | ------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valu JWT token generated at login and stored in memory. |
 
 | Request parameters | Type     | Required | Description |
 | ------------------ | -------- | -------- | ----------- |
-| `id`               | `string` | `true`   | User ID.    |
+| `uid`              | `string` | `true`   | User ID.    |
 
 | Response body                  | Type      | Description                                                             |
 | ------------------------------ | --------- | ----------------------------------------------------------------------- |
@@ -481,7 +481,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 ##### You can only update your data, even the admin can't update you either.
 
 ```
-  PATCH /api/v1/users/${id}
+  PATCH /api/v1/users/${uid}
 ```
 
 | HTTP Headers    | Type           | Required | Description                                              |
@@ -490,7 +490,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 
 | Request parameters | Type     | Required | Description |
 | ------------------ | -------- | -------- | ----------- |
-| `id`               | `string` | `true`   | User ID.    |
+| `uid`              | `string` | `true`   | User ID.    |
 
 | Request body | Type     | Description              |
 | ------------ | -------- | ------------------------ |
@@ -509,7 +509,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 ##### Only for users with administrator role.
 
 ```
-  DELETE /api/v1/users/${id}
+  DELETE /api/v1/users/${uid}
 ```
 
 | HTTP Headers    | Type           | Required | Description                                              |
@@ -518,7 +518,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eleifend turpis s
 
 | Request parameters | Type     | Required | Description |
 | ------------------ | -------- | -------- | ----------- |
-| `id`               | `string` | `true`   | User ID.    |
+| `uid`              | `string` | `true`   | User ID.    |
 
 | Response body | Type     | Description                                                             |
 | ------------- | -------- | ----------------------------------------------------------------------- |
