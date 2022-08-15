@@ -9,7 +9,7 @@ import {
   register,
   reSendConfirmAccountLink,
   resetPassword,
-} from "../controllers/auth.controller.js";
+} from "../controllers/auth.controllers.js";
 import {
   changePassDataValidations,
   confirmationTokenValidations,
@@ -18,9 +18,9 @@ import {
   registryDataValidations,
   resetPassDataValidations,
   uidParamValidations,
-} from "../middlewares/validateData.js";
-import { requireRefreshToken } from "../middlewares/requireRefreshToken.js";
-import { requireAccessToken } from "../middlewares/requireAccessToken.js";
+} from "../middlewares/validateData.middleware.js";
+import { requireRefreshToken } from "../middlewares/requireRefreshToken.middleware.js";
+import { requireAccessToken } from "../middlewares/requireAccessToken.middleware.js";
 const router = Router();
 
 router.get("/token", requireRefreshToken, refreshAccessToken);

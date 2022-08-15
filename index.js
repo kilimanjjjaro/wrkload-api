@@ -3,10 +3,10 @@ import "./config/database.js";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import authRouter from "./routes/auth.js";
-import tasksRouter from "./routes/tasks.js";
-import usersRouter from "./routes/users.js";
-import errorsHandler from "./middlewares/errorsHandler.js";
+import authRouter from "./routes/auth.routes.js";
+import tasksRouter from "./routes/tasks.routes.js";
+import usersRouter from "./routes/users.routes.js";
+import errorsHandler from "./middlewares/errorsHandler.middleware.js";
 
 const app = express();
 

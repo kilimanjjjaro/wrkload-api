@@ -1,13 +1,13 @@
 import "dotenv/config";
 import jwt from "jsonwebtoken";
-import transporter from "../helpers/transporter.js";
+import transporter from "../utils/transporter.js";
 import { User } from "../models/User.js";
 import {
   confirmationTokenGenerator,
   refreshTokenGenerator,
   resetPassTokenGenerator,
   tokenGenerator,
-} from "../helpers/tokenManager.js";
+} from "../utils/tokenManager.js";
 
 export const register = async (req, res, next) => {
   try {

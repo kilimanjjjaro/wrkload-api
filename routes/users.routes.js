@@ -4,13 +4,13 @@ import {
   getUser,
   getUsers,
   updateUser,
-} from "../controllers/users.controller.js";
-import { requireAccessToken } from "../middlewares/requireAccessToken.js";
+} from "../controllers/users.controllers.js";
+import { requireAccessToken } from "../middlewares/requireAccessToken.middleware.js";
 import {
   paginationParamsValidations,
   uidParamValidations,
   updateDataValidations,
-} from "../middlewares/validateData.js";
+} from "../middlewares/validateData.middleware.js";
 const router = Router();
 
 router.get("/", requireAccessToken, paginationParamsValidations, getUsers);

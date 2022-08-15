@@ -5,13 +5,13 @@ import {
   getTask,
   getTasks,
   updateTask,
-} from "../controllers/tasks.controller.js";
-import { requireAccessToken } from "../middlewares/requireAccessToken.js";
+} from "../controllers/tasks.controllers.js";
+import { requireAccessToken } from "../middlewares/requireAccessToken.middleware.js";
 import {
   idParamValidations,
   paginationParamsValidations,
   taskDataValidations,
-} from "../middlewares/validateData.js";
+} from "../middlewares/validateData.middleware.js";
 const router = Router();
 
 router.get("/", requireAccessToken, paginationParamsValidations, getTasks);
