@@ -8,7 +8,8 @@ export const getUsers = async (req, res, next) => {
     const limit = req.query.limit;
 
     const paginationOptions = {
-      select: "username role email avatar confirmationToken confirmationStatus",
+      select:
+        "username role registeredAt lastActiveAt email avatar confirmationToken confirmationStatus",
       page: page,
       limit: limit,
     };
@@ -52,6 +53,8 @@ export const getUser = async (req, res, next) => {
         _id: user._id,
         username: user.username,
         role: user.role,
+        registeredAt: user.registeredAt,
+        lastActiveAt: user.lastActiveAt,
         email: user.email,
         avatar: user.avatar,
         confirmationToken: user.confirmationToken,

@@ -157,6 +157,13 @@ const errorsHandler = (err, req, res, next) => {
         message: "Can't update ID data",
       });
 
+    case "Can't update this data":
+      return res.status(401).json({
+        status: "error",
+        code: "tasks/permission-denied",
+        message: "Can't update this data",
+      });
+
     // USERS ERRORS
     case "Permission denied":
       return res.status(401).json({

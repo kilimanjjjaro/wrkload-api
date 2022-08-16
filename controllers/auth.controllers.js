@@ -1,5 +1,6 @@
 import "dotenv/config";
 import jwt from "jsonwebtoken";
+import moment from "moment";
 import transporter from "../utils/transporter.js";
 import { User } from "../models/User.js";
 import {
@@ -19,6 +20,7 @@ export const register = async (req, res, next) => {
     user = new User({
       username: username,
       role: role,
+      registeredAt: moment().format(),
       email: email,
       avatar: avatar,
       password: password,
@@ -37,7 +39,7 @@ export const register = async (req, res, next) => {
     const { accessToken, expiresIn } = tokenGenerator(user._id, user.role);
     refreshTokenGenerator(user._id, user.role, res);
 
-    res.status(201).json({ accessToken, expiresIn });
+    res.status(201).json({ status: "ok", accessToken, expiresIn });
   } catch (error) {
     console.error(error);
     next(error);
@@ -57,10 +59,14 @@ export const login = async (req, res, next) => {
 
     if (!reqPass) throw new Error("Wrong password");
 
+    user.lastActiveAt = moment().format();
+
+    await user.save();
+
     const { accessToken, expiresIn } = tokenGenerator(user._id, user.role);
     refreshTokenGenerator(user._id, user.role, res);
 
-    res.status(200).json({ accessToken, expiresIn });
+    res.status(200).json({ status: "ok", accessToken, expiresIn });
   } catch (error) {
     console.error(error);
     next(error);
@@ -71,7 +77,7 @@ export const refreshAccessToken = (req, res, next) => {
   try {
     const { accessToken, expiresIn } = tokenGenerator(req.uid, req.role);
 
-    res.status(201).json({ accessToken, expiresIn });
+    res.status(201).json({ status: "ok", accessToken, expiresIn });
   } catch (error) {
     console.error(error);
     next(error);

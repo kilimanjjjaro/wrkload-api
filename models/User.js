@@ -13,6 +13,15 @@ const userSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+  registeredAt: {
+    type: String,
+    require: true,
+  },
+  lastActiveAt: {
+    type: String,
+    require: true,
+    default: "",
+  },
   email: {
     type: String,
     required: true,

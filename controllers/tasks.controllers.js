@@ -1,4 +1,6 @@
+import moment from "moment";
 import { Task } from "../models/Task.js";
+import { User } from "../models/User.js";
 
 export const getTasks = async (req, res, next) => {
   try {
@@ -6,8 +8,14 @@ export const getTasks = async (req, res, next) => {
     const page = req.query.page;
     const limit = req.query.limit;
 
+    await User.findOneAndUpdate(
+      { _id: req.uid },
+      { lastActiveAt: moment().format() }
+    );
+
     const paginationOptions = {
-      select: "title authorId project timing month delivered description",
+      select:
+        "title authorId createdAt updatedAt project timing month delivered description",
       page: page,
       limit: limit,
     };
@@ -56,6 +64,8 @@ export const getTask = async (req, res, next) => {
         _id: task._id,
         title: task.title,
         authorId: task.authorId,
+        createdAt: task.createdAt,
+        updatedAt: task.updatedAt,
         project: task.project,
         timing: task.timing,
         month: task.month,
@@ -78,10 +88,11 @@ export const createTask = async (req, res, next) => {
     const task = new Task({
       title,
       authorId: req.uid,
+      createdAt: moment().format(),
       project,
       timing,
       month,
-      delivered,
+      delivered: moment(delivered).format(),
       description,
     });
 
@@ -118,7 +129,6 @@ export const updateTask = async (req, res, next) => {
     let reqTask;
     const { id } = req.params;
     const task = await Task.findById(id);
-    console.log(task);
 
     if (!task) throw new Error("Task not found");
 
@@ -133,8 +143,16 @@ export const updateTask = async (req, res, next) => {
       }
     }
 
-    if (reqTask.authorId || reqTask.id || reqTask._id)
-      throw new Error("Can't update ID data");
+    if (
+      reqTask.authorId ||
+      reqTask.id ||
+      reqTask._id ||
+      reqTask.createdAt ||
+      reqTask.updatedAt
+    )
+      throw new Error("Can't update this data");
+
+    reqTask.updatedAt = moment().format();
 
     await task.updateOne({ $set: reqTask });
 

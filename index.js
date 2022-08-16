@@ -21,6 +21,7 @@ app.use(
       return callback("Not allowed by CORS");
     },
     methods: "GET,PATCH,POST,DELETE",
+    credentials: true,
   })
 );
 

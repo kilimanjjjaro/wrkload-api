@@ -12,6 +12,15 @@ const taskSchema = new mongoose.Schema({
     ref: "User",
     require: true,
   },
+  createdAt: {
+    type: String,
+    require: true,
+  },
+  updatedAt: {
+    type: String,
+    require: true,
+    default: "",
+  },
   project: {
     type: String,
     required: true,
@@ -28,7 +37,7 @@ const taskSchema = new mongoose.Schema({
     trim: true,
   },
   delivered: {
-    type: Date,
+    type: String,
     trim: true,
   },
   description: {

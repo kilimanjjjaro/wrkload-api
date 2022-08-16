@@ -37,6 +37,8 @@ wrkload API is an easy-to-use API REST developed to be implemented as backend by
 - They can **create and store** useful information about their tasks such as: timing, project, delivery day, task type, a short description that can be used as a note book.
 - With this information, the frontend can show them **how many hours per month they spend on a project**. What **kind of tasks** they do more. If the **budget of each project is known**, the **objectives earned can be calculated** according to the number of hours invested.
 - `User passwords are salt (10 rounds) and hash with the Blowfish cipher` before being saved on database.
+- You can have user session information such as: the last time it was active or when it was registered.
+- You can see when a `user was last active` or `when they signed up`. You can also check `when a task was created or updated`.
 
 <br>
 
@@ -294,6 +296,8 @@ This API provides a tasks management system. You can request all tasks or a sing
 | `results`.`_id`               | `string` | Task ID.                                                                |
 | `results`.`title`             | `string` | Title of task.                                                          |
 | `results`.`authorId`          | `string` | Author ID of task.                                                      |
+| `results`.`createdAt`         | `string` | Task create date in ISO8601 format.                                     |
+| `results`.`updatedAt`         | `string` | Task update date in ISO8601 format.                                     |
 | `results`.`project`           | `string` | Task project name.                                                      |
 | `results`.`timing`            | `string` | Time the task was completed.                                            |
 | `results`.`month`             | `string` | Month the task was completed.                                           |
@@ -325,6 +329,8 @@ This API provides a tasks management system. You can request all tasks or a sing
 | `result`.`_id`         | `string` | Task ID.                                                                |
 | `result`.`title`       | `string` | Title of task.                                                          |
 | `result`.`authorId`    | `string` | Author ID of task.                                                      |
+| `result`.`createdAt`   | `string` | Task create date in ISO8601 format.                                     |
+| `result`.`updatedAt`   | `string` | Task update date in ISO8601 format.                                     |
 | `result`.`project`     | `string` | Task project name.                                                      |
 | `result`.`timing`      | `string` | Time the task was completed.                                            |
 | `result`.`month`       | `string` | Month the task was completed.                                           |
@@ -447,6 +453,8 @@ This API provides an users management system. You can request all users or a sin
 | `results`                       | `array`   | The results of the request.                                             |
 | `results`.`_id`                 | `string`  | User ID.                                                                |
 | `results`.`username`            | `string`  | Name of user.                                                           |
+| `results`.`registeredAt`        | `string`  | User registry date in ISO8601 format.                                   |
+| `results`.`lastActiveAt`        | `string`  | Date in ISO8601 format of the last time the user was active.            |
 | `results`.`role`                | `number`  | Role of user.                                                           |
 | `results`.`email`               | `string`  | Valid email of new user.                                                |
 | `results`.`avatar`              | `string`  | URL of image.                                                           |
@@ -478,6 +486,8 @@ This API provides an users management system. You can request all users or a sin
 | `result`.`_id`                 | `string`  | User ID.                                                                |
 | `result`.`username`            | `string`  | Name of user.                                                           |
 | `result`.`role`                | `number`  | Role of user.                                                           |
+| `result`.`registeredAt`        | `string`  | User registry date in ISO8601 format.                                   |
+| `result`.`lastActiveAt`        | `string`  | Date in ISO8601 format of the last time the user was active.            |
 | `result`.`email`               | `string`  | Valid email of new user.                                                |
 | `result`.`avatar`              | `string`  | URL of image.                                                           |
 | `result`.`confirmationToken`   | `string`  | Valid JWT token generated at registry.                                  |

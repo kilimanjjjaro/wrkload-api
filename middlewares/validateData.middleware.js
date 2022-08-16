@@ -25,6 +25,8 @@ export const registryDataValidations = [
     .isNumeric()
     .withMessage("A data type number is expected")
     .replace(["1"], "2"),
+  check("registeredAt").trim().escape(),
+  check("lastActiveAt").trim().escape(),
   check("email")
     .trim()
     .notEmpty()
@@ -129,8 +131,10 @@ export const taskDataValidations = [
     .notEmpty()
     .withMessage("Project are required")
     .escape(),
+  check("createdAt").trim().escape(),
+  check("updatedAt").trim().escape(),
   check("timing").trim().notEmpty().withMessage("Timing are required").escape(),
-  check("month").trim().notEmpty().withMessage("Date are required").escape(),
+  check("month").trim().notEmpty().withMessage("Month are required").escape(),
   check("delivered")
     .trim()
     .notEmpty()
@@ -138,8 +142,7 @@ export const taskDataValidations = [
     .bail()
     .isISO8601()
     .withMessage("Invalid date format. ISO8601 required")
-    .bail()
-    .toDate(),
+    .bail(),
   check("description").trim().escape(),
   manageValidationErrors,
 ];
