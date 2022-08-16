@@ -38,7 +38,7 @@ wrkload API is an easy-to-use API REST developed to be implemented as backend by
 - With this information, the frontend can show them **how many hours per month they spend on a project**. What **kind of tasks** they do more. If the **budget of each project is known**, the **objectives earned can be calculated** according to the number of hours invested.
 - `User passwords are salt (10 rounds) and hash with the Blowfish cipher` before being saved on database.
 - You can have user session information such as: the last time it was active or when it was registered.
-- You can see when a `user was last active` or `when they signed up`. You can also check `when a task was created or updated`.
+- You can see `when a user was last active` or `when they signed up`. You can also check `when a task was created or updated`.
 
 <br>
 
@@ -55,6 +55,7 @@ wrkload API is an easy-to-use API REST developed to be implemented as backend by
 - [cors](https://github.com/expressjs/cors)
 - [dotenv](https://github.com/motdotla/dotenv)
 - [Nodemailer](https://github.com/nodemailer/nodemailer)
+- [Moment.js](https://github.com/moment/moment)
 - [nodemon](https://github.com/remy/nodemon)
 
 <br>
@@ -94,7 +95,7 @@ This API provides an authentication and authorization system designed to validat
 <details>
 <summary>See all details</summary>
 
-#### Register
+#### — Register
 
 ```
   POST /api/v1/auth/register
@@ -110,10 +111,12 @@ This API provides an authentication and authorization system designed to validat
 | Response body | Type     | Description                                                             |
 | ------------- | -------- | ----------------------------------------------------------------------- |
 | `status`      | `string` | In the case of error a `code` and `message` property will be populated. |
+| `accessToken` | `string` | Valid access token to be included in request headers.                   |
+| `expiresIn`   | `number` | Validity time in seconds of the access token.                           |
 
 <br>
 
-#### Login
+#### — Login
 
 ```
   POST /api/v1/auth/login
@@ -127,10 +130,12 @@ This API provides an authentication and authorization system designed to validat
 | Response body | Type     | Description                                                             |
 | ------------- | -------- | ----------------------------------------------------------------------- |
 | `status`      | `string` | In the case of error a `code` and `message` property will be populated. |
+| `accessToken` | `string` | Valid access token to be included in request headers.                   |
+| `expiresIn`   | `number` | Validity time in seconds of the access token.                           |
 
 <br>
 
-#### Confirm account
+#### — Confirm account
 
 ##### Link with confirmation token sent by email.
 
@@ -148,7 +153,7 @@ This API provides an authentication and authorization system designed to validat
 
 <br>
 
-#### Resend confirm account link
+#### — Resend confirm account link
 
 ```
   POST /api/v1/auth/resend-confirm-account
@@ -164,7 +169,7 @@ This API provides an authentication and authorization system designed to validat
 
 <br>
 
-#### Change password
+#### — Change password
 
 ```
   PATCH /api/v1/auth/change-password
@@ -186,7 +191,7 @@ This API provides an authentication and authorization system designed to validat
 
 <br>
 
-#### Forgot password
+#### — Forgot password
 
 ```
   POST /api/v1/auth/forgot-password
@@ -202,7 +207,7 @@ This API provides an authentication and authorization system designed to validat
 
 <br>
 
-#### Reset password
+#### — Reset password
 
 ```
   PATCH /api/v1/auth/reset-password/${uid}/${resetPasswordToken}
@@ -223,7 +228,7 @@ This API provides an authentication and authorization system designed to validat
 
 <br>
 
-#### Logout
+#### — Logout
 
 ```
   GET /api/v1/auth/logout
@@ -239,7 +244,7 @@ This API provides an authentication and authorization system designed to validat
 
 <br>
 
-#### Access token re-generator
+#### — Access token re-generator
 
 ```
   GET /api/v1/auth/token
@@ -256,6 +261,8 @@ This API provides an authentication and authorization system designed to validat
 | Response body | Type     | Description                                                             |
 | ------------- | -------- | ----------------------------------------------------------------------- |
 | `status`      | `string` | In the case of error a `code` and `message` property will be populated. |
+| `accessToken` | `string` | Valid access token to be included in request headers.                   |
+| `expiresIn`   | `number` | Validity time in seconds of the access token.                           |
 
 </details>
 
@@ -266,7 +273,7 @@ This API provides a tasks management system. You can request all tasks or a sing
 <details>
 <summary>See all details</summary>
 
-#### Get all tasks
+#### — Get all tasks
 
 ##### Only users with administrator role can read tasks from other users.
 
@@ -306,7 +313,7 @@ This API provides a tasks management system. You can request all tasks or a sing
 
 <br>
 
-#### Get task
+#### — Get task
 
 ##### You can only read own tasks, except users with administrator role.
 
@@ -339,7 +346,7 @@ This API provides a tasks management system. You can request all tasks or a sing
 
 <br>
 
-#### Create task
+#### — Create task
 
 ```
   POST /api/v1/tasks
@@ -364,7 +371,7 @@ This API provides a tasks management system. You can request all tasks or a sing
 
 <br>
 
-#### Update task
+#### — Update task
 
 ##### You can only update own tasks, even the admin can't update yours either.
 
@@ -395,7 +402,7 @@ This API provides a tasks management system. You can request all tasks or a sing
 
 <br>
 
-#### Delete task
+#### — Delete task
 
 ##### You can only delete own tasks.
 
@@ -424,7 +431,7 @@ This API provides an users management system. You can request all users or a sin
 <details>
 <summary>See all details</summary>
 
-#### Get all users
+#### — Get all users
 
 ##### Only for users with administrator role.
 
@@ -463,7 +470,7 @@ This API provides an users management system. You can request all users or a sin
 
 <br>
 
-#### Get user
+#### — Get user
 
 ##### You can only read your own data. Full response for users with administrator role.
 
@@ -495,7 +502,7 @@ This API provides an users management system. You can request all users or a sin
 
 <br>
 
-#### Update user
+#### — Update user
 
 ##### You can only update your data, even the admin can't update you either.
 
@@ -523,7 +530,7 @@ This API provides an users management system. You can request all users or a sin
 
 <br>
 
-#### Delete user
+#### — Delete user
 
 ##### Only for users with administrator role.
 
