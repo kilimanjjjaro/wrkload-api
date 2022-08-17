@@ -583,6 +583,8 @@ Keeping in mind that the reason of to be of this project is to learn, I want to 
 
 - [x] Items per page and pagination params to GET requests.
 - [x] Unique access and refresh tokens per user.
+- [ ] Requests by projects or by the name or type of task.
+- [ ] Design mails for confirmation account, resend account confirmation and forgot password.
 - [ ] Refactor the code to use Postgres Database with Supabase instead of MongoDB and Google Firebase.
 - [ ] Automatically calculate earned objectives based on the time it takes to complete a task and the budget that the project has to pay this.
 - [ ] Stateful sessions (maybe?).
