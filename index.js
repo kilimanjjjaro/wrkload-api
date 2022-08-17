@@ -10,7 +10,7 @@ import errorsHandler from "./middlewares/errorsHandler.middleware.js";
 
 const app = express();
 
-const whiteList = [process.env.FRONTEND];
+const whiteList = [process.env.FRONTEND_URL];
 
 app.use(
   cors({
