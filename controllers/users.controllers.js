@@ -4,8 +4,7 @@ export const getUsers = async (req, res, next) => {
   try {
     if (req.role !== 1) throw new Error("Permission denied");
 
-    const page = req.query.page;
-    const limit = req.query.limit;
+    const { page, limit } = req.query;
 
     const paginationOptions = {
       select:

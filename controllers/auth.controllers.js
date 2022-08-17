@@ -33,7 +33,7 @@ export const register = async (req, res, next) => {
       from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
       to: user.email,
       subject: "Confirm your account",
-      html: `<a href="${process.env.BACKEND_URL}/api/v1/auth/confirm-account/${user.confirmationToken}">Click to confirm account</a>`,
+      html: `<a href="${process.env.BACKEND_URL}/api/v1/auth/confirm-account/${user.confirmationToken}">Click to confirm account</a></br><p>TO BE DESIGNED</p>`,
     });
 
     const { accessToken, expiresIn } = tokenGenerator(user._id, user.role);
@@ -133,7 +133,7 @@ export const reSendConfirmAccountLink = async (req, res, next) => {
       from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
       to: user.email,
       subject: "Confirm your account",
-      html: `<a href="${process.env.BACKEND_URL}/api/v1/auth/confirm-account/${user.confirmationToken}">Click to confirm account</a>`,
+      html: `<a href="${process.env.BACKEND_URL}/api/v1/auth/confirm-account/${user.confirmationToken}">Click to confirm account</a></br><p>TO BE DESIGNED</p>`,
     });
 
     res.status(201).json({ status: "ok" });
@@ -188,7 +188,7 @@ export const forgotPassword = async (req, res, next) => {
       from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
       to: user.email,
       subject: "Reset your password",
-      html: `<a href="${process.env.BACKEND_URL}/api/v1/auth/reset-password/${user._id}/${resetPasswordToken}">Click to reset your password</a>`,
+      html: `<a href="${process.env.BACKEND_URL}/api/v1/auth/reset-password/${user._id}/${resetPasswordToken}">Click to reset your password</a></br><p>TO BE DESIGNED</p>`,
     });
 
     res.status(200).json({ status: "ok" });

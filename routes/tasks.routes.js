@@ -11,6 +11,7 @@ import {
   idParamValidations,
   paginationParamsValidations,
   taskDataValidations,
+  updateTaskDataValidations,
 } from "../middlewares/validateData.middleware.js";
 const router = Router();
 
@@ -22,7 +23,7 @@ router.patch(
   "/:id",
   requireAccessToken,
   idParamValidations,
-  taskDataValidations,
+  updateTaskDataValidations,
   updateTask
 );
 
