@@ -49,7 +49,6 @@ Demo: [https://wrkload-api-production.up.railway.app](https://wrkload-api-produc
 - [Node.js](https://github.com/nodejs/node)
 - [Express.js](https://github.com/expressjs/express)
 - [Express validator](https://github.com/express-validator/express-validator)
-- [MongoDB](https://www.mongodb.com/)
 - [Mongoose](https://github.com/Automattic/mongoose)
 - [JSON Web Tokens](https://jwt.io/)
 - [bcrypt.js](https://github.com/dcodeIO/bcrypt.js)
@@ -604,6 +603,8 @@ Please be kind and try to create bug reports that are:
 - _Unique._ Do not duplicate existing opened issues.
 - _Scoped to a Single Bug._ One bug per report.
 
+[Go to issues](https://github.com/kilimanjjjaro/wrkload-api/issues)
+
 <br>
 
 ## License
@@ -618,7 +619,6 @@ I am grateful to these incredible resources and guys who directly or indirectly 
 
 - <https://mailtrap.io>
 - <https://www.thunderclient.com>
-- <https://www.postman.com>
 - <https://www.grc.com/passwords.htm>
 - <https://unlayer.com>
 - <https://code.visualstudio.com>
