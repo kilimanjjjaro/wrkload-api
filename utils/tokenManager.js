@@ -24,9 +24,10 @@ export const refreshTokenGenerator = (uid, role, res) => {
     });
 
     res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: !(process.env.DEV_MODE === "true"),
-      expires: new Date(Date.now() + expiresIn * 1000),
+      // httpOnly: true,
+      // secure: !(process.env.DEV_MODE === "true"),
+      // expires: new Date(Date.now() + expiresIn * 1000),
+      expires: new Date(Date.now() + expiresIn),
     });
   } catch (error) {
     console.error(error);
