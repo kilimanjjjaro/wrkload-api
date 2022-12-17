@@ -70,11 +70,9 @@ export const login = async (req, res, next) => {
 
     const { accessToken, expiresIn } = tokenGenerator(
       user._id,
-      user.email,
-      user.username,
       user.role
     );
-    refreshTokenGenerator(user._id, user.email, user.username, user.role, res);
+    refreshTokenGenerator(user._id, user.role, res);
 
     res.status(200).json({ status: "ok", accessToken, expiresIn });
   } catch (error) {

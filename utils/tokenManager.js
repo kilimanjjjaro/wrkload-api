@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-export const tokenGenerator = (uid, email, username, role) => {
+export const tokenGenerator = (uid, role) => {
   // const expiresIn = 60 * 15;
   const expiresIn = 60;
 
@@ -18,7 +18,7 @@ export const tokenGenerator = (uid, email, username, role) => {
   }
 };
 
-export const refreshTokenGenerator = (uid, email, username, role, res) => {
+export const refreshTokenGenerator = (uid, role, res) => {
   // const expiresIn = 60 * 60 * 24 * 30;
   const expiresIn = 120;
 
