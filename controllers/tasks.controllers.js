@@ -5,7 +5,8 @@ import { User } from "../models/User.js";
 export const getTasks = async (req, res, next) => {
   try {
     let tasks;
-    const { page, limit } = req.query;
+    const page = req.query.page;
+    const limit = req.query.limit;
 
     await User.findOneAndUpdate(
       { _id: req.uid },

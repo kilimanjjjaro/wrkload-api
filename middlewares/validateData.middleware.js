@@ -147,23 +147,6 @@ export const taskDataValidations = [
   manageValidationErrors,
 ];
 
-export const updateTaskDataValidations = [
-  check("title").trim().escape(),
-  check("project").trim().escape(),
-  check("createdAt").trim().escape(),
-  check("updatedAt").trim().escape(),
-  check("timing").trim().escape(),
-  check("month").trim().escape(),
-  check("delivered")
-    .optional()
-    .trim()
-    .isISO8601()
-    .withMessage("Invalid date format. ISO8601 required")
-    .bail(),
-  check("description").trim().escape(),
-  manageValidationErrors,
-];
-
 export const idParamValidations = [
   param("id")
     .trim()
