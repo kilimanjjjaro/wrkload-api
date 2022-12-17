@@ -36,13 +36,8 @@ export const register = async (req, res, next) => {
       html: `<a href="${process.env.BACKEND_URL}/api/v1/auth/confirm-account/${user.confirmationToken}">Click to confirm account</a></br><p>TO BE DESIGNED</p>`,
     });
 
-    const { accessToken, expiresIn } = tokenGenerator(
-      user._id,
-      user.email,
-      user.username,
-      user.role
-    );
-    refreshTokenGenerator(user._id, user.email, user.username, user.role, res);
+    const { accessToken, expiresIn } = tokenGenerator(user._id, user.role);
+    refreshTokenGenerator(user._id, user.role, res);
 
     res.status(201).json({ status: "ok", accessToken, expiresIn });
   } catch (error) {
@@ -68,10 +63,7 @@ export const login = async (req, res, next) => {
 
     await user.save();
 
-    const { accessToken, expiresIn } = tokenGenerator(
-      user._id,
-      user.role
-    );
+    const { accessToken, expiresIn } = tokenGenerator(user._id, user.role);
     refreshTokenGenerator(user._id, user.role, res);
 
     res.status(200).json({ status: "ok", accessToken, expiresIn });
