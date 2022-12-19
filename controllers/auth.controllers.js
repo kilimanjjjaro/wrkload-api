@@ -39,7 +39,7 @@ export const register = async (req, res, next) => {
     const { accessToken, expiresIn } = tokenGenerator(user._id, user.role);
     refreshTokenGenerator(user._id, user.role, res);
 
-    res.status(201).json({ status: "ok", accessToken, expiresIn });
+    res.status(201).json({ status: "ok", data: user, accessToken, expiresIn });
   } catch (error) {
     console.error(error);
     next(error);
@@ -66,7 +66,7 @@ export const login = async (req, res, next) => {
     const { accessToken, expiresIn } = tokenGenerator(user._id, user.role);
     refreshTokenGenerator(user._id, user.role, res);
 
-    res.status(200).json({ status: "ok", accessToken, expiresIn });
+    res.status(200).json({ status: "ok", data: user, accessToken, expiresIn });
   } catch (error) {
     console.error(error);
     next(error);
