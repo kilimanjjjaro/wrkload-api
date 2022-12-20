@@ -188,7 +188,7 @@ export const forgotPassword = async (req, res, next) => {
       from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
       to: user.email,
       subject: "Reset your password",
-      html: `<a href="${process.env.BACKEND_URL}/api/v1/auth/reset-password/${user._id}/${resetPasswordToken}">Click to reset your password</a>`,
+      html: `<a href="${process.env.FRONTEND_URL}/reset-password/${user._id}/${resetPasswordToken}">Click to reset your password</a>`,
     });
 
     res.status(200).json({ status: "ok", resetPasswordToken, expiresIn });
