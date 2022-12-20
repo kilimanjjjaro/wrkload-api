@@ -179,7 +179,7 @@ export const forgotPassword = async (req, res, next) => {
 
     if (!user) throw new Error("User not found to reset password");
 
-    const { resetPasswordToken } = resetPassTokenGenerator(
+    const { resetPasswordToken, expiresIn } = resetPassTokenGenerator(
       user._id,
       user.password
     );
@@ -191,7 +191,7 @@ export const forgotPassword = async (req, res, next) => {
       html: `<a href="${process.env.BACKEND_URL}/api/v1/auth/reset-password/${user._id}/${resetPasswordToken}">Click to reset your password</a>`,
     });
 
-    res.status(200).json({ status: "ok" });
+    res.status(200).json({ status: "ok", resetPasswordToken, expiresIn });
   } catch (error) {
     console.error(error);
     next(error);
