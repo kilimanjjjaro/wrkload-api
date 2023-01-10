@@ -36,7 +36,7 @@ const taskSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-  delivered: {
+  deliveredAt: {
     type: String,
     trim: true,
   },

@@ -63,10 +63,10 @@ export const login = async (req, res, next) => {
 
     await user.save();
 
-    const { accessToken, expiresIn } = tokenGenerator(user._id, user.role);
+    tokenGenerator(user._id, user.role, res);
     refreshTokenGenerator(user._id, user.role, res);
 
-    res.status(200).json({ status: "ok", user, accessToken, expiresIn });
+    res.status(200).json({ status: "ok", uid: user.id });
   } catch (error) {
     console.error(error);
     next(error);
@@ -85,6 +85,7 @@ export const refreshAccessToken = (req, res, next) => {
 };
 
 export const logout = (req, res) => {
+  res.clearCookie("accessToken");
   res.clearCookie("refreshToken");
   res.status(200).json({ status: "ok" });
 };

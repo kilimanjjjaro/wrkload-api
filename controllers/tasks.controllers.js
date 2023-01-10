@@ -15,7 +15,7 @@ export const getTasks = async (req, res, next) => {
 
     const paginationOptions = {
       select:
-        "title authorId createdAt updatedAt project timing month delivered description",
+        "title authorId createdAt updatedAt project timing month deliveredAt description",
       page: page,
       limit: limit,
     };
@@ -69,7 +69,7 @@ export const getTask = async (req, res, next) => {
         project: task.project,
         timing: task.timing,
         month: task.month,
-        delivered: task.delivered,
+        deliveredAt: task.deliveredAt,
         description: task.description,
       },
     };
@@ -83,7 +83,7 @@ export const getTask = async (req, res, next) => {
 
 export const createTask = async (req, res, next) => {
   try {
-    const { title, project, timing, month, delivered, description } = req.body;
+    const { title, project, timing, month, deliveredAt, description } = req.body;
 
     const task = new Task({
       title,
@@ -92,7 +92,7 @@ export const createTask = async (req, res, next) => {
       project,
       timing,
       month,
-      delivered: moment(delivered).format(),
+      deliveredAt: moment(deliveredAt).format(),
       description,
     });
 

@@ -135,10 +135,10 @@ export const taskDataValidations = [
   check("updatedAt").trim().escape(),
   check("timing").trim().notEmpty().withMessage("Timing are required").escape(),
   check("month").trim().notEmpty().withMessage("Month are required").escape(),
-  check("delivered")
+  check("deliveredAt")
     .trim()
     .notEmpty()
-    .withMessage("Delivery are required")
+    .withMessage("DeliveryAt are required")
     .bail()
     .isISO8601()
     .withMessage("Invalid date format. ISO8601 required")
