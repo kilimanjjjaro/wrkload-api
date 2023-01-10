@@ -9,8 +9,8 @@ export const tokenGenerator = (uid, role, res) => {
     });
 
     res.cookie("accessToken", accessToken, {
-      sameSite: true,
-      secure: !(process.env.DEV_MODE === "true"),
+      // sameSite: true,
+      // secure: !(process.env.DEV_MODE === "true"),
       expires: new Date(Date.now() + expiresIn * 1000)
     });
 
