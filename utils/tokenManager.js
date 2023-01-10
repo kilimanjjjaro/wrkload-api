@@ -30,7 +30,7 @@ export const refreshTokenGenerator = (uid, role, res) => {
 
     res.cookie("refreshToken", refreshToken, {
       // sameSite: true,
-      // httpOnly: true,
+      httpOnly: true,
       // secure: !(process.env.DEV_MODE === "true"),
       expires: new Date(Date.now() + expiresIn * 1000)
     });
