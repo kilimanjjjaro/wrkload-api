@@ -5,19 +5,28 @@ import { User } from "../models/User.js";
 export const getTasks = async (req, res, next) => {
   try {
     let tasks;
+    let limit = 10;
     const page = req.query.page;
-    const limit = req.query.limit;
+
+    console.log(limit)
+    console.log(req.query.page)
+    
+    if (req.query.limit) {
+      limit = req.query.limit;
+    }
+    console.log(limit)
 
     await User.findOneAndUpdate(
       { _id: req.uid },
       { lastActiveAt: moment().format() }
     );
 
+    
     const paginationOptions = {
       select:
-        "title authorId createdAt updatedAt project timing month deliveredAt description",
+      "title authorId createdAt updatedAt project timing month deliveredAt description",
       page: page,
-      limit: limit,
+      
     };
 
     if (req.role === 1) {
