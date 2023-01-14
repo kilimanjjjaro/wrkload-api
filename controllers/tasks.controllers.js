@@ -7,14 +7,7 @@ export const getTasks = async (req, res, next) => {
     let tasks;
     let limit = 10;
     const page = req.query.page;
-
-    console.log(limit)
-    console.log(req.query.page)
-    
-    if (req.query.limit) {
-      limit = req.query.limit;
-    }
-    console.log(limit)
+    limit = req.query.limit;
 
     await User.findOneAndUpdate(
       { _id: req.uid },
