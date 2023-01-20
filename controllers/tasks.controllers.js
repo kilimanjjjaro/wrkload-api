@@ -96,9 +96,9 @@ export const createTask = async (req, res, next) => {
       description,
     });
 
-    await task.save();
+    const newTask = await task.save();
 
-    res.status(201).json({ status: "ok" });
+    res.status(201).json({ status: "ok", result: newTask });
   } catch (error) {
     console.error(error);
     next(error);
@@ -154,9 +154,9 @@ export const updateTask = async (req, res, next) => {
 
     reqTask.updatedAt = moment().format();
 
-    await task.updateOne({ $set: reqTask });
+    const updatedTask = await Task.findOneAndUpdate({ _id: id }, reqTask, { new: true });
 
-    res.status(200).json({ status: "ok" });
+    res.status(200).json({ status: "ok", result: updatedTask });
   } catch (error) {
     console.error(error);
     next(error);
