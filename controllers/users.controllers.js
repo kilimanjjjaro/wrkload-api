@@ -118,7 +118,7 @@ export const updateUser = async (req, res, next) => {
 
     await user.updateOne({ $set: reqUser });
 
-    res.status(200).json({ status: "ok" });
+    res.status(200).json({ status: "ok", user });
   } catch (error) {
     console.error(error);
     next(error);
