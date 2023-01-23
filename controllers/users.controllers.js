@@ -1,8 +1,4 @@
-import { v4 as defaultPasswordGenerator } from 'uuid'
-import dayjs from 'dayjs'
 import { User } from "../models/User.js";
-import { confirmationTokenGenerator } from "../utils/tokenManager.js";
-import transporter from "../utils/transporter.js";
 
 export const getUsers = async (req, res, next) => {
   try {
@@ -116,9 +112,9 @@ export const updateUser = async (req, res, next) => {
     )
       throw new Error("Permission denied");
 
-    await user.updateOne({ $set: reqUser });
+    const updatedUser = await User.findOneAndUpdate({ _id: id }, reqUser, { new: true });
 
-    res.status(200).json({ status: "ok", user });
+    res.status(200).json({ status: "ok", result: updatedUser });
   } catch (error) {
     console.error(error);
     next(error);
