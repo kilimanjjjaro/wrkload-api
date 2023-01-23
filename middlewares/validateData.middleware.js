@@ -40,7 +40,7 @@ export const registryDataValidations = [
     .notEmpty()
     .withMessage("Avatar are required")
     .bail()
-    .isURL()
+    .isURL({ require_tld: false })
     .withMessage("Invalid URL avatar"),
   check("password")
     .trim()
@@ -64,7 +64,7 @@ export const updateDataValidations = [
     .notEmpty()
     .withMessage("Avatar are required")
     .bail()
-    .isURL()
+    .isURL({ require_tld: false })
     .withMessage("Invalid URL avatar"),
 ];
 
