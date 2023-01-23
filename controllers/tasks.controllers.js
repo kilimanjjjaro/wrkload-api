@@ -1,4 +1,4 @@
-import moment from "moment";
+import dayjs from "dayjs";
 import { Task } from "../models/Task.js";
 import { User } from "../models/User.js";
 
@@ -10,7 +10,7 @@ export const getTasks = async (req, res, next) => {
 
     await User.findOneAndUpdate(
       { _id: req.uid },
-      { lastActiveAt: moment().format() }
+      { lastActiveAt: dayjs().format() }
     );
 
     const paginationOptions = {
@@ -88,11 +88,11 @@ export const createTask = async (req, res, next) => {
     const task = new Task({
       title,
       authorId: req.uid,
-      createdAt: moment().format(),
+      createdAt: dayjs().format(),
       project,
       timing,
       month,
-      deliveredAt: moment(deliveredAt).format(),
+      deliveredAt: dayjs(deliveredAt).format(),
       description,
     });
 
@@ -152,7 +152,7 @@ export const updateTask = async (req, res, next) => {
     )
       throw new Error("Can't update this data");
 
-    reqTask.updatedAt = moment().format();
+    reqTask.updatedAt = dayjs().format();
 
     const updatedTask = await Task.findOneAndUpdate({ _id: id }, reqTask, { new: true });
 

@@ -56,7 +56,7 @@ Demo: [https://wrkload-api-production.up.railway.app](https://wrkload-api-produc
 - [cors](https://github.com/expressjs/cors)
 - [dotenv](https://github.com/motdotla/dotenv)
 - [Nodemailer](https://github.com/nodemailer/nodemailer)
-- [Moment.js](https://github.com/moment/moment)
+- [day.js](https://github.com/iamkun/dayjs/)
 - [nodemon](https://github.com/remy/nodemon)
 
 <br>

@@ -1,6 +1,6 @@
 import "dotenv/config";
 import jwt from "jsonwebtoken";
-import moment from "moment";
+import dayjs from "dayjs";
 import transporter from "../utils/transporter.js";
 import { User } from "../models/User.js";
 import {
@@ -20,7 +20,7 @@ export const register = async (req, res, next) => {
     user = new User({
       username: username,
       role: role,
-      registeredAt: moment().format(),
+      registeredAt: dayjs().format(),
       email: email,
       avatar: avatar,
       password: password,
@@ -36,7 +36,7 @@ export const register = async (req, res, next) => {
       html: `<a href="${process.env.BACKEND_URL}/api/v1/auth/confirm-account/${user.confirmationToken}">Click to confirm account</a>`,
     });
 
-    const { accessToken, expiresIn } = tokenGenerator(user._id, user.role);
+    const { accessToken, expiresIn } = tokenGenerator(user._id, user.role, res);
     refreshTokenGenerator(user._id, user.role, res);
 
     res.status(201).json({ status: "ok", user, accessToken, expiresIn });
@@ -59,7 +59,7 @@ export const login = async (req, res, next) => {
 
     if (!reqPass) throw new Error("Wrong password");
 
-    user.lastActiveAt = moment().format();
+    user.lastActiveAt = dayjs().format();
 
     await user.save();
 
