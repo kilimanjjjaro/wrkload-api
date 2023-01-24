@@ -20,11 +20,8 @@ export const getTasks = async (req, res, next) => {
       limit: limit,
     };
 
-    if (req.role === 1) {
-      tasks = await Task.paginate({}, paginationOptions);
-    } else {
-      tasks = await Task.paginate({ authorId: req.uid }, paginationOptions);
-    }
+
+    tasks = await Task.paginate({ authorId: req.uid }, paginationOptions);
 
     if (tasks.docs.length < 1) throw new Error("Tasks not found");
 
@@ -37,7 +34,7 @@ export const getTasks = async (req, res, next) => {
         page: tasks.page,
         nextPage: tasks.nextPage,
       },
-      results: tasks.docs,
+      tasks: tasks.docs,
     };
 
     res.status(200).json(tasks);
@@ -60,7 +57,7 @@ export const getTask = async (req, res, next) => {
 
     task = {
       status: "ok",
-      result: {
+      task: {
         _id: task._id,
         title: task.title,
         authorId: task.authorId,
@@ -98,7 +95,7 @@ export const createTask = async (req, res, next) => {
 
     const newTask = await task.save();
 
-    res.status(201).json({ status: "ok", result: newTask });
+    res.status(201).json({ status: "ok", newTask });
   } catch (error) {
     console.error(error);
     next(error);
@@ -156,7 +153,7 @@ export const updateTask = async (req, res, next) => {
 
     const updatedTask = await Task.findOneAndUpdate({ _id: id }, reqTask, { new: true });
 
-    res.status(200).json({ status: "ok", result: updatedTask });
+    res.status(200).json({ status: "ok", updatedTask });
   } catch (error) {
     console.error(error);
     next(error);

@@ -27,7 +27,7 @@ export const getUsers = async (req, res, next) => {
         page: users.page,
         nextPage: users.nextPage,
       },
-      results: users.docs,
+      users: users.docs,
     };
 
     res.status(200).json(users);
@@ -49,7 +49,7 @@ export const getUser = async (req, res, next) => {
 
     user = {
       status: "ok",
-      result: {
+      user: {
         _id: user._id,
         username: user.username,
         role: user.role,
@@ -112,9 +112,9 @@ export const updateUser = async (req, res, next) => {
     )
       throw new Error("Permission denied");
 
-    const updatedUser = await User.findOneAndUpdate({ _id: id }, reqUser, { new: true });
+    const updatedUser = await User.findOneAndUpdate({ _id: uid }, reqUser, { new: true });
 
-    res.status(200).json({ status: "ok", result: updatedUser });
+    res.status(200).json({ status: "ok", updatedUser });
   } catch (error) {
     console.error(error);
     next(error);

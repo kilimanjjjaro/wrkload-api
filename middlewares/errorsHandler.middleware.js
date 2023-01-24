@@ -186,6 +186,56 @@ const errorsHandler = (err, req, res, next) => {
         message: "This user doesn't exist",
       });
 
+    // PROJECTS ERRORS
+    case "Projects not found":
+      return res.status(404).json({
+        status: "error",
+        code: "projects/projects-not-found",
+        message: "Projects not found",
+      });
+
+    case "Project not found":
+      return res.status(404).json({
+        status: "error",
+        code: "projects/project-not-found",
+        message: "Project not found",
+      });
+
+    case "Can't read other authors projects":
+      return res.status(401).json({
+        status: "error",
+        code: "projects/permission-denied",
+        message: "Can't read other authors projects",
+      });
+
+    case "Can't update other authors projects":
+      return res.status(401).json({
+        status: "error",
+        code: "projects/permission-denied",
+        message: "Can't update other authors projects",
+      });
+
+    case "Can't delete other authors projects":
+      return res.status(401).json({
+        status: "error",
+        code: "projects/permission-denied",
+        message: "Can't delete other authors projects",
+      });
+
+    case "Can't update ID data":
+      return res.status(401).json({
+        status: "error",
+        code: "projects/permission-denied",
+        message: "Can't update ID data",
+      });
+
+    case "Can't update this data":
+      return res.status(401).json({
+        status: "error",
+        code: "projects/permission-denied",
+        message: "Can't update this data",
+      });
+
     // UNTRACKED ERRORS
     default:
       return res.status(500).json({

@@ -203,3 +203,8 @@ export const paginationParamsValidations = [
   query("limit").trim().escape().default(6),
   manageValidationErrors,
 ];
+
+export const projectDataValidations = [
+  check("name").trim().notEmpty().withMessage("Name are required").escape(),
+  manageValidationErrors,
+];
