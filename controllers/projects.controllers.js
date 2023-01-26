@@ -21,7 +21,12 @@ export const getProjects = async (req, res, next) => {
 
     projects = await Project.paginate({ authorId: req.uid }, paginationOptions);
 
-    if (projects.docs.length < 1) throw new Error("Projects not found");
+    if (projects.docs.length < 1)
+      return res.status(200).json({
+        status: "ok",
+        pagination: null,
+        projects: [],
+      });
 
     projects = {
       status: "ok",

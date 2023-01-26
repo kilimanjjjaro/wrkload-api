@@ -20,10 +20,14 @@ export const getTasks = async (req, res, next) => {
       limit: limit,
     };
 
-
     tasks = await Task.paginate({ authorId: req.uid }, paginationOptions);
 
-    if (tasks.docs.length < 1) throw new Error("Tasks not found");
+    if (tasks.docs.length < 1)
+      return res.status(200).json({
+        status: "ok",
+        pagination: null,
+        tasks: [],
+      });
 
     tasks = {
       status: "ok",
@@ -80,7 +84,8 @@ export const getTask = async (req, res, next) => {
 
 export const createTask = async (req, res, next) => {
   try {
-    const { title, project, timing, month, deliveredAt, description } = req.body;
+    const { title, project, timing, month, deliveredAt, description } =
+      req.body;
 
     const task = new Task({
       title,
@@ -151,7 +156,9 @@ export const updateTask = async (req, res, next) => {
 
     reqTask.updatedAt = dayjs().format();
 
-    const updatedTask = await Task.findOneAndUpdate({ _id: id }, reqTask, { new: true });
+    const updatedTask = await Task.findOneAndUpdate({ _id: id }, reqTask, {
+      new: true,
+    });
 
     res.status(200).json({ status: "ok", updatedTask });
   } catch (error) {

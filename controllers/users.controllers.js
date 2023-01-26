@@ -16,7 +16,12 @@ export const getUsers = async (req, res, next) => {
 
     let users = await User.paginate({}, paginationOptions);
 
-    if (users.docs.length < 1) throw new Error("Users not found");
+    if (users.docs.length < 1)
+      return res.status(200).json({
+        status: "ok",
+        pagination: null,
+        users: [],
+      });
 
     users = {
       status: "ok",
@@ -112,7 +117,9 @@ export const updateUser = async (req, res, next) => {
     )
       throw new Error("Permission denied");
 
-    const updatedUser = await User.findOneAndUpdate({ _id: uid }, reqUser, { new: true });
+    const updatedUser = await User.findOneAndUpdate({ _id: uid }, reqUser, {
+      new: true,
+    });
 
     res.status(200).json({ status: "ok", updatedUser });
   } catch (error) {
