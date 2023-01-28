@@ -198,9 +198,22 @@ export const resetPassDataValidations = [
   manageValidationErrors,
 ];
 
-export const paginationParamsValidations = [
+export const tasksParamsValidations = [
+  query("project").exists().withMessage("Project parameter are required").trim().escape().notEmpty().withMessage("Project parameter cannot be empty"),
   query("page").trim().escape().default(1),
-  query("limit").trim().escape().default(6),
+  query("limit").trim().escape().default(12),
+  manageValidationErrors,
+];
+
+export const projectsParamsValidations = [
+  query("page").trim().escape().default(1),
+  query("limit").trim().escape().default(12),
+  manageValidationErrors,
+];
+
+export const usersParamsValidations = [
+  query("page").trim().escape().default(1),
+  query("limit").trim().escape().default(12),
   manageValidationErrors,
 ];
 

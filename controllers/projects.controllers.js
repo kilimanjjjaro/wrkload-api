@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import { Project } from "../models/Project.js";
+import { Task } from "../models/Task.js";
 import { User } from "../models/User.js";
 
 export const getProjects = async (req, res, next) => {
@@ -27,6 +28,14 @@ export const getProjects = async (req, res, next) => {
         pagination: null,
         projects: [],
       });
+
+    projects.docs.forEach(project => {
+      Task.find({ project: project.name, authorId: req.uid }, (err, tasks) => {
+        if (err) console.error(err);
+        project.totalTasks = tasks.length;
+        project.save();
+      });
+    });
 
     projects = {
       status: "ok",
@@ -79,6 +88,11 @@ export const getProject = async (req, res, next) => {
 export const createProject = async (req, res, next) => {
   try {
     const { name } = req.body;
+    console.log(req)
+
+    const exists = Project.find({ name });
+
+    if (exists) throw new Error("Project already exists");
 
     const project = new Project({
       name,

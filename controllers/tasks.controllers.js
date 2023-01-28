@@ -1,12 +1,19 @@
 import dayjs from "dayjs";
+import { type } from "os";
 import { Task } from "../models/Task.js";
 import { User } from "../models/User.js";
+import { getCurrentMonthTasks, getPastMonthTasks, getTotalTasksTiming, isBetterPerformance } from "../utils/stats.js";
 
 export const getTasks = async (req, res, next) => {
   try {
-    let tasks;
+    let tasks = [];
     const page = req.query.page;
     const limit = req.query.limit;
+    const project = req.query.project;
+    let projectStats = null;
+    let totalTimingPastMonth = '';
+    let totalTimingCurrentMonth = '';
+    let performance = ''
 
     await User.findOneAndUpdate(
       { _id: req.uid },
@@ -20,14 +27,46 @@ export const getTasks = async (req, res, next) => {
       limit: limit,
     };
 
-    tasks = await Task.paginate({ authorId: req.uid }, paginationOptions);
+    tasks = await Task.paginate({ authorId: req.uid, project }, paginationOptions);
 
-    if (tasks.docs.length < 1)
+    if (tasks.docs.length < 1) {
       return res.status(200).json({
         status: "ok",
         pagination: null,
         tasks: [],
+        projectStats: null,
       });
+    }
+
+    const pastMonthTasks = getPastMonthTasks(tasks.docs)
+
+    if (pastMonthTasks.length >= 1) {
+      totalTimingPastMonth = getTotalTasksTiming(pastMonthTasks);
+
+      projectStats = {
+        ...projectStats,
+        totalTimingPastMonth: totalTimingPastMonth,
+        totalTasksPastMonth: pastMonthTasks.length.toString(),
+      };
+    }
+
+    const currentMonthTasks = getCurrentMonthTasks(tasks.docs)
+
+    if (currentMonthTasks.length >= 1) {
+      totalTimingCurrentMonth = getTotalTasksTiming(currentMonthTasks);
+
+      projectStats = {
+        ...projectStats,
+        totalTimingCurrentMonth: totalTimingCurrentMonth,
+        totalTasksCurrentMonth: currentMonthTasks.length.toString(),
+      };
+    }
+
+    if (isBetterPerformance(currentMonthTasks, pastMonthTasks)) {
+      performance = 'better'
+    } else {
+      performance = 'worst'
+    }
 
     tasks = {
       status: "ok",
@@ -39,6 +78,10 @@ export const getTasks = async (req, res, next) => {
         nextPage: tasks.nextPage,
       },
       tasks: tasks.docs,
+      projectStats: {
+        ...projectStats,
+        performance
+      }
     };
 
     res.status(200).json(tasks);

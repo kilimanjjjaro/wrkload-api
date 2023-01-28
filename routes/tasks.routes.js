@@ -9,12 +9,12 @@ import {
 import { requireAccessToken } from "../middlewares/requireAccessToken.middleware.js";
 import {
   idParamValidations,
-  paginationParamsValidations,
+  tasksParamsValidations,
   taskDataValidations,
 } from "../middlewares/validateData.middleware.js";
 const router = Router();
 
-router.get("/", requireAccessToken, paginationParamsValidations, getTasks);
+router.get("/", requireAccessToken, tasksParamsValidations, getTasks);
 router.get("/:id", requireAccessToken, idParamValidations, getTask);
 router.post("/", requireAccessToken, taskDataValidations, createTask);
 router.delete("/:id", requireAccessToken, idParamValidations, deleteTask);

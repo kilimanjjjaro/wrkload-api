@@ -9,12 +9,12 @@ import {
 import { requireAccessToken } from "../middlewares/requireAccessToken.middleware.js";
 import {
   idParamValidations,
-  paginationParamsValidations,
   projectDataValidations,
+  projectsParamsValidations,
 } from "../middlewares/validateData.middleware.js";
 const router = Router();
 
-router.get("/", requireAccessToken, paginationParamsValidations, getProjects);
+router.get("/", requireAccessToken, projectsParamsValidations, getProjects);
 router.get("/:id", requireAccessToken, idParamValidations, getProject);
 router.post("/", requireAccessToken, projectDataValidations, createProject);
 router.delete("/:id", requireAccessToken, idParamValidations, deleteProject);

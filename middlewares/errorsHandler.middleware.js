@@ -236,6 +236,13 @@ const errorsHandler = (err, req, res, next) => {
         message: "Can't update this data",
       });
 
+    case "Project already exists":
+      return res.status(403).json({
+        status: "error",
+        code: "projects/project-already-exists",
+        message: "Project already exists",
+      });
+
     // UNTRACKED ERRORS
     default:
       return res.status(500).json({
