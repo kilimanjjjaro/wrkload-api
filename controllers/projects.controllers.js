@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import { Project } from "../models/Project.js";
 import { Task } from "../models/Task.js";
 import { User } from "../models/User.js";
+import { getBestProjectOfPastMonth } from "../utils/stats.js";
 
 export const getProjects = async (req, res, next) => {
   try {
@@ -14,13 +15,13 @@ export const getProjects = async (req, res, next) => {
       { lastActiveAt: dayjs().format() }
     );
 
-    const paginationOptions = {
+    const projectPaginationOptions = {
       select: "name authorId createdAt totalTasks",
       page: page,
       limit: limit,
     };
 
-    projects = await Project.paginate({ authorId: req.uid }, paginationOptions);
+    projects = await Project.paginate({ authorId: req.uid }, projectPaginationOptions);
 
     if (projects.docs.length < 1)
       return res.status(200).json({
@@ -29,13 +30,22 @@ export const getProjects = async (req, res, next) => {
         projects: [],
       });
 
+
     projects.docs.forEach(project => {
       Task.find({ project: project.name, authorId: req.uid }, (err, tasks) => {
-        if (err) console.error(err);
+        if (err) throw new Error(err);
         project.totalTasks = tasks.length;
         project.save();
       });
     });
+
+    const tasksPaginationOptions = {
+      select: "project deliveredAt",
+    };
+
+    const tasks = await Task.paginate({ authorId: req.uid }, tasksPaginationOptions);
+
+    const bestProjectOfPastMonth = await getBestProjectOfPastMonth(tasks.docs);
 
     projects = {
       status: "ok",
@@ -47,6 +57,9 @@ export const getProjects = async (req, res, next) => {
         nextPage: projects.nextPage,
       },
       projects: projects.docs,
+      stats: {
+        bestProjectOfPastMonth
+      }
     };
 
     res.status(200).json(projects);
@@ -88,17 +101,15 @@ export const getProject = async (req, res, next) => {
 export const createProject = async (req, res, next) => {
   try {
     const { name } = req.body;
-    console.log(req)
 
-    const exists = Project.find({ name });
+    const exists = await Project.findOne({ name, authorId: req.uid });
 
     if (exists) throw new Error("Project already exists");
 
     const project = new Project({
       name,
       authorId: req.uid,
-      createdAt: dayjs().format(),
-      totalTasks: 0,
+      createdAt: dayjs().format()
     });
 
     const newProject = await project.save();

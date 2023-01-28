@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import { type } from "os";
 import { Task } from "../models/Task.js";
 import { User } from "../models/User.js";
-import { getCurrentMonthTasks, getPastMonthTasks, getTotalTasksTiming, isBetterPerformance } from "../utils/stats.js";
+import { getBestProjectOfPastMonth, getCurrentMonthTasks, getPastMonthTasks, getTotalTasksTiming, isPerformanceBetter } from "../utils/stats.js";
 
 export const getTasks = async (req, res, next) => {
   try {
@@ -10,9 +10,9 @@ export const getTasks = async (req, res, next) => {
     const page = req.query.page;
     const limit = req.query.limit;
     const project = req.query.project;
-    let projectStats = null;
-    let totalTimingPastMonth = '';
-    let totalTimingCurrentMonth = '';
+    let stats = null;
+    let totalPastMonthTiming = '';
+    let totalCurrentMonthTiming = '';
     let performance = ''
 
     await User.findOneAndUpdate(
@@ -34,38 +34,54 @@ export const getTasks = async (req, res, next) => {
         status: "ok",
         pagination: null,
         tasks: [],
-        projectStats: null,
+        stats: null,
       });
     }
 
     const pastMonthTasks = getPastMonthTasks(tasks.docs)
 
     if (pastMonthTasks.length >= 1) {
-      totalTimingPastMonth = getTotalTasksTiming(pastMonthTasks);
+      totalPastMonthTiming = getTotalTasksTiming(pastMonthTasks);
 
-      projectStats = {
-        ...projectStats,
-        totalTimingPastMonth: totalTimingPastMonth,
+      stats = {
+        ...stats,
+        totalPastMonthTiming: totalPastMonthTiming,
         totalTasksPastMonth: pastMonthTasks.length.toString(),
+      };
+    } else {
+      stats = {
+        ...stats,
+        totalPastMonthTiming: '',
+        totalTasksPastMonth: '',
       };
     }
 
     const currentMonthTasks = getCurrentMonthTasks(tasks.docs)
 
     if (currentMonthTasks.length >= 1) {
-      totalTimingCurrentMonth = getTotalTasksTiming(currentMonthTasks);
+      totalCurrentMonthTiming = getTotalTasksTiming(currentMonthTasks);
 
-      projectStats = {
-        ...projectStats,
-        totalTimingCurrentMonth: totalTimingCurrentMonth,
+      stats = {
+        ...stats,
+        totalCurrentMonthTiming: totalCurrentMonthTiming,
         totalTasksCurrentMonth: currentMonthTasks.length.toString(),
+      };
+    } else {
+      stats = {
+        ...stats,
+        totalCurrentMonthTiming: '',
+        totalTasksCurrentMonth: '',
       };
     }
 
-    if (isBetterPerformance(currentMonthTasks, pastMonthTasks)) {
-      performance = 'better'
+    if (totalCurrentMonthTiming === totalPastMonthTiming) {
+      performance = 'same'
     } else {
-      performance = 'worst'
+      if (isPerformanceBetter(totalCurrentMonthTiming, totalPastMonthTiming)) {
+        performance = 'better'
+      } else {
+        performance = 'worst'
+      }
     }
 
     tasks = {
@@ -78,8 +94,8 @@ export const getTasks = async (req, res, next) => {
         nextPage: tasks.nextPage,
       },
       tasks: tasks.docs,
-      projectStats: {
-        ...projectStats,
+      stats: {
+        ...stats,
         performance
       }
     };
