@@ -24,24 +24,26 @@ export const getTotalTasksTiming = (tasks) => {
   let totalMinutes = 0;
 
   tasks.forEach(task => {
+    console.log(task.timing)
     const splitTime = task.timing.split(':');
     totalMinutes += (parseInt(splitTime[0]) * 60) + parseInt(splitTime[1]);
   });
 
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes - (hours * 60);
+  const timing = hours + ':' + minutes;
 
-  return hours + ':' + minutes;
+  return parseInt(timing);
 };
 
 export const isPerformanceBetter = (totalCurrentTiming, totalPastTiming) => {
-  if (!totalCurrentTiming) totalCurrentTiming = '00:00'
-  if (!totalPastTiming) totalPastTiming = '00:00'
-
-  const totalCurrentTimingInMs = Date.parse('1970-01-01T' + totalCurrentTiming + 'Z');
-  const totalPastTimingInMs = Date.parse('1970-01-01T' + totalPastTiming + 'Z');
-
-  return totalCurrentTimingInMs > totalPastTimingInMs;
+  if (totalCurrentTiming === totalPastTiming) {
+    return 'same';
+  } else if (totalCurrentTiming > totalPastTiming) {
+    return 'better';
+  } else {
+    return 'worse';
+  }
 }
 
 export const getBestProjectOfPastMonth = async (tasks) => {

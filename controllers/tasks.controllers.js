@@ -11,9 +11,8 @@ export const getTasks = async (req, res, next) => {
     const limit = req.query.limit;
     const project = req.query.project;
     let stats = null;
-    let totalPastMonthTiming = '';
-    let totalCurrentMonthTiming = '';
-    let performance = ''
+    let totalPastMonthTiming = 0;
+    let totalCurrentMonthTiming = 0;
 
     await User.findOneAndUpdate(
       { _id: req.uid },
@@ -42,17 +41,16 @@ export const getTasks = async (req, res, next) => {
 
     if (pastMonthTasks.length >= 1) {
       totalPastMonthTiming = getTotalTasksTiming(pastMonthTasks);
-
       stats = {
         ...stats,
         totalPastMonthTiming: totalPastMonthTiming,
-        totalTasksPastMonth: pastMonthTasks.length.toString(),
+        totalTasksPastMonth: pastMonthTasks.length,
       };
     } else {
       stats = {
         ...stats,
-        totalPastMonthTiming: '',
-        totalTasksPastMonth: '',
+        totalPastMonthTiming: 0,
+        totalTasksPastMonth: 0,
       };
     }
 
@@ -64,24 +62,14 @@ export const getTasks = async (req, res, next) => {
       stats = {
         ...stats,
         totalCurrentMonthTiming: totalCurrentMonthTiming,
-        totalTasksCurrentMonth: currentMonthTasks.length.toString(),
+        totalTasksCurrentMonth: currentMonthTasks.length,
       };
     } else {
       stats = {
         ...stats,
-        totalCurrentMonthTiming: '',
-        totalTasksCurrentMonth: '',
+        totalCurrentMonthTiming: 0,
+        totalTasksCurrentMonth: 0,
       };
-    }
-
-    if (totalCurrentMonthTiming === totalPastMonthTiming) {
-      performance = 'same'
-    } else {
-      if (isPerformanceBetter(totalCurrentMonthTiming, totalPastMonthTiming)) {
-        performance = 'better'
-      } else {
-        performance = 'worst'
-      }
     }
 
     tasks = {
@@ -96,7 +84,7 @@ export const getTasks = async (req, res, next) => {
       tasks: tasks.docs,
       stats: {
         ...stats,
-        performance
+        performance: isPerformanceBetter(totalCurrentMonthTiming, totalPastMonthTiming)
       }
     };
 
