@@ -134,7 +134,6 @@ export const taskDataValidations = [
   check("createdAt").trim().escape(),
   check("updatedAt").trim().escape(),
   check("timing").trim().notEmpty().withMessage("Timing are required").escape(),
-  check("month").trim().notEmpty().withMessage("Month are required").escape(),
   check("deliveredAt")
     .trim()
     .notEmpty()

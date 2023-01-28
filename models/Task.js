@@ -31,11 +31,6 @@ const taskSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-  month: {
-    type: String,
-    required: true,
-    trim: true,
-  },
   deliveredAt: {
     type: String,
     trim: true,
