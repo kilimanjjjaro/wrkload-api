@@ -200,7 +200,8 @@ export const resetPassDataValidations = [
 export const tasksParamsValidations = [
   query("project").exists().withMessage("Project parameter are required").trim().escape().notEmpty().withMessage("Project parameter cannot be empty"),
   query("page").trim().escape().default(1),
-  query("limit").trim().escape().default(12),
+  query("limit").trim().escape(),
+  query('search').trim().unescape(),
   manageValidationErrors,
 ];
 

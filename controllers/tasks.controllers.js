@@ -1,5 +1,4 @@
 import dayjs from "dayjs";
-import { type } from "os";
 import { Task } from "../models/Task.js";
 import { User } from "../models/User.js";
 import { getCurrentMonthTasks, getPastMonthTasks, getTotalTasksTiming, isPerformanceBetter } from "../utils/stats.js";
@@ -7,9 +6,11 @@ import { getCurrentMonthTasks, getPastMonthTasks, getTotalTasksTiming, isPerform
 export const getTasks = async (req, res, next) => {
   try {
     let tasks = [];
+    let paginationOptions = {};
     const page = req.query.page;
     const limit = req.query.limit;
     const project = req.query.project;
+    const search = req.query.search;
     let stats = null;
     let totalPastMonthTiming = 0;
     let totalCurrentMonthTiming = 0;
@@ -19,14 +20,28 @@ export const getTasks = async (req, res, next) => {
       { lastActiveAt: dayjs().format() }
     );
 
-    const paginationOptions = {
-      select:
-        "title authorId createdAt updatedAt project timing deliveredAt description",
-      page: page,
-      limit: limit,
-    };
+    if (limit) {
+      paginationOptions = {
+        select:
+          "title authorId createdAt updatedAt project timing deliveredAt description",
+        page: page,
+        limit: limit,
+      };
+    } else {
+      paginationOptions = {
+        select:
+          "title authorId createdAt updatedAt project timing deliveredAt description",
+        pagination: false,
+      };
+    }
 
-    tasks = await Task.paginate({ authorId: req.uid, project }, paginationOptions);
+    if (search) {
+      console.log(search)
+      const escapedString = search.replace(/^"|"$/g, '');
+      tasks = await Task.paginate({ authorId: req.uid, project, title: { "$regex": escapedString, "$options": "i" } }, paginationOptions);
+    } else {
+      tasks = await Task.paginate({ authorId: req.uid, project }, paginationOptions);
+    }
 
     if (tasks.docs.length < 1) {
       return res.status(200).json({
@@ -37,7 +52,12 @@ export const getTasks = async (req, res, next) => {
       });
     }
 
-    const pastMonthTasks = getPastMonthTasks(tasks.docs)
+    const tasksForStats = await Task.paginate({ authorId: req.uid, project }, {
+      select: "deliveredAt timing",
+      pagination: false,
+    });
+
+    const pastMonthTasks = getPastMonthTasks(tasksForStats.docs)
 
     if (pastMonthTasks.length >= 1) {
       totalPastMonthTiming = getTotalTasksTiming(pastMonthTasks);
@@ -54,7 +74,7 @@ export const getTasks = async (req, res, next) => {
       };
     }
 
-    const currentMonthTasks = getCurrentMonthTasks(tasks.docs)
+    const currentMonthTasks = getCurrentMonthTasks(tasksForStats.docs)
 
     if (currentMonthTasks.length >= 1) {
       totalCurrentMonthTiming = getTotalTasksTiming(currentMonthTasks);
