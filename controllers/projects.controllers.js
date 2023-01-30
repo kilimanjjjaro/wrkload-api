@@ -39,13 +39,12 @@ export const getProjects = async (req, res, next) => {
       });
     });
 
-    const tasksPaginationOptions = {
+    const tasksForStats = await Task.paginate({ authorId: req.uid }, {
       select: "project deliveredAt",
-    };
+      pagination: false,
+    });
 
-    const tasks = await Task.paginate({ authorId: req.uid }, tasksPaginationOptions);
-
-    const bestProjectOfPastMonth = await getBestProjectOfPastMonth(tasks.docs);
+    const bestProjectOfPastMonth = await getBestProjectOfPastMonth(tasksForStats.docs);
 
     projects = {
       status: "ok",
