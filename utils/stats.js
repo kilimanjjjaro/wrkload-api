@@ -24,7 +24,6 @@ export const getTotalTasksTiming = (tasks) => {
   let totalMinutes = 0;
 
   tasks.forEach(task => {
-    console.log(task.timing)
     const splitTime = task.timing.split(':');
     totalMinutes += (parseInt(splitTime[0]) * 60) + parseInt(splitTime[1]);
   });
