@@ -22,6 +22,11 @@ const userSchema = new mongoose.Schema({
     require: true,
     default: "",
   },
+  recentlyActive: {
+    type: Boolean,
+    require: true,
+    default: false,
+  },
   email: {
     type: String,
     required: true,

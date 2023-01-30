@@ -1,4 +1,5 @@
 import { User } from "../models/User.js";
+import dayjs from "dayjs";
 
 export const getUsers = async (req, res, next) => {
   try {
@@ -9,7 +10,7 @@ export const getUsers = async (req, res, next) => {
 
     const paginationOptions = {
       select:
-        "username role registeredAt lastActiveAt email avatar confirmationToken confirmationStatus",
+        "username role registeredAt lastActiveAt recentlyActive email avatar confirmationToken confirmationStatus",
       page: page,
       limit: limit,
     };
@@ -22,6 +23,16 @@ export const getUsers = async (req, res, next) => {
         pagination: null,
         users: [],
       });
+
+    const lastHour = dayjs().subtract(1, "hour").format("YYYY-MM-DD HH:mm:ss");
+
+    users.docs.forEach(user => {
+      if (user.lastActiveAt > lastHour) {
+        user.recentlyActive = true
+      } else {
+        user.recentlyActive = false
+      }
+    });
 
     users = {
       status: "ok",
@@ -60,6 +71,7 @@ export const getUser = async (req, res, next) => {
         role: user.role,
         registeredAt: user.registeredAt,
         lastActiveAt: user.lastActiveAt,
+        recentlyActive: user.recentlyActive,
         email: user.email,
         avatar: user.avatar,
         confirmationToken: user.confirmationToken,
