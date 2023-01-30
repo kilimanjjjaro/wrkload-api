@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import { type } from "os";
 import { Task } from "../models/Task.js";
 import { User } from "../models/User.js";
-import { getBestProjectOfPastMonth, getCurrentMonthTasks, getPastMonthTasks, getTotalTasksTiming, isPerformanceBetter } from "../utils/stats.js";
+import { getCurrentMonthTasks, getPastMonthTasks, getTotalTasksTiming, isPerformanceBetter } from "../utils/stats.js";
 
 export const getTasks = async (req, res, next) => {
   try {
@@ -58,18 +58,6 @@ export const getTasks = async (req, res, next) => {
 
     if (currentMonthTasks.length >= 1) {
       totalCurrentMonthTiming = getTotalTasksTiming(currentMonthTasks);
-
-      stats = {
-        ...stats,
-        totalCurrentMonthTiming: totalCurrentMonthTiming,
-        totalTasksCurrentMonth: currentMonthTasks.length,
-      };
-    } else {
-      stats = {
-        ...stats,
-        totalCurrentMonthTiming: 0,
-        totalTasksCurrentMonth: 0,
-      };
     }
 
     tasks = {
