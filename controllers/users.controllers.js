@@ -11,8 +11,6 @@ export const getUsers = async (req, res, next) => {
     const limit = req.query.limit;
     const search = req.query.search;
 
-    console.log(req.query.search)
-
     if (limit) {
       paginationOptions = {
         select: "username role registeredAt lastActiveAt recentlyActive email avatar confirmationToken confirmationStatus",
