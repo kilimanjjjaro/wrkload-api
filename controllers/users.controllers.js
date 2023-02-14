@@ -5,17 +5,33 @@ export const getUsers = async (req, res, next) => {
   try {
     if (req.role !== 1) throw new Error("Permission denied");
 
+    let users = {};
+    let paginationOptions = {};
     const page = req.query.page;
     const limit = req.query.limit;
+    const search = req.query.search;
 
-    const paginationOptions = {
-      select:
-        "username role registeredAt lastActiveAt recentlyActive email avatar confirmationToken confirmationStatus",
-      page: page,
-      limit: limit,
-    };
+    console.log(req.query.search)
 
-    let users = await User.paginate({}, paginationOptions);
+    if (limit) {
+      paginationOptions = {
+        select: "username role registeredAt lastActiveAt recentlyActive email avatar confirmationToken confirmationStatus",
+        page: page,
+        limit: limit,
+      };
+    } else {
+      paginationOptions = {
+        select: "username role registeredAt lastActiveAt recentlyActive email avatar confirmationToken confirmationStatus",
+        pagination: false,
+      };
+    }
+
+    if (search) {
+      const escapedString = search.replace(/^"|"$/g, '');
+      users = await User.paginate({ username: { "$regex": escapedString, "$options": "i" } }, paginationOptions);
+    } else {
+      users = await User.paginate({}, paginationOptions);
+    }
 
     if (users.docs.length < 1)
       return res.status(200).json({

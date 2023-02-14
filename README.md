@@ -583,6 +583,7 @@ Keeping in mind that the reason of to be of this project is to learn, I want to 
 
 - [x] Items per page and pagination params to GET requests.
 - [x] Unique access and refresh tokens per user.
+- [ ] Add date filter on tasks.
 - [ ] Requests by projects or by the name or type of task.
 - [ ] Design mails for confirmation account, resend account confirmation and forgot password.
 - [ ] Refactor the code to use Postgres Database with Supabase instead of MongoDB and Google Firebase.

@@ -3,13 +3,21 @@ import { Task } from "../models/Task.js";
 import { User } from "../models/User.js";
 import { getCurrentMonthTasks, getPastMonthTasks, getTotalTasksTiming, isPerformanceBetter } from "../utils/stats.js";
 
+const capitalize = (string) => {
+  const words = string.split(' ')
+  const capitalizedWords = words.map(word => {
+    return word.charAt(0).toUpperCase() + word.slice(1)
+  })
+  return capitalizedWords.join(' ')
+}
+
 export const getTasks = async (req, res, next) => {
   try {
     let tasks = [];
     let paginationOptions = {};
     const page = req.query.page;
     const limit = req.query.limit;
-    const project = req.query.project;
+    const project = capitalize(req.query.project);
     const search = req.query.search;
     let stats = null;
     let totalPastMonthTiming = 0;
@@ -36,7 +44,6 @@ export const getTasks = async (req, res, next) => {
     }
 
     if (search) {
-      console.log(search)
       const escapedString = search.replace(/^"|"$/g, '');
       tasks = await Task.paginate({ authorId: req.uid, project, title: { "$regex": escapedString, "$options": "i" } }, paginationOptions);
     } else {

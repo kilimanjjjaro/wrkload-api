@@ -7,21 +7,35 @@ import { getBestProjectOfPastMonth } from "../utils/stats.js";
 export const getProjects = async (req, res, next) => {
   try {
     let projects;
+    let projectPaginationOptions;
     const page = req.query.page;
     const limit = req.query.limit;
+    const search = req.query.search;
 
     await User.findOneAndUpdate(
       { _id: req.uid },
       { lastActiveAt: dayjs().format() }
     );
 
-    const projectPaginationOptions = {
-      select: "name authorId createdAt totalTasks",
-      page: page,
-      limit: limit,
-    };
+    if (limit) {
+      projectPaginationOptions = {
+        select: "name authorId createdAt totalTasks",
+        page: page,
+        limit: limit,
+      };
+    } else {
+      projectPaginationOptions = {
+        select: "name authorId createdAt totalTasks",
+        pagination: false,
+      };
+    }
 
-    projects = await Project.paginate({ authorId: req.uid }, projectPaginationOptions);
+    if (search) {
+      const escapedString = search.replace(/^"|"$/g, '');
+      projects = await Project.paginate({ authorId: req.uid, name: { "$regex": escapedString, "$options": "i" } }, projectPaginationOptions);
+    } else {
+      projects = await Project.paginate({ authorId: req.uid }, projectPaginationOptions);
+    }
 
     if (projects.docs.length < 1)
       return res.status(200).json({
