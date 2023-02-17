@@ -207,13 +207,13 @@ export const tasksParamsValidations = [
 
 export const projectsParamsValidations = [
   query("page").trim().escape().default(1),
-  query("limit").trim().escape().default(12),
+  query("limit").trim().escape(),
   manageValidationErrors,
 ];
 
 export const usersParamsValidations = [
   query("page").trim().escape().default(1),
-  query("limit").trim().escape().default(12),
+  query("limit").trim().escape(),
   manageValidationErrors,
 ];
 
