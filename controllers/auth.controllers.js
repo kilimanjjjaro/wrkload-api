@@ -33,13 +33,10 @@ export const register = async (req, res, next) => {
       from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
       to: user.email,
       subject: "Confirm your account",
-      html: `<a href="${process.env.BACKEND_URL}/api/v1/auth/confirm-account/${user.confirmationToken}">Click to confirm account</a>`,
+      html: `<a href="${process.env.FRONTEND_URL}/confirm-account/${user.confirmationToken}">Click to confirm account</a>`,
     });
 
-    const { accessToken, expiresIn } = tokenGenerator(user._id, user.role, res);
-    refreshTokenGenerator(user._id, user.role, res);
-
-    res.status(201).json({ status: "ok", _id: user.id, accessToken, expiresIn });
+    res.status(201).json({ status: "ok" });
   } catch (error) {
     console.error(error);
     next(error);
@@ -134,7 +131,7 @@ export const reSendConfirmAccountLink = async (req, res, next) => {
       from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
       to: user.email,
       subject: "Confirm your account",
-      html: `<a href="${process.env.BACKEND_URL}/api/v1/auth/confirm-account/${user.confirmationToken}">Click to confirm account</a>`,
+      html: `<a href="${process.env.FRONTEND_URL}/confirm-account/${user.confirmationToken}">Click to confirm account</a>`,
     });
 
     res.status(201).json({ status: "ok" });
@@ -173,7 +170,7 @@ export const changePassword = async (req, res, next) => {
   }
 };
 
-export const forgotPassword = async (req, res, next) => {
+export const rememberPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
     let user = await User.findOne({ email });

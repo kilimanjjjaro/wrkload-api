@@ -195,7 +195,7 @@ This API provides an authentication and authorization system developed to valida
 #### — Forgot password
 
 ```
-  POST /api/v1/auth/forgot-password
+  POST /api/v1/auth/remember-password
 ```
 
 | Request body | Type     | Required | Description                  |

@@ -102,8 +102,6 @@ export const getUser = async (req, res, next) => {
 
 export const deleteUser = async (req, res, next) => {
   try {
-    if (req.role !== 1) throw new Error("Permission denied");
-
     const { uid } = req.params;
     const user = await User.findById(uid);
 

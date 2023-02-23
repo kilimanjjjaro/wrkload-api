@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   changePassword,
   confirmAccount,
-  forgotPassword,
+  rememberPassword,
   login,
   logout,
   refreshAccessToken,
@@ -27,7 +27,7 @@ router.get("/token", requireRefreshToken, refreshAccessToken);
 router.get("/logout", logout);
 router.post("/register", registryDataValidations, register);
 router.post("/login", loginDataValidations, login);
-router.post("/forgot-password", emailValidations, forgotPassword);
+router.post("/remember-password", emailValidations, rememberPassword);
 router.post(
   "/resend-confirm-account",
   emailValidations,
