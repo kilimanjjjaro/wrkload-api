@@ -23,7 +23,7 @@ import { requireRefreshToken } from "../middlewares/requireRefreshToken.middlewa
 import { requireAccessToken } from "../middlewares/requireAccessToken.middleware.js";
 const router = Router();
 
-router.get("/token", requireRefreshToken, refreshAccessToken);
+router.get("/refreshToken", requireRefreshToken, refreshAccessToken);
 router.get("/logout", logout);
 router.post("/register", registryDataValidations, register);
 router.post("/login", loginDataValidations, login);

@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
 export const tokenGenerator = (uid, role, res) => {
-  const expiresIn = 60 * 15;
+  const expiresIn = 15;
 
   try {
     const accessToken = jwt.sign({ uid, role }, process.env.ACCESS_KEY, {

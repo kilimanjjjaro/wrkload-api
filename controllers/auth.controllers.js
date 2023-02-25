@@ -60,10 +60,10 @@ export const login = async (req, res, next) => {
 
     await user.save();
 
-    const { accessToken, expiresIn } = tokenGenerator(user._id, user.role, res);
+    tokenGenerator(user._id, user.role, res);
     refreshTokenGenerator(user._id, user.role, res);
 
-    res.status(200).json({ status: "ok", _id: user.id, accessToken, expiresIn });
+    res.status(200).json({ status: "ok", _id: user.id });
   } catch (error) {
     console.error(error);
     next(error);
@@ -72,9 +72,9 @@ export const login = async (req, res, next) => {
 
 export const refreshAccessToken = (req, res, next) => {
   try {
-    const { accessToken, expiresIn } = tokenGenerator(req.uid, req.role);
+    tokenGenerator(req.uid, req.role, res);
 
-    res.status(201).json({ status: "ok", accessToken, expiresIn });
+    res.status(201).json({ status: "ok" });
   } catch (error) {
     console.error(error);
     next(error);

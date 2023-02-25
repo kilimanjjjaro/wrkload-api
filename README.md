@@ -248,7 +248,7 @@ This API provides an authentication and authorization system developed to valida
 #### — Access token re-generator
 
 ```
-  GET /api/v1/auth/token
+  GET /api/v1/auth/refreshToken
 ```
 
 | HTTP Headers    | Type           | Required | Description                                              |
