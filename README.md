@@ -571,7 +571,6 @@ To run this server, you must create an .env file in the root of your project wit
 | `EMAIL_PASS`               | `string` | Password of email account to be used with nodemailer. |
 | `FRONTEND_URL`             | `string` | Link to client side, e.g.: http://localhost:7000      |
 | `BACKEND_URL`              | `string` | Link to server side, e.g.: http://localhost:5000      |
-| `DEV_MODE`                 | `string` | `true` if you are on dev environment.                 |
 
 To generate base64 secret keys you can use [_GeneratePlus_](https://generate.plus/en/base64).
 
