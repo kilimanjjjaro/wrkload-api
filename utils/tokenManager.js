@@ -9,8 +9,8 @@ export const tokenGenerator = (uid, role, res) => {
     });
 
     res.cookie("accessToken", accessToken, {
-      // sameSite: true,
-      // secure: !(process.env.DEV_MODE === "true"),
+      sameSite: true,
+      secure: process.env.NODE_ENV === "production",
       expires: new Date(Date.now() + expiresIn * 1000)
     });
 
@@ -29,9 +29,9 @@ export const refreshTokenGenerator = (uid, role, res) => {
     });
 
     res.cookie("refreshToken", refreshToken, {
-      // sameSite: true,
-      // httpOnly: true,
-      // secure: !(process.env.DEV_MODE === "true"),
+      sameSite: true,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
       expires: new Date(Date.now() + expiresIn * 1000)
     });
   } catch (error) {
