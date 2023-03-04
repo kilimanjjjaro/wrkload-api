@@ -85,6 +85,17 @@ export const getTasks = async (req, res, next) => {
 
     if (currentMonthTasks.length >= 1) {
       totalCurrentMonthTiming = getTotalTasksTiming(currentMonthTasks);
+      stats = {
+        ...stats,
+        totalCurrentMonthTiming: totalCurrentMonthTiming,
+        totalTasksCurrentMonth: currentMonthTasks.length,
+      };
+    } else {
+      stats = {
+        ...stats,
+        totalCurrentMonthTiming: 0,
+        totalTasksCurrentMonth: 0,
+      };
     }
 
     tasks = {
