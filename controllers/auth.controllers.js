@@ -190,7 +190,7 @@ export const rememberPassword = async (req, res, next) => {
       from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
       to: user.email,
       subject: "Reset your password",
-      html: rememberPasswordMail({id: user._id, resetPasswordTolen}),
+      html: rememberPasswordMail({id: user._id, resetPasswordToken}),
     });
 
     res.status(200).json({ status: "ok" });
