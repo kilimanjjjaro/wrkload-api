@@ -199,7 +199,7 @@ export default function confirmAccountMail (confirmationToken) {
                                                             <![endif]-->
                                                             <div align="center">
                                                               <!--[if mso]>
-                                                              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${frontendUrl}" style="height:48px; v-text-anchor:middle; width:179px;" arcsize="8.5%"  stroke="f" fillcolor="#0a0a0a">
+                                                              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${frontendUrl}/confirm-account/${confirmationToken}" style="height:48px; v-text-anchor:middle; width:179px;" arcsize="8.5%"  stroke="f" fillcolor="#0a0a0a">
                                                                 <w:anchorlock/>
                                                                 <center style="color:#7686b7;font-family:helvetica,sans-serif;">
                                                                   <![endif]-->  

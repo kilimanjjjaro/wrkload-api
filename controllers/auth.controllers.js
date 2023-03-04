@@ -10,7 +10,8 @@ import {
   tokenGenerator,
 } from "../utils/tokenManager.js";
 import confirmAccountMail from "../templates/confirmAccountMail.js";
-import resendConfirmationAccountLink from "../templates/resendConfirmationAccountLink.js";
+import resendConfirmationAccountLinkMail from "../templates/resendConfirmationAccountLinkMail.js";
+import rememberPasswordMail from "../templates/rememberPasswordMail.js";
 
 export const register = async (req, res, next) => {
   try {
@@ -134,7 +135,7 @@ export const reSendConfirmAccountLink = async (req, res, next) => {
       from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
       to: user.email,
       subject: "Confirm your account",
-      html: resendConfirmationAccountLink(user.confirmationToken),
+      html: resendConfirmationAccountLinkMail(user.confirmationToken),
     });
 
     res.status(201).json({ status: "ok" });
@@ -189,7 +190,7 @@ export const rememberPassword = async (req, res, next) => {
       from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
       to: user.email,
       subject: "Reset your password",
-      html: `<a href="${process.env.FRONTEND_URL}/reset-password/${user._id}/${resetPasswordToken}">Click to reset your password</a>`,
+      html: rememberPasswordMail({id: user._id, resetPasswordTolen}),
     });
 
     res.status(200).json({ status: "ok" });
