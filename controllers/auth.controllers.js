@@ -9,8 +9,8 @@ import {
   resetPassTokenGenerator,
   tokenGenerator,
 } from "../utils/tokenManager.js";
-import confirmAccountMail from "../templates/confirmAccountMail";
-import resendConfirmationAccountLink from "../templates/resendConfirmationAccountLink";
+import confirmAccountMail from "../templates/confirmAccountMail.js";
+import resendConfirmationAccountLink from "../templates/resendConfirmationAccountLink.js";
 
 export const register = async (req, res, next) => {
   try {
