@@ -1,4 +1,4 @@
-export default function confirmAccountMail ({ confirmationToken }) {
+export default function confirmAccountMail (confirmationToken) {
   const frontendUrl = process.env.FRONTEND_URL
 
   return `

@@ -1,4 +1,4 @@
-export default function resendConfirmationAccountLink ({ confirmationToken }) {
+export default function resendConfirmationAccountLink (confirmationToken) {
   const frontendUrl = process.env.FRONTEND_URL
   
   return `
