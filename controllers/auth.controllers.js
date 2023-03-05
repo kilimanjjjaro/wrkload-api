@@ -68,12 +68,18 @@ export const login = async (req, res, next) => {
     refreshTokenGenerator(user._id, user.role, res);
 
     const cleanUser = {
-      id: user._id,
+      _id: user._id,
       role: user.role,
-      email: user.email
+      email: user.email,
+      username: user.username,
+      avatar: user.avatar,
+      registeredAt: user.registeredAt,
+      lastActiveAt: user.lastActiveAt,
+      recentlyActive: user.recentlyActive,
+      confirmationStatus: user.confirmationStatus,
     };
 
-    res.status(200).json({ status: "ok", user: cleanUser, accessToken, expiresIn });
+    res.status(200).json({ status: "ok", _id: user.id, accessToken, expiresIn });
   } catch (error) {
     console.error(error);
     next(error);
