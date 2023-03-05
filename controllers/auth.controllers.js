@@ -79,7 +79,7 @@ export const login = async (req, res, next) => {
       confirmationStatus: user.confirmationStatus,
     };
 
-    res.status(200).json({ status: "ok", _id: user.id, accessToken, expiresIn });
+    res.status(200).json({ status: "ok", user: cleanUser, accessToken, expiresIn });
   } catch (error) {
     console.error(error);
     next(error);
