@@ -165,7 +165,7 @@ export const createTask = async (req, res, next) => {
       createdAt: dayjs().format(),
       project,
       timing,
-      deliveredAt: dayjs(deliveredAt).format(),
+      deliveredAt: dayjs(deliveredAt).format('YYYY-MM-DD'),
       description,
     });
 

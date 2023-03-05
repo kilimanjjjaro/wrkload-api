@@ -33,7 +33,7 @@ export const register = async (req, res, next) => {
     await user.save();
 
     await transporter.sendMail({
-      from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
+      from: '"wrkload" <wrkload@kilimanjjjaro.com>',
       to: user.email,
       subject: "Confirm your account",
       html: confirmAccountMail(user.confirmationToken),
@@ -144,7 +144,7 @@ export const reSendConfirmAccountLink = async (req, res, next) => {
     await user.save();
 
     await transporter.sendMail({
-      from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
+      from: '"wrkload" <wrkload@kilimanjjjaro.com>',
       to: user.email,
       subject: "Confirm your account",
       html: resendConfirmationAccountLinkMail(user.confirmationToken),
@@ -199,7 +199,7 @@ export const rememberPassword = async (req, res, next) => {
     );
 
     await transporter.sendMail({
-      from: '"Kilimanjjjaro" <noreply@kilimanjjjaro.com>',
+      from: '"wrkload" <wrkload@kilimanjjjaro.com>',
       to: user.email,
       subject: "Reset your password",
       html: rememberPasswordMail({id: user._id, resetPasswordToken}),
