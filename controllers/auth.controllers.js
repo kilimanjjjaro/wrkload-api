@@ -63,9 +63,9 @@ export const login = async (req, res, next) => {
 
     await user.save();
 
-    const { accessToken, expiresIn } = tokenGenerator(user._id, user.role, res);
+    const { accessToken, expiresIn } = tokenGenerator(user._id, user.role, user.email, res);
   
-    refreshTokenGenerator(user._id, user.role, res);
+    refreshTokenGenerator(user._id, user.role, user.email, res);
 
     const cleanUser = {
       _id: user._id,
@@ -88,7 +88,7 @@ export const login = async (req, res, next) => {
 
 export const refreshAccessToken = (req, res, next) => {
   try {
-    tokenGenerator(req.uid, req.role, res);
+    tokenGenerator(req.uid, req.role, req.email, res);
 
     res.status(201).json({ status: "ok" });
   } catch (error) {

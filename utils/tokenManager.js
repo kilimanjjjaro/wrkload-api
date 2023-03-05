@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken";
 
-export const tokenGenerator = (uid, role, res) => {
+export const tokenGenerator = (uid, role, email, res) => {
   const expiresIn = 60 * 15;
 
   try {
-    const accessToken = jwt.sign({ uid, role }, process.env.ACCESS_KEY, {
+    const accessToken = jwt.sign({ uid, role, email }, process.env.ACCESS_KEY, {
       expiresIn,
     });
 
@@ -20,11 +20,11 @@ export const tokenGenerator = (uid, role, res) => {
   }
 };
 
-export const refreshTokenGenerator = (uid, role, res) => {
+export const refreshTokenGenerator = (uid, role, email, res) => {
   const expiresIn = 60 * 60 * 24 * 30;
 
   try {
-    const refreshToken = jwt.sign({ uid, role }, process.env.REFRESH_KEY, {
+    const refreshToken = jwt.sign({ uid, role, email }, process.env.REFRESH_KEY, {
       expiresIn,
     });
 
