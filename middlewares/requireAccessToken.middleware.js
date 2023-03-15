@@ -8,10 +8,11 @@ export const requireAccessToken = (req, res, next) => {
 
     accessToken = accessToken.split(" ")[1];
 
-    const { uid, role } = jwt.verify(accessToken, process.env.ACCESS_KEY);
+    const { uid, role, email } = jwt.verify(accessToken, process.env.ACCESS_KEY);
 
     req.uid = uid;
     req.role = role;
+    req.email = email;
 
     next();
   } catch (error) {
