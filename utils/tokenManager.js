@@ -9,7 +9,7 @@ export const tokenGenerator = (uid, role, email, res) => {
     });
 
     res.cookie("accessToken", accessToken, {
-      sameSite: 'none',
+      sameSite: 'lax',
       secure: process.env.NODE_ENV === "production",
       expires: new Date(Date.now() + expiresIn * 1000)
     });
@@ -29,7 +29,7 @@ export const refreshTokenGenerator = (uid, role, email, res) => {
     });
 
     res.cookie("refreshToken", refreshToken, {
-      sameSite: 'none',
+      sameSite: 'lax',
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       expires: new Date(Date.now() + expiresIn * 1000)
