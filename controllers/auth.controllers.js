@@ -88,9 +88,9 @@ export const login = async (req, res, next) => {
 
 export const refreshAccessToken = (req, res, next) => {
   try {
-    tokenGenerator(req.uid, req.role, req.email, res);
+    const { accessToken } = tokenGenerator(req.uid, req.role, req.email, res);
 
-    res.status(201).json({ status: "ok" });
+    res.status(201).json({ status: "ok", accessToken });
   } catch (error) {
     console.error(error);
     next(error);

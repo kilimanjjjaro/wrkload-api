@@ -34,6 +34,8 @@ export const refreshTokenGenerator = (uid, role, email, res) => {
       secure: process.env.NODE_ENV === "production",
       expires: new Date(Date.now() + expiresIn * 1000)
     });
+
+    return { refreshToken };
   } catch (error) {
     console.error(error);
   }
