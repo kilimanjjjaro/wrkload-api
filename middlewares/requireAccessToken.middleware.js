@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 
 export const requireAccessToken = (req, res, next) => {
+  console.log('cookies:', req.headers)
   try {
     let accessToken = req.headers?.authorization;
 
