@@ -562,7 +562,6 @@ To run this server, you must create an .env file in the root of your project wit
 | Key                        | Type     | Description                                           |
 | -------------------------- | -------- | ----------------------------------------------------- |
 | `DATABASE`                 | `string` | Link to your MongoDB connection.                      |
-| `PORT`                     | `number` | Port of your server.                                  |
 | `ACCESS_KEY`               | `string` | Secret key to sign your access tokens.                |
 | `REFRESH_KEY`              | `string` | Secret key to sign your refresh tokens.               |
 | `CONFIRMATION_ACCOUNT_KEY` | `string` | Secret key to sign your confirmation account tokens.  |
