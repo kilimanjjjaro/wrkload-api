@@ -63,9 +63,9 @@ export const login = async (req, res, next) => {
 
     await user.save();
 
-    const { accessToken, expiresIn } = tokenGenerator(user._id, user.role, user.email, res);
+    const { accessToken } = tokenGenerator(user._id, user.role, user.email, res);
   
-    refreshTokenGenerator(user._id, user.role, user.email, res);
+    const { refreshToken } = refreshTokenGenerator(user._id, user.role, user.email, res);
 
     const cleanUser = {
       _id: user._id,
@@ -79,7 +79,7 @@ export const login = async (req, res, next) => {
       confirmationStatus: user.confirmationStatus,
     };
 
-    res.status(200).json({ status: "ok", user: cleanUser, accessToken, expiresIn });
+    res.status(200).json({ status: "ok", user: cleanUser, accessToken, refreshToken });
   } catch (error) {
     console.error(error);
     next(error);
@@ -88,9 +88,9 @@ export const login = async (req, res, next) => {
 
 export const refreshAccessToken = (req, res, next) => {
   try {
-    const { accessToken, expiresIn } = tokenGenerator(req.uid, req.role, req.email, res);
+    const { accessToken } = tokenGenerator(req.uid, req.role, req.email, res);
 
-    res.status(201).json({ status: "ok", accessToken, expiresIn });
+    res.status(201).json({ status: "ok", accessToken });
   } catch (error) {
     console.error(error);
     next(error);
