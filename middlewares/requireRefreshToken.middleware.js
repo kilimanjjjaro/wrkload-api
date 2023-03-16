@@ -1,9 +1,6 @@
 import jwt from "jsonwebtoken";
 
-// MAKE A MIDDLEWARE TO REQUIRE A REFRESH TOKEN.
 export const requireRefreshToken = (req, res, next) => {
-  console.log('cookies: ', req.cookies)
-  
   try {
     const refreshToken = req.cookies.refreshToken;
 
