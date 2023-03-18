@@ -65,7 +65,7 @@ export const login = async (req, res, next) => {
 
     const { accessToken } = tokenGenerator(user._id, user.role, user.email, res);
   
-    const { refreshToken, expiresIn } = refreshTokenGenerator(user._id, user.role, user.email, res);
+    const { refreshToken } = refreshTokenGenerator(user._id, user.role, user.email, res);
 
     const cleanUser = {
       _id: user._id,
@@ -78,13 +78,6 @@ export const login = async (req, res, next) => {
       recentlyActive: user.recentlyActive,
       confirmationStatus: user.confirmationStatus,
     };
-
-    res.cookie("refreshToken", refreshToken, {
-      maxAge: expiresIn * 1000,
-      sameSite: "none",
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production'
-    });
 
     res.status(200).json({ status: "ok", user: cleanUser, accessToken, refreshToken });
   } catch (error) {
