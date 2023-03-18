@@ -8,11 +8,11 @@ export const tokenGenerator = (uid, role, email, res) => {
       expiresIn,
     });
 
-    res.cookie("accessToken", accessToken, {
-      sameSite: 'none',
-      secure: process.env.NODE_ENV === "production",
-      expires: new Date(Date.now() + expiresIn * 1000)
-    });
+    // res.cookie("accessToken", accessToken, {
+    //   sameSite: 'none',
+    //   secure: process.env.NODE_ENV === "production",
+    //   expires: new Date(Date.now() + expiresIn * 1000)
+    // });
 
     return { accessToken, expiresIn };
   } catch (error) {
@@ -28,12 +28,12 @@ export const refreshTokenGenerator = (uid, role, email, res) => {
       expiresIn,
     });
 
-    res.cookie("refreshToken", refreshToken, {
-      sameSite: 'none',
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      expires: new Date(Date.now() + expiresIn * 1000)
-    });
+    // res.cookie("refreshToken", refreshToken, {
+    //   sameSite: 'none',
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === "production",
+    //   expires: new Date(Date.now() + expiresIn * 1000)
+    // });
 
     return { refreshToken, expiresIn };
   } catch (error) {
