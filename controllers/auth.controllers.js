@@ -99,9 +99,7 @@ export const refreshAccessToken = (req, res, next) => {
 };
 
 export const logout = (req, res) => {
-  console.log('req.cookies', req.cookies)
-  console.log('res.cookies', res.cookies)
-  res.clearCookie("refreshToken");
+  req.clearCookie("refreshToken");
   res.status(200).json({ status: "ok" });
 };
 

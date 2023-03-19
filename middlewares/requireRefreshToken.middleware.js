@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 
 export const requireRefreshToken = (req, res, next) => {
-  console.log("requireRefreshToken", req.cookies)
   try {
     const refreshToken = req.cookies.refreshToken;
 
