@@ -8,12 +8,6 @@ export const tokenGenerator = (uid, role, email, res) => {
       expiresIn,
     });
 
-    res.cookie("accessToken", accessToken, {
-      maxAge: expiresIn,
-      sameSite: 'none',
-      secure: process.env.NODE_ENV === "production",
-    });
-
     return { accessToken, expiresIn };
   } catch (error) {
     console.error(error);
