@@ -28,12 +28,12 @@ export const refreshTokenGenerator = (uid, role, email, res) => {
       expiresIn,
     });
 
-    // res.cookie("refreshToken", refreshToken, {
-    //   sameSite: 'none',
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === "production",
-    //   expires: new Date(Date.now() + expiresIn * 1000)
-    // });
+    res.cookie("refreshToken", refreshToken, {
+      maxAge: expiresIn,
+      sameSite: 'none',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production'
+    });
 
     return { refreshToken, expiresIn };
   } catch (error) {
