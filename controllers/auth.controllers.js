@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { serialize } from 'cookie';
 import jwt from "jsonwebtoken";
 import dayjs from "dayjs";
 import transporter from "../utils/transporter.js";
@@ -79,7 +80,16 @@ export const login = async (req, res, next) => {
       confirmationStatus: user.confirmationStatus,
     };
 
-    res.status(200).json({ status: "ok", user: cleanUser, accessToken, refreshToken });
+    const serialized = serialize('refreshToken', refreshToken, {
+      maxAge: 60 * 60 * 24 * 30,
+      sameSite: 'none',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+    });
+
+    res.setHeader('Set-Cookie', serialized);
+
+    res.status(200).json({ status: "ok", user: cleanUser, accessToken });
   } catch (error) {
     console.error(error);
     next(error);
