@@ -85,7 +85,7 @@ export const login = async (req, res, next) => {
       sameSite: 'none',
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      domain: process.env.FRONTEND_URL,
+      domain: 'wrkload.vercel.app',
     });
 
     res.setHeader('Set-Cookie', serialized);
