@@ -23,6 +23,8 @@ app.use(
     },
     methods: "GET,PATCH,POST,DELETE",
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-csrf-token'],
+    exposedHeaders: ['*', 'Authorization', ]
   })
 );
 

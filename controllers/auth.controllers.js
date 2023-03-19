@@ -84,8 +84,7 @@ export const login = async (req, res, next) => {
       maxAge: 60 * 60 * 24 * 30,
       sameSite: 'none',
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      domain: 'wrkload.vercel.app',
+      secure: process.env.NODE_ENV === 'production'
     });
 
     res.setHeader('Set-Cookie', serialized);
