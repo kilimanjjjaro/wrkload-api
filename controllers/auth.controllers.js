@@ -64,7 +64,7 @@ export const login = async (req, res, next) => {
 
     await user.save();
 
-    const { accessToken } = tokenGenerator(user._id, user.role, user.email, res);
+    tokenGenerator(user._id, user.role, user.email, res);
   
     refreshTokenGenerator(user._id, user.role, user.email, res);
 
@@ -80,7 +80,7 @@ export const login = async (req, res, next) => {
       confirmationStatus: user.confirmationStatus,
     };
 
-    res.status(200).json({ status: "ok", user: cleanUser, accessToken });
+    res.status(200).json({ status: "ok", user: cleanUser });
   } catch (error) {
     console.error(error);
     next(error);
@@ -89,9 +89,9 @@ export const login = async (req, res, next) => {
 
 export const refreshAccessToken = (req, res, next) => {
   try {
-    const { accessToken } = tokenGenerator(req.uid, req.role, req.email, res);
+    tokenGenerator(req.uid, req.role, req.email, res);
 
-    res.status(201).json({ status: "ok", accessToken });
+    res.status(201).json({ status: "ok" });
   } catch (error) {
     console.error(error);
     next(error);

@@ -8,11 +8,11 @@ export const tokenGenerator = (uid, role, email, res) => {
       expiresIn,
     });
 
-    // res.cookie("accessToken", accessToken, {
-    //   sameSite: 'none',
-    //   secure: process.env.NODE_ENV === "production",
-    //   expires: new Date(Date.now() + expiresIn * 1000)
-    // });
+    res.cookie("accessToken", accessToken, {
+      maxAge: expiresIn,
+      sameSite: 'none',
+      secure: process.env.NODE_ENV === "production",
+    });
 
     return { accessToken, expiresIn };
   } catch (error) {
