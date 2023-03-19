@@ -24,7 +24,7 @@ export const refreshTokenGenerator = (uid, role, email, res) => {
 
     res.cookie("refreshToken", refreshToken, {
       maxAge: expiresIn,
-      sameSite: 'none',
+      sameSite: 'lax',
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production'
     });

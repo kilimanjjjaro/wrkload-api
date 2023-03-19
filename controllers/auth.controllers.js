@@ -1,5 +1,4 @@
 import "dotenv/config";
-import { serialize } from 'cookie';
 import jwt from "jsonwebtoken";
 import dayjs from "dayjs";
 import transporter from "../utils/transporter.js";
