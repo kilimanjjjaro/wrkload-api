@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
 export const tokenGenerator = (uid, role, email, res) => {
-  const expiresIn = 60 * 15;
+  const expiresIn = 60 * 1;
 
   try {
     const accessToken = jwt.sign({ uid, role, email }, process.env.ACCESS_KEY, {
@@ -24,10 +24,9 @@ export const refreshTokenGenerator = (uid, role, email, res) => {
 
     res.cookie("refreshToken", refreshToken, {
       maxAge: expiresIn,
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      httpOnly: process.env.NODE_ENV === 'production',
-      secure: process.env.NODE_ENV === 'production',
-      domain: process.env.NODE_ENV === 'production' ? '.wrkload.vercel.app' : 'localhost',
+      sameSite: 'none',
+      httpOnly: true,
+      secure: true
     });
 
     return { refreshToken, expiresIn };
