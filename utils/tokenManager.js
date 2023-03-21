@@ -24,9 +24,10 @@ export const refreshTokenGenerator = (uid, role, email, res) => {
 
     res.cookie("refreshToken", refreshToken, {
       maxAge: expiresIn,
-      sameSite: 'none',
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production'
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      httpOnly: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === 'production',
+      domain: process.env.NODE_ENV === 'production' ? '.wrkload.vercel.app' : 'localhost',
     });
 
     return { refreshToken, expiresIn };
