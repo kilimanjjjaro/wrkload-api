@@ -46,8 +46,7 @@ export const getProjects = async (req, res, next) => {
 
 
     projects.docs.forEach(project => {
-      Task.find({ project: project.name, authorId: req.uid }, (err, tasks) => {
-        if (err) throw new Error(err);
+      Task.find({ project: project.name, authorId: req.uid }).then(tasks => {
         project.totalTasks = tasks.length;
         project.save();
       });

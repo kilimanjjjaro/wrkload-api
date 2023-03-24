@@ -72,11 +72,7 @@ export const login = async (req, res, next) => {
       role: user.role,
       email: user.email,
       username: user.username,
-      avatar: user.avatar,
-      registeredAt: user.registeredAt,
-      lastActiveAt: user.lastActiveAt,
-      recentlyActive: user.recentlyActive,
-      confirmationStatus: user.confirmationStatus,
+      avatar: user.avatar
     };
 
     res.status(200).json({ status: "ok", user: cleanUser, accessToken, expiresIn });
