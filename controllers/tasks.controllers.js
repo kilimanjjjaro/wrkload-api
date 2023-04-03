@@ -181,14 +181,9 @@ export const createTask = async (req, res, next) => {
 export const deleteTask = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const task = await Task.findById(id);
+    const task = await Task.findOneAndDelete({ _id: id, authorId: req.uid });
 
     if (!task) throw new Error("Task not found");
-
-    if (!task.authorId.equals(req.uid))
-      throw new Error("Can't delete other authors tasks");
-
-    await task.remove();
 
     res.status(200).json({ status: "ok" });
   } catch (error) {

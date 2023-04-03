@@ -136,14 +136,9 @@ export const createProject = async (req, res, next) => {
 export const deleteProject = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const project = await Project.findById(id);
+    const project = await Project.findOneAndDelete({ _id: id, authorId: req.uid });
 
     if (!project) throw new Error("Project not found");
-
-    if (!project.authorId.equals(req.uid))
-      throw new Error("Can't delete other authors projects");
-
-    await project.remove();
 
     res.status(200).json({ status: "ok" });
   } catch (error) {
