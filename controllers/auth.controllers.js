@@ -162,6 +162,8 @@ export const changePassword = async (req, res, next) => {
 
     if (!user) throw new Error("User not found");
 
+    if (user._id.equals('6439b01cf35b6e22570cd842')) throw new Error("Trial account detected");
+
     let reqPass = await user.comparePassword(oldPassword);
 
     if (!reqPass) throw new Error("Wrong password");
@@ -187,6 +189,8 @@ export const rememberPassword = async (req, res, next) => {
     let user = await User.findOne({ email });
 
     if (!user) throw new Error("User not found to reset password");
+
+    if (user._id.equals('6439b01cf35b6e22570cd842')) throw new Error("Trial account detected");
 
     const { resetPasswordToken } = resetPassTokenGenerator(
       user._id,
@@ -218,6 +222,8 @@ export const resetPassword = async (req, res, next) => {
     let user = await User.findOne({ _id: uid });
 
     if (!user) throw new Error("User not found");
+
+    if (user._id.equals('6439b01cf35b6e22570cd842')) throw new Error("Trial account detected");
 
     let token = process.env.RESET_PASSWORD_KEY + user.password;
 

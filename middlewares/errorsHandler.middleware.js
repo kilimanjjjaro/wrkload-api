@@ -243,6 +243,14 @@ const errorsHandler = (err, req, res, next) => {
         message: "Project already exists",
       });
 
+    // TRIAL ACCOUNT ERRORS
+    case "Trial account detected":
+      return res.status(401).json({
+        status: "error",
+        code: "trial/permission-denied",
+        message: "This is a trial account",
+      });
+
     // UNTRACKED ERRORS
     default:
       return res.status(500).json({

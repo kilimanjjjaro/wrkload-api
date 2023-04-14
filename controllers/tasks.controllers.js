@@ -157,7 +157,9 @@ export const getTask = async (req, res, next) => {
 export const createTask = async (req, res, next) => {
   try {
     const { title, project, timing, deliveredAt, description } =
-      req.body;
+    req.body;
+
+    if (req.uid === '6439b01cf35b6e22570cd842') throw new Error("Trial account detected");
 
     const task = new Task({
       title,
@@ -181,6 +183,9 @@ export const createTask = async (req, res, next) => {
 export const deleteTask = async (req, res, next) => {
   try {
     const { id } = req.params;
+    
+    if (req.uid === '6439b01cf35b6e22570cd842') throw new Error("Trial account detected");
+
     const task = await Task.findOneAndDelete({ _id: id, authorId: req.uid });
 
     if (!task) throw new Error("Task not found");
@@ -196,6 +201,9 @@ export const updateTask = async (req, res, next) => {
   try {
     let reqTask;
     const { id } = req.params;
+
+    if (req.uid === '6439b01cf35b6e22570cd842') throw new Error("Trial account detected");
+
     const task = await Task.findById(id);
 
     if (!task) throw new Error("Task not found");

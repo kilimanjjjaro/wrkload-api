@@ -114,6 +114,8 @@ export const createProject = async (req, res, next) => {
   try {
     const { name } = req.body;
 
+    if (req.uid === '6439b01cf35b6e22570cd842') throw new Error("Trial account detected");
+
     const exists = await Project.findOne({ name, authorId: req.uid });
 
     if (exists) throw new Error("Project already exists");
@@ -136,6 +138,9 @@ export const createProject = async (req, res, next) => {
 export const deleteProject = async (req, res, next) => {
   try {
     const { id } = req.params;
+
+    if (req.uid === '6439b01cf35b6e22570cd842') throw new Error("Trial account detected");
+
     const project = await Project.findOneAndDelete({ _id: id, authorId: req.uid });
 
     if (!project) throw new Error("Project not found");
@@ -151,6 +156,9 @@ export const updateProject = async (req, res, next) => {
   try {
     let reqProject;
     const { id } = req.params;
+
+    if (req.uid === '6439b01cf35b6e22570cd842') throw new Error("Trial account detected");
+    
     const project = await Project.findById(id);
 
     if (!project) throw new Error("Project not found");

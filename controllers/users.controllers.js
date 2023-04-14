@@ -103,6 +103,9 @@ export const getUser = async (req, res, next) => {
 export const deleteUser = async (req, res, next) => {
   try {
     const { uid } = req.params;
+    
+    if (uid === '6439b01cf35b6e22570cd842') throw new Error("Trial account detected");
+
     const user = await User.findOneAndDelete({ _id: uid });
 
     if (!user) throw new Error("User not found");
@@ -118,6 +121,9 @@ export const updateUser = async (req, res, next) => {
   try {
     let reqUser;
     const { uid } = req.params;
+    
+    if (uid === '6439b01cf35b6e22570cd842') throw new Error("Trial account detected");
+
     const user = await User.findById(uid);
 
     if (!user) throw new Error("User not found");
