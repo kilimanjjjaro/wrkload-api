@@ -23,10 +23,10 @@ export const refreshTokenGenerator = (uid, role, email, res) => {
     });
 
     res.cookie("refreshToken", refreshToken, {
-      maxAge: expiresIn,
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       httpOnly: process.env.NODE_ENV === 'production',
-      secure: process.env.NODE_ENV === 'production'
+      secure: process.env.NODE_ENV === 'production',
+      expires: new Date(Date.now() + expiresIn * 1000)
     });
 
     return { refreshToken, expiresIn };
