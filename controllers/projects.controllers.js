@@ -145,6 +145,8 @@ export const deleteProject = async (req, res, next) => {
 
     if (!project) throw new Error("Project not found");
 
+    await Task.deleteMany({ project: project.name, authorId: req.uid });
+
     res.status(200).json({ status: "ok" });
   } catch (error) {
     console.error(error);
