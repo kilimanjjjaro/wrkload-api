@@ -48,7 +48,7 @@ export const registryDataValidations = [
     .withMessage("Password are required")
     .bail()
     .isLength({ min: 8 })
-    .withMessage("Password must have a minimum of 6 characters"),
+    .withMessage("Password must have a minimum of 8 characters"),
   manageValidationErrors,
 ];
 
@@ -83,7 +83,7 @@ export const loginDataValidations = [
     .withMessage("Password are required")
     .bail()
     .isLength({ min: 8 })
-    .withMessage("Password must have a minimum of 6 characters"),
+    .withMessage("Password must have a minimum of 8 characters"),
   manageValidationErrors,
 ];
 
@@ -102,14 +102,14 @@ export const changePassDataValidations = [
     .withMessage("Password are required")
     .bail()
     .isLength({ min: 8 })
-    .withMessage("Password must have a minimum of 6 characters"),
+    .withMessage("Password must have a minimum of 8 characters"),
   check("newPassword")
     .trim()
     .notEmpty()
     .withMessage("New password are required")
     .bail()
     .isLength({ min: 8 })
-    .withMessage("New password must have a minimum of 6 characters"),
+    .withMessage("New password must have a minimum of 8 characters"),
   manageValidationErrors,
 ];
 
@@ -193,7 +193,7 @@ export const resetPassDataValidations = [
     .withMessage("New password are required")
     .bail()
     .isLength({ min: 8 })
-    .withMessage("New password must have a minimum of 6 characters"),
+    .withMessage("New password must have a minimum of 8 characters"),
   manageValidationErrors,
 ];
 
