@@ -24,7 +24,7 @@ export const registryDataValidations = [
     .bail()
     .isNumeric()
     .withMessage("A data type number is expected")
-    .replace(["1"], "2"),
+    .replace(["1"], "3"),
   check("registeredAt").trim().escape(),
   check("lastActiveAt").trim().escape(),
   check("email")

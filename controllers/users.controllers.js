@@ -152,14 +152,8 @@ export const updateUser = async (req, res, next) => {
     const secureUser = {
       _id: updatedUser._id,
       email: updatedUser.email,
-      role: updatedUser.role,
       username: updatedUser.username,
-      avatar: updatedUser.avatar,
-      registeredAt: updatedUser.registeredAt,
-      lastActiveAt: updatedUser.lastActiveAt,
-      recentlyActive: updatedUser.recentlyActive,
-      confirmationToken: updatedUser.confirmationToken,
-      confirmationStatus: updatedUser.confirmationStatus,
+      avatar: updatedUser.avatar
     };
 
     res.status(200).json({ status: "ok", user: secureUser });
