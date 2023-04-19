@@ -28,6 +28,7 @@ export const register = async (req, res, next) => {
       avatar: avatar,
       password: password,
       confirmationToken: confirmationTokenGenerator(email),
+      confirmationStatus: false,
     });
 
     await user.save();
@@ -67,15 +68,20 @@ export const login = async (req, res, next) => {
   
     refreshTokenGenerator(user._id, user.role, user.email, res);
 
-    const cleanUser = {
+    const secureUser = {
       _id: user._id,
       role: user.role,
       email: user.email,
       username: user.username,
-      avatar: user.avatar
+      avatar: user.avatar,
+      registeredAt: user.registeredAt,
+      lastActiveAt: user.lastActiveAt,
+      recentlyActive: user.recentlyActive,
+      confirmationToken: user.confirmationToken,
+      confirmationStatus: user.confirmationStatus,
     };
 
-    res.status(200).json({ status: "ok", user: cleanUser, accessToken, expiresIn });
+    res.status(200).json({ status: "ok", user: secureUser, accessToken, expiresIn });
   } catch (error) {
     console.error(error);
     next(error);

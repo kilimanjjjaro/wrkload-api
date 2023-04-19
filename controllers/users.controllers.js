@@ -149,7 +149,20 @@ export const updateUser = async (req, res, next) => {
       new: true,
     });
 
-    res.status(200).json({ status: "ok", updatedUser });
+    const secureUser = {
+      _id: updatedUser._id,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      username: updatedUser.username,
+      avatar: updatedUser.avatar,
+      registeredAt: updatedUser.registeredAt,
+      lastActiveAt: updatedUser.lastActiveAt,
+      recentlyActive: updatedUser.recentlyActive,
+      confirmationToken: updatedUser.confirmationToken,
+      confirmationStatus: updatedUser.confirmationStatus,
+    };
+
+    res.status(200).json({ status: "ok", user: secureUser });
   } catch (error) {
     console.error(error);
     next(error);
