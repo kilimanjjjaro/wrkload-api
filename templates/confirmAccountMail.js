@@ -181,10 +181,10 @@ export default function confirmAccountMail (confirmationToken) {
                                                         <tr>
                                                           <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:40px 20px 25px;font-family:helvetica,sans-serif;" align="left">
                                                             <div class="v-font-size" style="font-size: 20px; color: #0a0a0a; line-height: 140%; text-align: center; word-wrap: break-word;">
-                                                              <p style="line-height: 140%;">Welcome to wrkload, the app that help you to track what you've worked on in a simple and organized way.</p>
+                                                              <p style="line-height: 140%;">Welcome to wrkload, the app that will help you keep track of what you have worked on in a simple and organized way.</p>
                                                               <p style="line-height: 140%;"> </p>
-                                                              <p style="line-height: 140%; margin-top: 20px;">To get started, confirm your account</p>
-                                                              <p style="line-height: 140%;">by clicking the button below.</p>
+                                                              <p style="line-height: 140%; margin-top: 20px;">To start, please confirm your account</p>
+                                                              <p style="line-height: 140%;">by clicking on the following button.</p>
                                                             </div>
                                                           </td>
                                                         </tr>
