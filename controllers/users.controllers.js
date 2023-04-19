@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 
 export const getUsers = async (req, res, next) => {
   try {
-    if (req.role !== 1) throw new Error("Permission denied");
+    if (req.role === 3) throw new Error("Permission denied");
 
     let users = {};
     let paginationOptions = {};
@@ -74,7 +74,7 @@ export const getUser = async (req, res, next) => {
 
     if (!user) throw new Error("User doesn't exist");
 
-    if (!user._id.equals(req.uid) && req.role !== 1)
+    if (!user._id.equals(req.uid) && req.role === 3)
       throw new Error("Permission denied");
 
     user = {
@@ -153,7 +153,8 @@ export const updateUser = async (req, res, next) => {
       _id: updatedUser._id,
       email: updatedUser.email,
       username: updatedUser.username,
-      avatar: updatedUser.avatar
+      avatar: updatedUser.avatar,
+      role: updatedUser.role,
     };
 
     res.status(200).json({ status: "ok", user: secureUser });

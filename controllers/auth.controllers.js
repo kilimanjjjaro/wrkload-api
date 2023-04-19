@@ -72,7 +72,8 @@ export const login = async (req, res, next) => {
       _id: user._id,
       email: user.email,
       username: user.username,
-      avatar: user.avatar
+      avatar: user.avatar,
+      role: user.role,
     };
 
     res.status(200).json({ status: "ok", user: secureUser, accessToken, expiresIn });
