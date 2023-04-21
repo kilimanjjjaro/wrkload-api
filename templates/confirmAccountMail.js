@@ -179,7 +179,7 @@ export default function confirmAccountMail (confirmationToken) {
                                                     <table id="u_content_text_1" style="font-family:helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
                                                       <tbody>
                                                         <tr>
-                                                          <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:40px 20px 25px;font-family:helvetica,sans-serif;" align="left">
+                                                          <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:40px 16px 25px;font-family:helvetica,sans-serif;" align="left">
                                                             <div class="v-font-size" style="font-size: 20px; color: #0a0a0a; line-height: 140%; text-align: center; word-wrap: break-word;">
                                                               <p style="line-height: 140%;">Welcome to wrkload, the app that will help you keep track of what you have worked on in a simple and organized way.</p>
                                                               <p style="line-height: 140%;"> </p>
