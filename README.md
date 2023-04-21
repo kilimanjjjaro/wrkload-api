@@ -2,8 +2,6 @@
 
 wrkload API is an easy-to-use API REST developed to be implemented as backend by an app. Gives the possibility to a user to keep organized and documented the time he was working on his tasks.
 
-Demo: [https://wrkload-api-production.up.railway.app](https://wrkload-api-production.up.railway.app)
-
 <br>
 
 ## Table of Contents
@@ -14,6 +12,7 @@ Demo: [https://wrkload-api-production.up.railway.app](https://wrkload-api-produc
 - [API References](#api-references)
   - [Auth API](#auth-api)
   - [Tasks API](#tasks-api)
+  - [Projects API](#projects-api)
   - [Users API](#users-api)
 - [Environment variables](#environment-variables)
 - [Roadmap](#roadmap)
@@ -30,14 +29,14 @@ Demo: [https://wrkload-api-production.up.railway.app](https://wrkload-api-produc
 - `Access tokens` are generated at authentication and they are **signed with the user ID** (in some cases with email or role user) and a **base64 secret key**. Each token are **unique** and **belongs to a single user**. These access tokens are sent by client on the request **via HTTP headers** and the server **verifies that they are valid** and **belong to the owner of the request** before sending a response.
 - Access tokens have a **short life cycle**, they expire each 15 minutes. Here the `refresh tokens` make his job, they **generate new access tokens in the same way as expired access tokens was generated** but in **client side background**.
 - Refresh tokens are used **only for generate new access tokens**, not for authorization. This is why they **expire after 30 days**, to ensure that user doesn't have to login every 15 minutes.
-- Access tokens are **not stored in cookies or local storage**, they **live in memory** for 15 minutes. Refresh tokens are **stored but in secure cookies**, they are `Http-only, same-site and secure type` and can only be accessed by the browser through `HTTPS requests`, not with Javascript.
+- The refresh tokens are set on the client from the server as HttpOnly and secure cookies. They can only be accessed through the browser via HTTPS requests, not with Javascript.
 - `Confirmation of accounts` and `reset passwords` by email with **unique**, **one-time use** and **expiration times** links.
 - Request `responses filtered` based on user role.
 - `Paginated APIs` with detailed responses, including number of **items per page**, **items in total**, **number of current**, **previous** and **next page**.
 - `User role system`, this opens the way for a lot of frontend-side implementations, like querying registered users, non-sensitive user data, types of uploaded projects, tasks by users, create role permissions, etc.
 - Users **only can read, update or delete own tasks**, even users with administration role.
 - They can **create and store** useful information about their tasks such as: timing, project, delivery day, task type, a short description that can be used as a note book.
-- With this information, the frontend can show them **how many hours per month they spend on a project**. What **kind of tasks** they do more. If the **budget of each project is known**, the **objectives earned can be calculated** according to the number of hours invested.
+- Thanks to this information, **statistics** are calculated and returned on how many hours were worked and how many tasks were assigned per project in the current and past month.
 - `User passwords are salt (10 rounds) and hash with the Blowfish cipher` before being saved on database.
 - You can have user session information such as: the last time it was active or when it was registered.
 - You can see `when a user was last active` or `when they signed up`. You can also check `when a task was created or updated`.
@@ -112,8 +111,6 @@ This API provides an authentication and authorization system developed to valida
 | Response body | Type     | Description                                                             |
 | ------------- | -------- | ----------------------------------------------------------------------- |
 | `status`      | `string` | In the case of error a `code` and `message` property will be populated. |
-| `accessToken` | `string` | Valid access token to be included in request headers.                   |
-| `expiresIn`   | `number` | Validity time in seconds of the access token.                           |
 
 <br>
 
@@ -128,11 +125,17 @@ This API provides an authentication and authorization system developed to valida
 | `email`      | `string` | `true`   | Valid email of the new user.       |
 | `password`   | `string` | `true`   | Password of at least 8 characters. |
 
-| Response body | Type     | Description                                                             |
-| ------------- | -------- | ----------------------------------------------------------------------- |
-| `status`      | `string` | In the case of error a `code` and `message` property will be populated. |
-| `accessToken` | `string` | Valid access token to be included in request headers.                   |
-| `expiresIn`   | `number` | Validity time in seconds of the access token.                           |
+| Response body     | Type     | Description                                                             |
+| ----------------- | -------- | ----------------------------------------------------------------------- |
+| `status`          | `string` | In the case of error a `code` and `message` property will be populated. |
+| `user`            | `object` | User object.                                                            |
+| `user`.`_id`      | `string` | User ID.                                                                |
+| `user`.`username` | `string` | Name of user.                                                           |
+| `user`.`role`     | `number` | Role of user.                                                           |
+| `user`.`email`    | `string` | Valid email of new user.                                                |
+| `user`.`avatar`   | `string` | URL of image.                                                           |
+| `accessToken`     | `string` | Valid access token to be included in request headers.                   |
+| `expiresIn`       | `number` | Validity time in seconds of the access token.                           |
 
 <br>
 
@@ -176,9 +179,9 @@ This API provides an authentication and authorization system developed to valida
   PATCH /api/v1/auth/change-password
 ```
 
-| HTTP Headers    | Type           | Required | Description                                              |
-| --------------- | -------------- | -------- | -------------------------------------------------------- |
-| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
+| HTTP Headers    | Type           | Required | Description                                                       |
+| --------------- | -------------- | -------- | ----------------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in a secure cookie. |
 
 | Request body  | Type     | Required | Description                        |
 | ------------- | -------- | -------- | ---------------------------------- |
@@ -192,7 +195,7 @@ This API provides an authentication and authorization system developed to valida
 
 <br>
 
-#### — Forgot password
+#### — Remember password
 
 ```
   POST /api/v1/auth/remember-password
@@ -245,19 +248,15 @@ This API provides an authentication and authorization system developed to valida
 
 <br>
 
-#### — Access token re-generator
+#### — Refresh access token
 
 ```
   GET /api/v1/auth/refreshToken
 ```
 
-| HTTP Headers    | Type           | Required | Description                                              |
-| --------------- | -------------- | -------- | -------------------------------------------------------- |
-| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
-
-| Cookies        | Type       | Required | Description                                                                                     |
-| -------------- | ---------- | -------- | ----------------------------------------------------------------------------------------------- |
-| `refreshToken` | `HttpOnly` | `true`   | Valid JWT token generated at login and stored in cookie only accessible through https requests. |
+| Cookies        | Type       | Required | Description                                                                  |
+| -------------- | ---------- | -------- | ---------------------------------------------------------------------------- |
+| `refreshToken` | `HttpOnly` | `true`   | Valid JWT token generated at login and stored as HttpOnly and secure cookie. |
 
 | Response body | Type     | Description                                                             |
 | ------------- | -------- | ----------------------------------------------------------------------- |
@@ -282,35 +281,42 @@ This API provides a tasks management system. You can request all tasks or a sing
   GET /api/v1/tasks
 ```
 
-| HTTP Headers    | Type           | Required | Description                                              |
-| --------------- | -------------- | -------- | -------------------------------------------------------- |
-| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
+| HTTP Headers    | Type           | Required | Description                                                       |
+| --------------- | -------------- | -------- | ----------------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in a secure cookie. |
 
 | Request parameters | Type     | Required | Description                               |
 | ------------------ | -------- | -------- | ----------------------------------------- |
+| `project`          | `string` | `true`   | The name of project.                      |
 | `limit`            | `string` | `false`  | The number of results per page to return. |
 | `page`             | `string` | `false`  | Use this to page through the results.     |
+| `search`           | `string` | `false`  | Search by title.                          |
 
-| Response body                 | Type     | Description                                                             |
-| ----------------------------- | -------- | ----------------------------------------------------------------------- |
-| `status`                      | `string` | In the case of error a `code` and `message` property will be populated. |
-| `pagination`                  | `object` | Pagination data object with following propierties.                      |
-| `pagination`.`totalResults`   | `number` | The total number of results available for your request.                 |
-| `pagination`.`resultsPerPage` | `number` | The number of results available per page.                               |
-| `pagination`.`prevPage`       | `number` | The number of previous page.                                            |
-| `pagination`.`page`           | `number` | The number of actual page.                                              |
-| `pagination`.`nextPage`       | `number` | The number of next page.                                                |
-| `results`                     | `array`  | The results of the request.                                             |
-| `results`.`_id`               | `string` | Task ID.                                                                |
-| `results`.`title`             | `string` | Title of task.                                                          |
-| `results`.`authorId`          | `string` | Author ID of task.                                                      |
-| `results`.`createdAt`         | `string` | Task create date in ISO8601 format.                                     |
-| `results`.`updatedAt`         | `string` | Task update date in ISO8601 format.                                     |
-| `results`.`project`           | `string` | Task project name.                                                      |
-| `results`.`timing`            | `string` | Time the task was completed.                                            |
-| `results`.`month`             | `string` | Month the task was completed.                                           |
-| `results`.`delivered`         | `string` | Date the task was completed. ISO8601 format required.                   |
-| `results`.`description`       | `string` | Description of the task.                                                |
+| Response body                     | Type     | Description                                                             |
+| --------------------------------- | -------- | ----------------------------------------------------------------------- |
+| `status`                          | `string` | In the case of error a `code` and `message` property will be populated. |
+| `pagination`                      | `object` | Pagination data object with following propierties.                      |
+| `pagination`.`totalResults`       | `number` | The total number of results available for your request.                 |
+| `pagination`.`resultsPerPage`     | `number` | The number of results available per page.                               |
+| `pagination`.`prevPage`           | `number` | The number of previous page.                                            |
+| `pagination`.`page`               | `number` | The number of actual page.                                              |
+| `pagination`.`nextPage`           | `number` | The number of next page.                                                |
+| `results`                         | `array`  | The results of the request.                                             |
+| `results`.`_id`                   | `string` | Task ID.                                                                |
+| `results`.`title`                 | `string` | Title of task.                                                          |
+| `results`.`authorId`              | `string` | Author ID of task.                                                      |
+| `results`.`createdAt`             | `string` | Task create date in ISO8601 format.                                     |
+| `results`.`updatedAt`             | `string` | Task update date in ISO8601 format.                                     |
+| `results`.`project`               | `string` | Task project name.                                                      |
+| `results`.`timing`                | `string` | Time the task was completed.                                            |
+| `results`.`delivered`             | `string` | Date the task was completed. ISO8601 format required.                   |
+| `results`.`description`           | `string` | Description of the task.                                                |
+| `stats`                           | `object` | The stats of the request.                                               |
+| `stats`.`totalPastMonthTiming`    | `number` | Total time of tasks completed in the past month.                        |
+| `stats`.`totalTasksPastMonth`     | `number` | Total tasks completed in the past month.                                |
+| `stats`.`totalCurrentMonthTiming` | `number` | Total time of tasks completed in the current month.                     |
+| `stats`.`totalTasksCurrentMonth`  | `number` | Total tasks completed in the current month.                             |
+| `stats`.`performance`             | `string` | Performance between the current month and the past                      |
 
 <br>
 
@@ -322,9 +328,9 @@ This API provides a tasks management system. You can request all tasks or a sing
   GET /api/v1/tasks/${id}
 ```
 
-| HTTP Headers    | Type           | Required | Description                                              |
-| --------------- | -------------- | -------- | -------------------------------------------------------- |
-| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
+| HTTP Headers    | Type           | Required | Description                                                       |
+| --------------- | -------------- | -------- | ----------------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in a secure cookie. |
 
 | Request parameters | Type     | Required | Description |
 | ------------------ | -------- | -------- | ----------- |
@@ -341,7 +347,6 @@ This API provides a tasks management system. You can request all tasks or a sing
 | `result`.`updatedAt`   | `string` | Task update date in ISO8601 format.                                     |
 | `result`.`project`     | `string` | Task project name.                                                      |
 | `result`.`timing`      | `string` | Time the task was completed.                                            |
-| `result`.`month`       | `string` | Month the task was completed.                                           |
 | `result`.`delivered`   | `string` | Date the task was completed. ISO8601 format required.                   |
 | `result`.`description` | `string` | Description of the task.                                                |
 
@@ -353,22 +358,31 @@ This API provides a tasks management system. You can request all tasks or a sing
   POST /api/v1/tasks
 ```
 
-| HTTP Headers    | Type           | Required | Description                                              |
-| --------------- | -------------- | -------- | -------------------------------------------------------- |
-| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
+| HTTP Headers    | Type           | Required | Description                                                       |
+| --------------- | -------------- | -------- | ----------------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in a secure cookie. |
 
 | Request body  | Type     | Required | Description                                           |
 | ------------- | -------- | -------- | ----------------------------------------------------- |
 | `title`       | `string` | `true`   | Title of task.                                        |
 | `project`     | `string` | `true`   | Task project name.                                    |
 | `timing`      | `string` | `true`   | Time the task was completed.                          |
-| `month`       | `string` | `true`   | Month the task was completed.                         |
-| `delivered`   | `string` | `false`  | Date the task was completed. ISO8601 format required. |
+| `delivered`   | `string` | `true`   | Date the task was completed. ISO8601 format required. |
 | `description` | `string` | `false`  | Description of the task.                              |
 
-| Response body | Type     | Description                                                             |
-| ------------- | -------- | ----------------------------------------------------------------------- |
-| `status`      | `string` | In the case of error a `code` and `message` property will be populated. |
+| Response body           | Type     | Description                                                             |
+| ----------------------- | -------- | ----------------------------------------------------------------------- |
+| `status`                | `string` | In the case of error a `code` and `message` property will be populated. |
+| `newTask`               | `object` | The new task created.                                                   |
+| `newTask`.`_id`         | `string` | Task ID.                                                                |
+| `newTask`.`title`       | `string` | Title of task.                                                          |
+| `newTask`.`authorId`    | `string` | Author ID of task.                                                      |
+| `newTask`.`createdAt`   | `string` | Task create date in ISO8601 format.                                     |
+| `newTask`.`updatedAt`   | `string` | Task update date in ISO8601 format.                                     |
+| `newTask`.`project`     | `string` | Task project name.                                                      |
+| `newTask`.`timing`      | `string` | Time the task was completed.                                            |
+| `newTask`.`delivered`   | `string` | Date the task was completed. ISO8601 format required.                   |
+| `newTask`.`description` | `string` | Description of the task.                                                |
 
 <br>
 
@@ -380,9 +394,9 @@ This API provides a tasks management system. You can request all tasks or a sing
   PATCH /api/v1/tasks/${id}
 ```
 
-| HTTP Headers    | Type           | Required | Description                                              |
-| --------------- | -------------- | -------- | -------------------------------------------------------- |
-| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
+| HTTP Headers    | Type           | Required | Description                                                       |
+| --------------- | -------------- | -------- | ----------------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in a secure cookie. |
 
 | Request parameters | Type     | Required | Description |
 | ------------------ | -------- | -------- | ----------- |
@@ -390,16 +404,26 @@ This API provides a tasks management system. You can request all tasks or a sing
 
 | Request body  | Type     | Required | Description                   |
 | ------------- | -------- | -------- | ----------------------------- |
-| `title`       | `string` | `true`   | Title of task.                |
-| `project`     | `string` | `true`   | Task project name.            |
-| `timing`      | `string` | `true`   | Time the task was completed.  |
-| `month`       | `string` | `true`   | Month the task was completed. |
+| `title`       | `string` | `false`  | Title of task.                |
+| `project`     | `string` | `false`  | Task project name.            |
+| `timing`      | `string` | `false`  | Time the task was completed.  |
+| `month`       | `string` | `false`  | Month the task was completed. |
 | `delivered`   | `string` | `false`  | Date the task was completed.  |
 | `description` | `string` | `false`  | Description of the task.      |
 
-| Response body | Type     | Description                                                             |
-| ------------- | -------- | ----------------------------------------------------------------------- |
-| `status`      | `string` | In the case of error a `code` and `message` property will be populated. |
+| Response body               | Type     | Description                                                             |
+| --------------------------- | -------- | ----------------------------------------------------------------------- |
+| `status`                    | `string` | In the case of error a `code` and `message` property will be populated. |
+| `updatedTask`               | `object` | The task updated.                                                       |
+| `updatedTask`.`_id`         | `string` | Task ID.                                                                |
+| `updatedTask`.`title`       | `string` | Title of task.                                                          |
+| `updatedTask`.`authorId`    | `string` | Author ID of task.                                                      |
+| `updatedTask`.`createdAt`   | `string` | Task create date in ISO8601 format.                                     |
+| `updatedTask`.`updatedAt`   | `string` | Task update date in ISO8601 format.                                     |
+| `updatedTask`.`project`     | `string` | Task project name.                                                      |
+| `updatedTask`.`timing`      | `string` | Time the task was completed.                                            |
+| `updatedTask`.`delivered`   | `string` | Date the task was completed. ISO8601 format required.                   |
+| `updatedTask`.`description` | `string` | Description of the task.                                                |
 
 <br>
 
@@ -411,13 +435,164 @@ This API provides a tasks management system. You can request all tasks or a sing
   DELETE /api/v1/tasks/${id}
 ```
 
-| HTTP Headers    | Type           | Required | Description                                              |
-| --------------- | -------------- | -------- | -------------------------------------------------------- |
-| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
+| HTTP Headers    | Type           | Required | Description                                                       |
+| --------------- | -------------- | -------- | ----------------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in a secure cookie. |
 
 | Request parameters | Type     | Required | Description |
 | ------------------ | -------- | -------- | ----------- |
 | `id`               | `string` | `true`   | ID task.    |
+
+| Response body | Type     | Description                                                             |
+| ------------- | -------- | ----------------------------------------------------------------------- |
+| `status`      | `string` | In the case of error a `code` and `message` property will be populated. |
+
+</details>
+
+### Projects API
+
+This API provides a project management system. You can request all projects or a single project, also you can create, edit, update or delete projects. Please, check the details to know its implementation.
+
+<details>
+<summary>See all details</summary>
+
+#### — Get all projects
+
+##### Only users with administrator role can read projects from other users.
+
+```
+  GET /api/v1/projects
+```
+
+| HTTP Headers    | Type           | Required | Description                                                       |
+| --------------- | -------------- | -------- | ----------------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in a secure cookie. |
+
+| Request parameters | Type     | Required | Description                               |
+| ------------------ | -------- | -------- | ----------------------------------------- |
+| `limit`            | `string` | `false`  | The number of results per page to return. |
+| `page`             | `string` | `false`  | Use this to page through the results.     |
+| `search`           | `string` | `false`  | Search by title.                          |
+
+| Response body                    | Type     | Description                                                             |
+| -------------------------------- | -------- | ----------------------------------------------------------------------- |
+| `status`                         | `string` | In the case of error a `code` and `message` property will be populated. |
+| `pagination`                     | `object` | Pagination data object with following propierties.                      |
+| `pagination`.`totalResults`      | `number` | The total number of results available for your request.                 |
+| `pagination`.`resultsPerPage`    | `number` | The number of results available per page.                               |
+| `pagination`.`prevPage`          | `number` | The number of previous page.                                            |
+| `pagination`.`page`              | `number` | The number of actual page.                                              |
+| `pagination`.`nextPage`          | `number` | The number of next page.                                                |
+| `results`                        | `array`  | The results of the request.                                             |
+| `results`.`_id`                  | `string` | Project ID.                                                             |
+| `results`.`name`                 | `string` | Name of project.                                                        |
+| `results`.`authorId`             | `string` | Author ID of project.                                                   |
+| `results`.`createdAt`            | `string` | Project create date in ISO8601 format.                                  |
+| `results`.`totalTasks`           | `number` | Total tasks of project.                                                 |
+| `stats`                          | `object` | The stats of the request.                                               |
+| `stats`.`bestProjectOfPastMonth` | `string` | The name of best project with more tasks in the past month.             |
+
+<br>
+
+#### — Get project
+
+##### You can only read own projects, except users with administrator role.
+
+```
+  GET /api/v1/projects/${id}
+```
+
+| HTTP Headers    | Type           | Required | Description                                                       |
+| --------------- | -------------- | -------- | ----------------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in a secure cookie. |
+
+| Request parameters | Type     | Required | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `id`               | `string` | `true`   | Project ID. |
+
+| Response body          | Type     | Description                                                             |
+| ---------------------- | -------- | ----------------------------------------------------------------------- |
+| `status`               | `string` | In the case of error a `code` and `message` property will be populated. |
+| `results`              | `array`  | The result of the request.                                              |
+| `results`.`_id`        | `string` | Project ID.                                                             |
+| `results`.`name`       | `string` | Name of project.                                                        |
+| `results`.`authorId`   | `string` | Author ID of project.                                                   |
+| `results`.`createdAt`  | `string` | Project create date in ISO8601 format.                                  |
+| `results`.`totalTasks` | `number` | Total tasks of project.                                                 |
+
+<br>
+
+#### — Create project
+
+```
+  POST /api/v1/projects
+```
+
+| HTTP Headers    | Type           | Required | Description                                                       |
+| --------------- | -------------- | -------- | ----------------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in a secure cookie. |
+
+| Request body | Type     | Required | Description      |
+| ------------ | -------- | -------- | ---------------- |
+| `name`       | `string` | `true`   | Name of project. |
+
+| Response body            | Type     | Description                                                             |
+| ------------------------ | -------- | ----------------------------------------------------------------------- |
+| `status`                 | `string` | In the case of error a `code` and `message` property will be populated. |
+| `newProject`             | `object` | The new project created.                                                |
+| `newProject`.`_id`       | `string` | Project ID.                                                             |
+| `newProject`.`name`      | `string` | Name of project.                                                        |
+| `newProject`.`authorId`  | `string` | Author ID of project.                                                   |
+| `newProject`.`createdAt` | `string` | Project create date in ISO8601 format.                                  |
+
+<br>
+
+#### — Update project
+
+##### You can only update own projects, even the admin can't update yours either.
+
+```
+  PATCH /api/v1/projects/${id}
+```
+
+| HTTP Headers    | Type           | Required | Description                                                       |
+| --------------- | -------------- | -------- | ----------------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in a secure cookie. |
+
+| Request parameters | Type     | Required | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `id`               | `string` | `true`   | Project ID. |
+
+| Request body | Type     | Required | Description      |
+| ------------ | -------- | -------- | ---------------- |
+| `name`       | `string` | `false`  | Name of project. |
+
+| Response body                | Type     | Description                                                             |
+| ---------------------------- | -------- | ----------------------------------------------------------------------- |
+| `status`                     | `string` | In the case of error a `code` and `message` property will be populated. |
+| `updatedProject`             | `object` | The project updated.                                                    |
+| `updatedProject`.`_id`       | `string` | Project ID.                                                             |
+| `updatedProject`.`name`      | `string` | Name of project.                                                        |
+| `updatedProject`.`authorId`  | `string` | Author ID of project.                                                   |
+| `updatedProject`.`createdAt` | `string` | Project create date in ISO8601 format.                                  |
+
+<br>
+
+#### — Delete project
+
+##### You can only delete own projects.
+
+```
+  DELETE /api/v1/projects/${id}
+```
+
+| HTTP Headers    | Type           | Required | Description                                                       |
+| --------------- | -------------- | -------- | ----------------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in a secure cookie. |
+
+| Request parameters | Type     | Required | Description |
+| ------------------ | -------- | -------- | ----------- |
+| `id`               | `string` | `true`   | Project ID. |
 
 | Response body | Type     | Description                                                             |
 | ------------- | -------- | ----------------------------------------------------------------------- |
@@ -440,14 +615,15 @@ This API provides an users management system. You can request all users or a sin
   GET /api/v1/users
 ```
 
-| HTTP Headers    | Type           | Required | Description                                              |
-| --------------- | -------------- | -------- | -------------------------------------------------------- |
-| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
+| HTTP Headers    | Type           | Required | Description                                                       |
+| --------------- | -------------- | -------- | ----------------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in a secure cookie. |
 
 | Request parameters | Type     | Required | Description                               |
 | ------------------ | -------- | -------- | ----------------------------------------- |
 | `limit`            | `string` | `false`  | The number of results per page to return. |
 | `page`             | `string` | `false`  | Use this to page through the results.     |
+| `search`           | `string` | `false`  | Search by title.                          |
 
 | Response body                   | Type      | Description                                                             |
 | ------------------------------- | --------- | ----------------------------------------------------------------------- |
@@ -479,9 +655,9 @@ This API provides an users management system. You can request all users or a sin
   GET /api/v1/users/${uid}
 ```
 
-| HTTP Headers    | Type           | Required | Description                                             |
-| --------------- | -------------- | -------- | ------------------------------------------------------- |
-| `Authorization` | `bearer token` | `true`   | Valu JWT token generated at login and stored in memory. |
+| HTTP Headers    | Type           | Required | Description                                                      |
+| --------------- | -------------- | -------- | ---------------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valu JWT token generated at login and stored in a secure cookie. |
 
 | Request parameters | Type     | Required | Description |
 | ------------------ | -------- | -------- | ----------- |
@@ -511,9 +687,9 @@ This API provides an users management system. You can request all users or a sin
   PATCH /api/v1/users/${uid}
 ```
 
-| HTTP Headers    | Type           | Required | Description                                              |
-| --------------- | -------------- | -------- | -------------------------------------------------------- |
-| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
+| HTTP Headers    | Type           | Required | Description                                                       |
+| --------------- | -------------- | -------- | ----------------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in a secure cookie. |
 
 | Request parameters | Type     | Required | Description |
 | ------------------ | -------- | -------- | ----------- |
@@ -525,9 +701,15 @@ This API provides an users management system. You can request all users or a sin
 | `email`      | `string` | New valid email of user. |
 | `avatar`     | `string` | URL of new image.        |
 
-| Response body | Type     | Description                                                             |
-| ------------- | -------- | ----------------------------------------------------------------------- |
-| `status`      | `string` | In the case of error a `code` and `message` property will be populated. |
+| Response body     | Type     | Description                                                             |
+| ----------------- | -------- | ----------------------------------------------------------------------- |
+| `status`          | `string` | In the case of error a `code` and `message` property will be populated. |
+| `user`            | `object` | The user of the request.                                                |
+| `user`.`_id`      | `string` | User ID.                                                                |
+| `user`.`email`    | `string` | Valid email of new user.                                                |
+| `user`.`username` | `string` | Name of user.                                                           |
+| `user`.`avatar`   | `string` | URL of image.                                                           |
+| `user`.`role`     | `number` | Role of user.                                                           |
 
 <br>
 
@@ -539,9 +721,9 @@ This API provides an users management system. You can request all users or a sin
   DELETE /api/v1/users/${uid}
 ```
 
-| HTTP Headers    | Type           | Required | Description                                              |
-| --------------- | -------------- | -------- | -------------------------------------------------------- |
-| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in memory. |
+| HTTP Headers    | Type           | Required | Description                                                       |
+| --------------- | -------------- | -------- | ----------------------------------------------------------------- |
+| `Authorization` | `bearer token` | `true`   | Valid JWT token generated at login and stored in a secure cookie. |
 
 | Request parameters | Type     | Required | Description |
 | ------------------ | -------- | -------- | ----------- |

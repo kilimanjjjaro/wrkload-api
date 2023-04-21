@@ -17,14 +17,6 @@ export const registryDataValidations = [
     .withMessage("Username are required")
     .escape()
     .withMessage("Invalid username format"),
-  check("role")
-    .trim()
-    .notEmpty()
-    .withMessage("Role are required")
-    .bail()
-    .isNumeric()
-    .withMessage("A data type number is expected")
-    .replace(["1"], "3"),
   check("registeredAt").trim().escape(),
   check("lastActiveAt").trim().escape(),
   check("email")

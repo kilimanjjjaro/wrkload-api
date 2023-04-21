@@ -15,14 +15,14 @@ import rememberPasswordMail from "../templates/rememberPasswordMail.js";
 
 export const register = async (req, res, next) => {
   try {
-    const { username, role, email, avatar, password } = req.body;
+    const { username, email, avatar, password } = req.body;
     let user = await User.findOne({ email });
 
     if (user) throw new Error("User already exists");
 
     user = new User({
       username: username,
-      role: role,
+      role: 3,
       registeredAt: dayjs().format(),
       email: email,
       avatar: avatar,
