@@ -165,7 +165,7 @@ export default function confirmAccountMail (confirmationToken) {
                                               <div id="u_column_2" class="u-col u-col-100" style="max-width: 320px;min-width: 500px;display: table-cell;vertical-align: top;">
                                                 <div style="background-color: #7686b7;height: 100%;width: 100% !important;border-radius: 24px;-webkit-border-radius: 24px; -moz-border-radius: 24px;">
                                                   <!--[if (!mso)&(!IE)]><!-->
-                                                  <div class="v-col-padding" style="box-sizing: border-box; height: 100%; padding: 45px 50px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;">
+                                                  <div class="v-col-padding" style="box-sizing: border-box; height: 100%; padding: 45px 40px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;">
                                                     <!--<![endif]-->
                                                     <table id="u_content_heading_2" style="font-family:helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
                                                       <tbody>
