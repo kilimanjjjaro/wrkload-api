@@ -82,7 +82,7 @@ Start the server with node
 $ npm run start
 ```
 
-View the server at `http://localhost:PORT`
+Open [http://localhost:5000](http://localhost:5000) with your browser.
 
 <br>
 
