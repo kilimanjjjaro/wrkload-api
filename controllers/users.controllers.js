@@ -1,4 +1,6 @@
 import { User } from "../models/User.js";
+import { Project } from "../models/Project.js";
+import { Task } from "../models/Task.js";
 import dayjs from "dayjs";
 
 export const getUsers = async (req, res, next) => {
@@ -109,6 +111,10 @@ export const deleteUser = async (req, res, next) => {
     const user = await User.findOneAndDelete({ _id: uid });
 
     if (!user) throw new Error("User not found");
+
+    await Task.deleteMany({ authorId: uid });
+
+    await Project.deleteMany({ authorId: uid });
 
     res.status(200).json({ status: "ok" });
   } catch (error) {
