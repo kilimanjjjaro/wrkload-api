@@ -114,7 +114,7 @@ export const createProject = async (req, res, next) => {
   try {
     const { name } = req.body;
 
-    // if (req.uid === '6439b01cf35b6e22570cd842') throw new Error("Trial account detected");
+    if (req.uid === '6439b01cf35b6e22570cd842') throw new Error("Trial account detected");
 
     const exists = await Project.findOne({ name, authorId: req.uid });
 
