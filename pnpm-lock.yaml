@@ -30,11 +30,11 @@ dependencies:
     specifier: ^9.0.1
     version: 9.0.1
   mongoose:
-    specifier: 7.4.0
-    version: 7.4.0
+    specifier: 7.4.2
+    version: 7.4.2
   mongoose-paginate-v2:
-    specifier: ^1.7.1
-    version: 1.7.1
+    specifier: ^1.7.31
+    version: 1.7.31
   nodemailer:
     specifier: ^6.9.4
     version: 6.9.4
@@ -46,8 +46,8 @@ devDependencies:
 
 packages:
 
-  /@types/node@20.4.2:
-    resolution: {integrity: sha512-Dd0BYtWgnWJKwO1jkmTrzofjK2QXXcai0dmtzvIBhcA+RsG5h8R3xlyta0kGOZRNfL9GuRtb1knmPEhQrePCEw==}
+  /@types/node@20.4.9:
+    resolution: {integrity: sha512-8e2HYcg7ohnTUbHk8focoklEQYvemQmu9M/f43DZVx43kHn0tE3BY/6gSDxS7k0SprtS0NHvj+L80cGLnoOUcQ==}
     dev: false
 
   /@types/webidl-conversions@7.0.0:
@@ -57,7 +57,7 @@ packages:
   /@types/whatwg-url@8.2.2:
     resolution: {integrity: sha512-FtQu10RWgn3D9U4aazdwIE2yzphmTJREDqNdODHrbrZmmMqI0vMheC/6NE/J1Yveaj8H+ela+YwWTjq5PGmuhA==}
     dependencies:
-      '@types/node': 20.4.2
+      '@types/node': 20.4.9
       '@types/webidl-conversions': 7.0.0
     dev: false
 
@@ -297,7 +297,7 @@ packages:
     engines: {node: '>= 8.0.0'}
     dependencies:
       lodash: 4.17.21
-      validator: 13.9.0
+      validator: 13.11.0
     dev: false
 
   /express@4.18.2:
@@ -598,13 +598,13 @@ packages:
       saslprep: 1.0.3
     dev: false
 
-  /mongoose-paginate-v2@1.7.1:
-    resolution: {integrity: sha512-J8DJw3zRXcXOKoZv+RvO9tt5HotRnbo2iCR3lke+TtsQsYwQvbY3EgUkPqZXw6qCX2IByvXrW5SGNdAB0od/Cw==}
+  /mongoose-paginate-v2@1.7.31:
+    resolution: {integrity: sha512-Zz7i/1k7/MJqipzttn9SUenbcW1hC63qBOB7HHBNMfIfg0AOPFT2CdAWpeAJ7BBGEQ4qC1Gu02fIaSeMmXOT0A==}
     engines: {node: '>=4.0.0'}
     dev: false
 
-  /mongoose@7.4.0:
-    resolution: {integrity: sha512-oHE1eqodfKzugXRlQxpo+msIea7jPcRoayDuEMr50+bYwM/juA5f+1stjkWlXcg6vo1PdJFVA6DGaKOPLuG5mA==}
+  /mongoose@7.4.2:
+    resolution: {integrity: sha512-sNolW2hyncwvWmZjIEIwAckjaSKtC1SE86zE1v2TKm3vPTRogZfBQf+3zLYYdrgrVTzoaoICieVpct9hjcn3EQ==}
     engines: {node: '>=14.20.1'}
     dependencies:
       bson: 5.4.0
@@ -923,8 +923,8 @@ packages:
     engines: {node: '>= 0.4.0'}
     dev: false
 
-  /validator@13.9.0:
-    resolution: {integrity: sha512-B+dGG8U3fdtM0/aNK4/X8CXq/EcxU2WPrPEkJGslb47qyHsxmbggTWK0yEA4qnYVNF+nxNlN88o14hIcPmSIEA==}
+  /validator@13.11.0:
+    resolution: {integrity: sha512-Ii+sehpSfZy+At5nPdnyMhx78fEoPDkR2XW/zimHEL3MyGJQOCQ7WeP20jPYRz7ZCpcKLB21NxuXHF3bxjStBQ==}
     engines: {node: '>= 0.10'}
     dev: false
 
