@@ -1,8 +1,6 @@
 import "dotenv/config";
 import nodemailer from "nodemailer";
 
-console.log(process.env.EMAIL_USER + "    " + process.env.EMAIL_PASS);
-
 const transporter = nodemailer.createTransport({
   host: "c2390804.ferozo.com",
   port: 465,
