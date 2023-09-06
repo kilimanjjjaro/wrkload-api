@@ -33,11 +33,11 @@ wrkload API is an easy-to-use API REST developed to be implemented as backend by
 - Refresh tokens are used **only for generate new access tokens**, not for authorization. This is why they **expire after 30 days**, to ensure that user doesn't have to login every 15 minutes.
 - The refresh tokens are set on the client from the server as HttpOnly and secure cookies. They can only be accessed through the browser via HTTPS requests, not with Javascript.
 - `Confirmation of accounts` and `reset passwords` by email with **unique**, **one-time use** and **expiration times** links.
-- Request `responses filtered` based on user role.
+- `Responses filtered` based on user role.
 - `Paginated APIs` with detailed responses, including number of **items per page**, **items in total**, **number of current**, **previous** and **next page**.
 - `User role system`, this opens the way for a lot of frontend-side implementations, like querying registered users, non-sensitive user data, types of uploaded projects, tasks by users, create role permissions, etc.
 - Users **only can read, update or delete own tasks**, even users with administration role.
-- They can **create and store** useful information about their tasks such as: timing, project, delivery day, task type, a short description that can be used as a note book.
+- Users **can create and store** useful information about their tasks such as: timing, project, delivery day, task type, a short description that can be used as a note book.
 - Thanks to this information, **statistics** are calculated and returned on how many hours were worked and how many tasks were assigned per project in the current and past month.
 - `User passwords are salt (10 rounds) and hash with the Blowfish cipher` before being saved on database.
 - You can have user session information such as: the last time it was active or when it was registered.
