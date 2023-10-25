@@ -3,7 +3,7 @@ import { Task } from "../models/Task.js";
 import { User } from "../models/User.js";
 import { getCurrentMonthTasks, getPastMonthTasks, getTotalTasksTiming, isPerformanceBetter } from "../utils/stats.js";
 
-const capitalize = (string) => {
+export const capitalize = (string) => {
   const words = string.split(' ')
   const capitalizedWords = words.map(word => {
     return word.charAt(0).toUpperCase() + word.slice(1)

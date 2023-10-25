@@ -3,6 +3,7 @@ import { Project } from "../models/Project.js";
 import { Task } from "../models/Task.js";
 import { User } from "../models/User.js";
 import { getBestProjectOfPastMonth } from "../utils/stats.js";
+import { capitalize } from "./tasks.controllers.js";
 
 export const getProjects = async (req, res, next) => {
   try {
@@ -112,7 +113,7 @@ export const getProject = async (req, res, next) => {
 
 export const createProject = async (req, res, next) => {
   try {
-    const { name } = req.body;
+    const name = capitalize(req.body.name)
 
     if (req.uid === '6439b01cf35b6e22570cd842') throw new Error("Trial account detected");
 
