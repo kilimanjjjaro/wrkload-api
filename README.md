@@ -40,7 +40,6 @@ wrkload API is an easy-to-use API REST developed to be implemented as backend by
 - Users **can create and store** useful information about their tasks such as: timing, project, delivery day, task type, a short description that can be used as a note book.
 - Thanks to this information, **statistics** are calculated and returned on how many hours were worked and how many tasks were assigned per project in the current and past month.
 - `User passwords are salt (10 rounds) and hash with the Blowfish cipher` before being saved on database.
-- You can have user session information such as: the last time it was active or when it was registered.
 - You can see `when a user was last active` or `when they signed up`. You can also check `when a task was created or updated`.
 
 <br>
