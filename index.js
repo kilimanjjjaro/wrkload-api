@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth.routes.js";
 import tasksRouter from "./routes/tasks.routes.js";
 import usersRouter from "./routes/users.routes.js";
+import dummyRouter from "./routes/dummy.routes.js";
 import projectsRouter from "./routes/projects.routes.js";
 import errorsHandler from "./middlewares/errorsHandler.middleware.js";
 
@@ -33,6 +34,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/tasks", tasksRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/projects", projectsRouter);
+app.use("/api/v1/dummy", dummyRouter);
 
 app.use(errorsHandler);
 
