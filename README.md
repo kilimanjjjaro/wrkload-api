@@ -1,6 +1,6 @@
 # wrkload API
 
-wrkload API is an easy-to-use API REST developed to be implemented as backend by an app. Gives the possibility to a user to keep organized and documented the time he was working on his tasks.
+wrkload API is an easy-to-use REST API developed to be implemented as backend by an app. Gives the possibility to a user to keep organized and documented the time he was working on his tasks.
 
 [API](https://wrkload-api.onrender.com) <sub>(Now the API is a bit slower because it was redeployed on a free Render account.)</sub>
 
