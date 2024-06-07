@@ -2,13 +2,14 @@ import "dotenv/config";
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-  host: "c2390804.ferozo.com",
+  service: "Gmail",
+  host: "smtp.gmail.com",
   port: 465,
+  secure: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
-  secure: true
 });
 
 transporter.verify().then(() => {
