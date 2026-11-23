@@ -28,7 +28,10 @@ export const getUsers: RequestHandler = async (req, res, next) => {
 
     const username = searchPattern(queryText(req.query.search))
     const users = await User.paginate(
-      username === undefined ? {} : { username },
+      {
+        ...(username === undefined ? {} : { username }),
+        ...(req.role === ROLE_ADMIN ? {} : { _id: req.uid })
+      },
       paginationOptions(
         'username role registeredAt lastActiveAt recentlyActive email avatar confirmationStatus',
         listQuery(req.query)
@@ -135,7 +138,8 @@ export const updateUser: RequestHandler<
 
     if (user === null) throw new Error('User not found')
 
-    if (!user._id.equals(req.uid)) throw new Error('Permission denied')
+    if (!user._id.equals(req.uid) && req.role !== ROLE_ADMIN)
+      throw new Error('Permission denied')
 
     const reqUser = updatedFields(req.body)
 

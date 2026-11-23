@@ -98,6 +98,24 @@ describe('GET /users', () => {
     expect(response.status).toBe(HTTP_STATUS_OK)
   })
 
+  it('lists only the trial account to the trial account', async () => {
+    await createUser({ username: 'Alice' })
+    const { authorization } = await createUserWithToken({
+      _id: TRIAL_ACCOUNT_ID,
+      username: 'Trial',
+      role: ROLE_TRIAL
+    })
+
+    const response = await request(app)
+      .get(API.users)
+      .set('Authorization', authorization)
+
+    expect(response.status).toBe(HTTP_STATUS_OK)
+    expect(
+      parseBody(USERS_SCHEMA, response).users.map(({ username }) => username)
+    ).toEqual(['Trial'])
+  })
+
   it('searches and paginates the users', async () => {
     const { authorization } = await createUserWithToken({ role: ROLE_ADMIN })
     await createUser({ username: 'kili one' })
@@ -285,8 +303,8 @@ describe('PATCH /users/:uid', () => {
     expect(updated?.confirmationStatus).toBe(false)
   })
 
-  it('rejects another user', async () => {
-    const { authorization } = await createUserWithToken({ role: ROLE_ADMIN })
+  it('rejects another user for a partner', async () => {
+    const { authorization } = await createUserWithToken()
     const other = await createUser()
 
     const response = await request(app)
@@ -296,6 +314,23 @@ describe('PATCH /users/:uid', () => {
 
     expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
     expect(body(response)).toMatchObject({ code: 'users/permission-denied' })
+  })
+
+  it('lets an admin update another user', async () => {
+    const { authorization } = await createUserWithToken({ role: ROLE_ADMIN })
+    const other = await createUser()
+
+    const response = await request(app)
+      .patch(`${API.users}/${other._id.toString()}`)
+      .set('Authorization', authorization)
+      .send({ username: 'New name' })
+
+    expect(response.status).toBe(HTTP_STATUS_OK)
+    expect(body(response)).toMatchObject({
+      status: 'ok',
+      user: { username: 'New name' }
+    })
+    expect((await User.findById(other._id))?.username).toBe('New name')
   })
 
   it('rejects the trial account', async () => {
