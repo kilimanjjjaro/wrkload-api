@@ -57,7 +57,6 @@ wrkload API is an easy-to-use REST API developed to be implemented as backend by
 - [dotenv](https://github.com/motdotla/dotenv)
 - [Nodemailer](https://github.com/nodemailer/nodemailer)
 - [day.js](https://github.com/iamkun/dayjs/)
-- [nodemon](https://github.com/remy/nodemon)
 
 <br>
 
@@ -71,7 +70,7 @@ Install dependencies
 $ npm install
 ```
 
-Start the server with nodemon
+Start the server in watch mode
 
 ```console
 $ npm run dev
