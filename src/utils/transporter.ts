@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import nodemailer from 'nodemailer'
 import { SMTP_SSL_PORT } from '../constants/index.ts'
-import { logInfo } from './logger.ts'
+import { logError, logInfo } from './logger.ts'
 
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
@@ -14,8 +14,11 @@ const transporter = nodemailer.createTransport({
   }
 })
 
-void transporter.verify().then(() => {
-  logInfo('Ready for send mails')
-})
+transporter
+  .verify()
+  .then(() => {
+    logInfo('Ready for send mails')
+  })
+  .catch(logError)
 
 export default transporter

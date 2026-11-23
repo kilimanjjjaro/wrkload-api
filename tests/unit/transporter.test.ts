@@ -47,6 +47,21 @@ describe('transporter', () => {
     expect(verifyCalls).toHaveLength(SINGLE_CALL)
   })
 
+  it('logs a failed connection check instead of crashing', async () => {
+    const error = new Error('Invalid login')
+    verify.mockRejectedValueOnce(error)
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined)
+
+    vi.resetModules()
+    await import('../../src/utils/transporter.ts')
+
+    await vi.waitFor(() => {
+      expect(consoleError).toHaveBeenCalledWith(error)
+    })
+  })
+
   it('builds the html mails the controllers send', async () => {
     const info = await transporter.sendMail({
       from: '"wrkload" <wrkload@kilimanjjjaro.com>',
