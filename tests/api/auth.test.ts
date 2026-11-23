@@ -355,6 +355,24 @@ describe('PATCH /auth/change-password', () => {
     expect(body(response)).toMatchObject({ code: 'auth/invalid-credentials' })
   })
 
+  it('changes the password of the logged in user only', async () => {
+    const user = await createUser()
+    const other = await createUser()
+
+    const response = await request(app)
+      .patch(`${API.auth}/change-password`)
+      .set('Authorization', bearer(user))
+      .send({
+        email: other.email,
+        oldPassword: DEFAULT_PASSWORD,
+        newPassword: NEW_PASSWORD
+      })
+
+    expect(response.status).toBe(HTTP_STATUS_CREATED)
+    expect((await login(user.email, NEW_PASSWORD)).status).toBe(HTTP_STATUS_OK)
+    expect((await login(other.email)).status).toBe(HTTP_STATUS_OK)
+  })
+
   it('rejects the same password', async () => {
     const user = await createUser()
 

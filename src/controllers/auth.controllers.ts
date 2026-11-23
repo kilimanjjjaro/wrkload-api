@@ -213,12 +213,12 @@ export const changePassword: RequestHandler<
 > = async (req, res, next) => {
   try {
     const {
-      body: { email, oldPassword, newPassword }
+      body: { oldPassword, newPassword }
     } = req
 
     if (newPassword === '') throw new Error('Empty fields')
 
-    const user = await User.findOne({ email })
+    const user = await User.findById(req.uid)
 
     if (user === null) throw new Error('User not found')
 
