@@ -290,6 +290,37 @@ describe('PATCH /projects/:id', () => {
     expect(await Task.countDocuments({ project: 'Web' })).toBe(SINGLE_DOCUMENT)
   })
 
+  it('rejects renaming a project to a name the user already has', async () => {
+    const { user, authorization } = await createUserWithToken()
+    const project = await createProject(user._id, 'Web')
+    await createProject(user._id, 'App')
+    await createTask(user._id, { project: 'Web' })
+
+    const response = await request(app)
+      .patch(`${API.projects}/${project._id.toString()}`)
+      .set('Authorization', authorization)
+      .send({ name: 'app' })
+
+    expect(response.status).toBe(HTTP_STATUS_FORBIDDEN)
+    expect(body(response)).toMatchObject({
+      code: 'projects/project-already-exists'
+    })
+    expect(await Task.countDocuments({ project: 'Web' })).toBe(SINGLE_DOCUMENT)
+  })
+
+  it('keeps the name when renaming a project to the same name', async () => {
+    const { user, authorization } = await createUserWithToken()
+    const project = await createProject(user._id, 'Web')
+
+    const response = await request(app)
+      .patch(`${API.projects}/${project._id.toString()}`)
+      .set('Authorization', authorization)
+      .send({ name: 'web' })
+
+    expect(response.status).toBe(HTTP_STATUS_OK)
+    expect(body(response)).toHaveProperty('updatedProject.name', 'Web')
+  })
+
   it('renames a project of the user', async () => {
     const { user, authorization } = await createUserWithToken()
     const project = await createProject(user._id)

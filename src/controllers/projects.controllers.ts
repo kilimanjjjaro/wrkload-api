@@ -199,15 +199,25 @@ export const updateProject: RequestHandler<
     if (typeof name !== 'string')
       throw new Error("Can't update this project data")
 
+    const newName = capitalize(name)
+
+    const exists = await Project.findOne({
+      _id: { $ne: id },
+      name: newName,
+      authorId: req.uid
+    })
+
+    if (exists !== null) throw new Error('Project already exists')
+
     const updatedProject = await Project.findOneAndUpdate(
       { _id: id },
-      { name: capitalize(name) },
+      { name: newName },
       { returnDocument: 'after' }
     )
 
     await Task.updateMany(
       { project: project.name, authorId: req.uid },
-      { project: capitalize(name) }
+      { project: newName }
     )
 
     res.status(HTTP_STATUS_OK).json({ status: 'ok', updatedProject })
