@@ -254,7 +254,7 @@ export const updateTask = async (req, res, next) => {
     reqTask.updatedAt = dayjs().format()
 
     const updatedTask = await Task.findOneAndUpdate({ _id: id }, reqTask, {
-      new: true
+      returnDocument: 'after'
     })
 
     res.status(200).json({ status: 'ok', updatedTask })

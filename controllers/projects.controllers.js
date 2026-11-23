@@ -204,7 +204,7 @@ export const updateProject = async (req, res, next) => {
     const updatedProject = await Project.findOneAndUpdate(
       { _id: id },
       reqProject,
-      { new: true }
+      { returnDocument: 'after' }
     )
 
     res.status(200).json({ status: 'ok', updatedProject })

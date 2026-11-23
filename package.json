@@ -24,7 +24,7 @@
     "express": "5.3.0",
     "express-validator": "7.3.2",
     "jsonwebtoken": "9.0.3",
-    "mongoose": "8.24.10",
+    "mongoose": "9.12.3",
     "mongoose-paginate-v2": "1.9.5",
     "nodemailer": "10.6.1"
   },

@@ -159,7 +159,7 @@ export const updateUser = async (req, res, next) => {
       throw new Error('Permission denied')
 
     const updatedUser = await User.findOneAndUpdate({ _id: uid }, reqUser, {
-      new: true
+      returnDocument: 'after'
     })
 
     const secureUser = {
