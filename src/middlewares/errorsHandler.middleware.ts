@@ -279,6 +279,14 @@ const API_ERRORS = new Map<string, ApiError>([
       code: 'trial/permission-denied',
       message: 'This is a trial account'
     }
+  ],
+  [
+    'Not allowed by CORS',
+    {
+      httpStatus: HTTP_STATUS_FORBIDDEN,
+      code: 'cors/origin-not-allowed',
+      message: 'Origin not allowed'
+    }
   ]
 ])
 

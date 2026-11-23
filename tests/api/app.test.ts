@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import app from '../../src/app.ts'
 import {
   API,
+  HTTP_STATUS_FORBIDDEN,
   HTTP_STATUS_INTERNAL_SERVER_ERROR,
   HTTP_STATUS_NO_CONTENT,
   HTTP_STATUS_OK
@@ -46,12 +47,12 @@ describe('cors', () => {
       .get(API.dummy)
       .set('Origin', 'https://evil.test')
 
-    expect(response.status).toBe(HTTP_STATUS_INTERNAL_SERVER_ERROR)
+    expect(response.status).toBe(HTTP_STATUS_FORBIDDEN)
     expect(response.headers['access-control-allow-origin']).toBeUndefined()
     expect(response.body).toEqual({
       status: 'error',
-      code: 'server/unhandled-error',
-      message: 'Not allowed by CORS'
+      code: 'cors/origin-not-allowed',
+      message: 'Origin not allowed'
     })
   })
 })
