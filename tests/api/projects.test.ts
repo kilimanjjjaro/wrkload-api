@@ -14,6 +14,7 @@ import {
   HTTP_STATUS_BAD_REQUEST,
   HTTP_STATUS_CREATED,
   HTTP_STATUS_FORBIDDEN,
+  HTTP_STATUS_INTERNAL_SERVER_ERROR,
   HTTP_STATUS_NOT_FOUND,
   HTTP_STATUS_OK,
   HTTP_STATUS_UNAUTHORIZED,
@@ -142,19 +143,37 @@ describe('GET /projects', () => {
     })
   })
 
-  it('updates the total tasks of each project in the background', async () => {
+  it('returns and stores the current total tasks of each project', async () => {
     const { user, authorization } = await createUserWithToken()
     const project = await createProject(user._id, 'Web')
     await createTask(user._id, { project: 'Web' })
     await createTask(user._id, { project: 'Web' })
 
-    await request(app).get(API.projects).set('Authorization', authorization)
+    const response = await request(app)
+      .get(API.projects)
+      .set('Authorization', authorization)
 
-    await vi.waitFor(async () => {
-      expect((await Project.findById(project._id))?.totalTasks).toBe(
-        TWO_DOCUMENTS
-      )
-    })
+    expect(body(response)).toHaveProperty(
+      'projects.0.totalTasks',
+      TWO_DOCUMENTS
+    )
+    expect((await Project.findById(project._id))?.totalTasks).toBe(
+      TWO_DOCUMENTS
+    )
+  })
+
+  it('answers 500 instead of crashing when a count update fails', async () => {
+    const { user, authorization } = await createUserWithToken()
+    await createProject(user._id, 'Web')
+    vi.spyOn(Project.prototype, 'save').mockRejectedValue(
+      new Error('write failed')
+    )
+
+    const response = await request(app)
+      .get(API.projects)
+      .set('Authorization', authorization)
+
+    expect(response.status).toBe(HTTP_STATUS_INTERNAL_SERVER_ERROR)
   })
 
   it('paginates and searches the projects', async () => {

@@ -48,14 +48,18 @@ export const getProjects: RequestHandler = async (req, res, next) => {
       return
     }
 
-    for (const project of projects.docs) {
-      void Task.find({ project: project.name, authorId: req.uid }).then(
-        (tasks) => {
-          project.set('totalTasks', tasks.length)
-          void project.save()
-        }
-      )
-    }
+    await Promise.all(
+      projects.docs.map(async (project) => {
+        project.set(
+          'totalTasks',
+          await Task.countDocuments({
+            project: project.name,
+            authorId: req.uid
+          })
+        )
+        await project.save()
+      })
+    )
 
     const tasksForStats = await Task.paginate(
       { authorId: req.uid },
