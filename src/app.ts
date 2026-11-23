@@ -15,10 +15,11 @@ const whiteList = [process.env.FRONTEND_URL]
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || whiteList.includes(origin)) {
-        return callback(null, origin)
+      if (origin === undefined || origin === '' || whiteList.includes(origin)) {
+        callback(null, origin)
+        return
       }
-      return callback('Not allowed by CORS' as unknown as Error)
+      callback(new Error('Not allowed by CORS'))
     },
     methods: 'GET,PATCH,POST,DELETE',
     credentials: true

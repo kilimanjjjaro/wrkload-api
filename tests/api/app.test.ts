@@ -44,7 +44,8 @@ describe('cors', () => {
     expect(response.headers['access-control-allow-origin']).toBeUndefined()
     expect(response.body).toEqual({
       status: 'error',
-      code: 'server/unhandled-error'
+      code: 'server/unhandled-error',
+      message: 'Not allowed by CORS'
     })
   })
 })
