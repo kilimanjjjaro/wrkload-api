@@ -47,6 +47,7 @@ wrkload API is an easy-to-use REST API developed to be implemented as backend by
 ## Built With
 
 - [Node.js](https://github.com/nodejs/node)
+- [TypeScript](https://github.com/microsoft/TypeScript)
 - [Express.js](https://github.com/expressjs/express)
 - [Express validator](https://github.com/express-validator/express-validator)
 - [Mongoose](https://github.com/Automattic/mongoose)
@@ -57,33 +58,39 @@ wrkload API is an easy-to-use REST API developed to be implemented as backend by
 - [dotenv](https://github.com/motdotla/dotenv)
 - [Nodemailer](https://github.com/nodemailer/nodemailer)
 - [day.js](https://github.com/iamkun/dayjs/)
-- [nodemon](https://github.com/remy/nodemon)
 
 <br>
 
 ## Quick Start
 
-The quickest way to run this server on your localhost is execute the following commands:
-
-Install dependencies
-
-```console
-$ npm install
-```
-
-Start the server with nodemon
+Requirements: Node.js 26 (pinned with Volta) and pnpm 11. pnpm runs the
+project scripts with the Node.js version declared in `devEngines`. Copy
+`.env.example` to `.env` and fill in the [environment variables](#environment-variables).
 
 ```console
-$ npm run dev
-```
-
-Start the server with node
-
-```console
-$ npm run start
+$ pnpm install
+$ pnpm dev     # Start the server in watch mode
+$ pnpm start   # Start the server
 ```
 
 Open [http://localhost:5000](http://localhost:5000) with your browser.
+
+### Checks
+
+```console
+$ pnpm format:check  # Prettier (pnpm format fixes the files)
+$ pnpm typecheck     # TypeScript
+$ pnpm lint          # ESLint
+$ pnpm test          # API and unit tests (Vitest)
+$ pnpm test:all      # Everything CI runs
+```
+
+The API is written in TypeScript and Node.js runs the `src` files directly
+with type stripping, so there is no build step.
+
+The API tests call every route with supertest against a MongoDB in memory
+(mongodb-memory-server downloads the binary on install) and mock the mail
+transporter.
 
 <br>
 
@@ -186,7 +193,7 @@ This API provides an authentication and authorization system developed to valida
 
 | Request body  | Type     | Required | Description                        |
 | ------------- | -------- | -------- | ---------------------------------- |
-| `email`       | `string` | `true`   | Valid email of the new user.       |
+| `email`       | `string` | `true`   | Email of the logged in user.       |
 | `oldPassword` | `string` | `true`   | Password of at least 8 characters. |
 | `newPassword` | `string` | `true`   | Password of at least 8 characters. |
 
@@ -643,7 +650,6 @@ This API provides an users management system. You can request all users or a sin
 | `results`.`role`                | `number`  | Role of user.                                                           |
 | `results`.`email`               | `string`  | Valid email of new user.                                                |
 | `results`.`avatar`              | `string`  | URL of image.                                                           |
-| `results`.`confirmationToken`   | `string`  | Valid JWT token generated at registry.                                  |
 | `results`.`confirmation_status` | `boolean` | Account status.                                                         |
 
 <br>
@@ -675,7 +681,6 @@ This API provides an users management system. You can request all users or a sin
 | `result`.`lastActiveAt`        | `string`  | Date in ISO8601 format of the last time the user was active.            |
 | `result`.`email`               | `string`  | Valid email of new user.                                                |
 | `result`.`avatar`              | `string`  | URL of image.                                                           |
-| `result`.`confirmationToken`   | `string`  | Valid JWT token generated at registry.                                  |
 | `result`.`confirmation_status` | `boolean` | Account status.                                                         |
 
 <br>
@@ -696,11 +701,12 @@ This API provides an users management system. You can request all users or a sin
 | ------------------ | -------- | -------- | ----------- |
 | `uid`              | `string` | `true`   | User ID.    |
 
-| Request body | Type     | Description              |
-| ------------ | -------- | ------------------------ |
-| `username`   | `string` | New name of user.        |
-| `email`      | `string` | New valid email of user. |
-| `avatar`     | `string` | URL of new image.        |
+| Request body | Type     | Description       |
+| ------------ | -------- | ----------------- |
+| `username`   | `string` | New name of user. |
+| `avatar`     | `string` | URL of new image. |
+
+Send at least one of them. Any other field answers `users/permission-denied`.
 
 | Response body     | Type     | Description                                                             |
 | ----------------- | -------- | ----------------------------------------------------------------------- |
@@ -716,7 +722,7 @@ This API provides an users management system. You can request all users or a sin
 
 #### — Delete user
 
-##### Only for users with administrator role.
+##### Only for users with administrator role and for the account owner.
 
 ```
   DELETE /api/v1/users/${uid}
