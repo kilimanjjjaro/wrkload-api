@@ -365,7 +365,7 @@ describe('PATCH /projects/:id', () => {
       })
 
     expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
-    expect((await Project.findById(project._id))?.authorId?.toString()).toBe(
+    expect((await Project.findById(project._id))?.authorId.toString()).toBe(
       user._id.toString()
     )
   })

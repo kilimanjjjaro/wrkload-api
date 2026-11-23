@@ -10,15 +10,13 @@ const taskSchema = new mongoose.Schema({
   authorId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    require: true
+    required: true
   },
   createdAt: {
-    type: String,
-    require: true
+    type: String
   },
   updatedAt: {
     type: String,
-    require: true,
     default: ''
   },
   project: {

@@ -118,7 +118,7 @@ export const getTask: RequestHandler = async (req, res, next) => {
 
     if (task === null) throw new Error('Task not found')
 
-    if (req.role !== ROLE_ADMIN && task.authorId?.equals(req.uid) !== true) {
+    if (req.role !== ROLE_ADMIN && !task.authorId.equals(req.uid)) {
       throw new Error("Can't read other authors tasks")
     }
 
@@ -204,7 +204,7 @@ export const updateTask: RequestHandler<
 
     if (task === null) throw new Error('Task not found')
 
-    if (task.authorId?.equals(req.uid) !== true)
+    if (!task.authorId.equals(req.uid))
       throw new Error("Can't update other authors tasks")
 
     const reqTask = updatedFields(req.body)

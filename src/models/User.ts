@@ -20,17 +20,14 @@ const userSchemaDefinition = {
     trim: true
   },
   registeredAt: {
-    type: String,
-    require: true
+    type: String
   },
   lastActiveAt: {
     type: String,
-    require: true,
     default: ''
   },
   recentlyActive: {
     type: Boolean,
-    require: true,
     default: false
   },
   email: {

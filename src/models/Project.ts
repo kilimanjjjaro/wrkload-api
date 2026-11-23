@@ -11,16 +11,14 @@ const projectSchema = new mongoose.Schema({
   authorId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    require: true
+    required: true
   },
   createdAt: {
     type: String,
-    require: true,
     default: ''
   },
   totalTasks: {
     type: Number,
-    require: true,
     default: NO_TASKS
   }
 })

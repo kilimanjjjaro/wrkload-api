@@ -98,7 +98,7 @@ export const getProject: RequestHandler = async (req, res, next) => {
 
     if (project === null) throw new Error('Project not found')
 
-    if (req.role !== ROLE_ADMIN && project.authorId?.equals(req.uid) !== true) {
+    if (req.role !== ROLE_ADMIN && !project.authorId.equals(req.uid)) {
       throw new Error("Can't read other authors projects")
     }
 
@@ -186,7 +186,7 @@ export const updateProject: RequestHandler<
 
     if (project === null) throw new Error('Project not found')
 
-    if (project.authorId?.equals(req.uid) !== true)
+    if (!project.authorId.equals(req.uid))
       throw new Error("Can't update other authors projects")
 
     const reqProject = updatedFields(req.body)

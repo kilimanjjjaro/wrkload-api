@@ -464,7 +464,7 @@ describe('PATCH /tasks/:id', () => {
 
     expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
     expect(body(response)).toMatchObject({ code: 'tasks/permission-denied' })
-    expect((await Task.findById(task._id))?.authorId?.toString()).toBe(
+    expect((await Task.findById(task._id))?.authorId.toString()).toBe(
       user._id.toString()
     )
   })
