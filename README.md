@@ -90,7 +90,7 @@ with type stripping, so there is no build step.
 
 The API tests call every route with supertest against a MongoDB in memory
 (mongodb-memory-server downloads the binary on install) and mock the mail
-transporter. Known bugs are covered with `it.fails`.
+transporter.
 
 <br>
 
@@ -193,7 +193,7 @@ This API provides an authentication and authorization system developed to valida
 
 | Request body  | Type     | Required | Description                        |
 | ------------- | -------- | -------- | ---------------------------------- |
-| `email`       | `string` | `true`   | Valid email of the new user.       |
+| `email`       | `string` | `true`   | Email of the logged in user.       |
 | `oldPassword` | `string` | `true`   | Password of at least 8 characters. |
 | `newPassword` | `string` | `true`   | Password of at least 8 characters. |
 
@@ -650,7 +650,6 @@ This API provides an users management system. You can request all users or a sin
 | `results`.`role`                | `number`  | Role of user.                                                           |
 | `results`.`email`               | `string`  | Valid email of new user.                                                |
 | `results`.`avatar`              | `string`  | URL of image.                                                           |
-| `results`.`confirmationToken`   | `string`  | Valid JWT token generated at registry.                                  |
 | `results`.`confirmation_status` | `boolean` | Account status.                                                         |
 
 <br>
@@ -682,7 +681,6 @@ This API provides an users management system. You can request all users or a sin
 | `result`.`lastActiveAt`        | `string`  | Date in ISO8601 format of the last time the user was active.            |
 | `result`.`email`               | `string`  | Valid email of new user.                                                |
 | `result`.`avatar`              | `string`  | URL of image.                                                           |
-| `result`.`confirmationToken`   | `string`  | Valid JWT token generated at registry.                                  |
 | `result`.`confirmation_status` | `boolean` | Account status.                                                         |
 
 <br>
@@ -703,11 +701,12 @@ This API provides an users management system. You can request all users or a sin
 | ------------------ | -------- | -------- | ----------- |
 | `uid`              | `string` | `true`   | User ID.    |
 
-| Request body | Type     | Description              |
-| ------------ | -------- | ------------------------ |
-| `username`   | `string` | New name of user.        |
-| `email`      | `string` | New valid email of user. |
-| `avatar`     | `string` | URL of new image.        |
+| Request body | Type     | Description       |
+| ------------ | -------- | ----------------- |
+| `username`   | `string` | New name of user. |
+| `avatar`     | `string` | URL of new image. |
+
+Send at least one of them. Any other field answers `users/permission-denied`.
 
 | Response body     | Type     | Description                                                             |
 | ----------------- | -------- | ----------------------------------------------------------------------- |
@@ -723,7 +722,7 @@ This API provides an users management system. You can request all users or a sin
 
 #### — Delete user
 
-##### Only for users with administrator role.
+##### Only for users with administrator role and for the account owner.
 
 ```
   DELETE /api/v1/users/${uid}
