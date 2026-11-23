@@ -5,13 +5,18 @@ import {
   refreshTokenGenerator,
   resetPassTokenGenerator,
   tokenGenerator
-} from '../../utils/tokenManager.js'
+} from '../../src/utils/tokenManager.ts'
 
 const UID = '6439b01cf35b6e22570cd000'
 const EMAIL = 'kili@wrkload.test'
 const ONE_DAY = 60 * 60 * 24
 
 const decode = (token: string) => jwt.decode(token) as jwt.JwtPayload
+
+const defined = <T>(value: T | undefined) => {
+  if (value === undefined) throw new Error('The token was not signed')
+  return value
+}
 
 describe('tokenGenerator', () => {
   it('signs a 15 minutes access token', () => {
@@ -31,11 +36,8 @@ describe('refreshTokenGenerator', () => {
   it('signs a 30 days refresh token and sets it as a cookie', () => {
     const res = { cookie: vi.fn() }
 
-    const { refreshToken, expiresIn } = refreshTokenGenerator(
-      UID,
-      3,
-      EMAIL,
-      res
+    const { refreshToken, expiresIn } = defined(
+      refreshTokenGenerator(UID, 3, EMAIL, res)
     )
 
     expect(expiresIn).toBe(ONE_DAY * 30)
@@ -70,7 +72,7 @@ describe('refreshTokenGenerator', () => {
 
 describe('confirmationTokenGenerator', () => {
   it('signs a 1 day confirmation token with the email', () => {
-    const token = confirmationTokenGenerator(EMAIL)
+    const token = defined(confirmationTokenGenerator(EMAIL))
 
     expect(
       jwt.verify(token, process.env.CONFIRMATION_ACCOUNT_KEY ?? '')

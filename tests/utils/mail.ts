@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import transporter from '../../utils/transporter.js'
+import transporter from '../../src/utils/transporter.ts'
 
 interface SentMail {
   from: string

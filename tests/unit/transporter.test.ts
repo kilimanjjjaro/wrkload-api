@@ -23,7 +23,7 @@ vi.mock('nodemailer', async (importOriginal) => {
 vi.stubEnv('EMAIL_USER', 'wrkload@gmail.test')
 vi.stubEnv('EMAIL_PASS', 'app-password')
 
-const { default: transporter } = await import('../../utils/transporter.js')
+const { default: transporter } = await import('../../src/utils/transporter.ts')
 
 const transportCalls = [...createTransport.mock.calls]
 const verifyCalls = [...verify.mock.calls]

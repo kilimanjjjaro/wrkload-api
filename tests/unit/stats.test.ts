@@ -1,13 +1,11 @@
 import dayjs from 'dayjs'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('../../models/Task.js', () => ({ Task: {} }))
-
 const NOW = new Date(2026, 10, 15, 12)
 
 const loadStats = async () => {
   vi.resetModules()
-  return await import('../../utils/stats.js')
+  return await import('../../src/utils/stats.ts')
 }
 
 const task = (deliveredAt: string, timing = '01:00', project = 'Web') => ({

@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import mongoose from 'mongoose'
 import { afterAll, afterEach, beforeAll, inject, vi } from 'vitest'
 
-vi.mock('../../utils/transporter.js', () => ({
+vi.mock('../../src/utils/transporter.ts', () => ({
   default: { sendMail: vi.fn().mockResolvedValue({}) }
 }))
 

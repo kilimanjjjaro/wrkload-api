@@ -2,10 +2,10 @@ import dayjs from 'dayjs'
 import mongoose from 'mongoose'
 import request from 'supertest'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import app from '../../app.js'
-import { Project } from '../../models/Project.js'
-import { Task } from '../../models/Task.js'
-import { User } from '../../models/User.js'
+import app from '../../src/app.ts'
+import { Project } from '../../src/models/Project.ts'
+import { Task } from '../../src/models/Task.ts'
+import { User } from '../../src/models/User.ts'
 import { API, ROLES, TRIAL_ACCOUNT_ID } from '../constants/api.ts'
 import { createProject, createTask } from '../utils/tasks.ts'
 import { createUser, createUserWithToken } from '../utils/users.ts'
@@ -184,6 +184,18 @@ describe('PATCH /users/:uid', () => {
         role: ROLES.partner
       }
     })
+  })
+
+  it('fails without fields to update', async () => {
+    const { user, authorization } = await createUserWithToken()
+
+    const response = await request(app)
+      .patch(`${API.users}/${user._id.toString()}`)
+      .set('Authorization', authorization)
+      .send({ username: '' })
+
+    expect(response.status).toBe(500)
+    expect(response.body.code).toBe('server/unhandled-error')
   })
 
   it('rejects changing the password or the role', async () => {

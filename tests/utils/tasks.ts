@@ -1,6 +1,6 @@
 import type mongoose from 'mongoose'
-import { Project } from '../../models/Project.js'
-import { Task } from '../../models/Task.js'
+import { Project } from '../../src/models/Project.ts'
+import { Task } from '../../src/models/Task.ts'
 
 interface CreateTaskOptions {
   title?: string

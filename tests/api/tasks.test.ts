@@ -3,9 +3,9 @@ import jwt from 'jsonwebtoken'
 import mongoose from 'mongoose'
 import request from 'supertest'
 import { describe, expect, it } from 'vitest'
-import app from '../../app.js'
-import { Task } from '../../models/Task.js'
-import { User } from '../../models/User.js'
+import app from '../../src/app.ts'
+import { Task } from '../../src/models/Task.ts'
+import { User } from '../../src/models/User.ts'
 import { API, ROLES, TRIAL_ACCOUNT_ID } from '../constants/api.ts'
 import { createTask } from '../utils/tasks.ts'
 import { createUserWithToken, signAccessToken } from '../utils/users.ts'
@@ -367,7 +367,7 @@ describe('PATCH /tasks/:id', () => {
       .set('Authorization', authorization)
       .send({ ...taskBody, $set: { authorId: otherId } })
 
-    expect((await Task.findById(task._id))?.authorId.toString()).toBe(
+    expect((await Task.findById(task._id))?.authorId?.toString()).toBe(
       user._id.toString()
     )
   })

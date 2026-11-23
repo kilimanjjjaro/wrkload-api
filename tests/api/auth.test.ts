@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken'
 import request from 'supertest'
 import { describe, expect, it } from 'vitest'
-import app from '../../app.js'
-import { User } from '../../models/User.js'
+import app from '../../src/app.ts'
+import { User } from '../../src/models/User.ts'
 import {
   ACCESS_TOKEN_EXPIRES_IN,
   API,

@@ -3,14 +3,15 @@
   "type": "module",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.ts",
   "scripts": {
-    "dev": "node --watch index.js",
-    "start": "node index.js",
+    "dev": "node --watch src/index.ts",
+    "start": "node src/index.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:all": "pnpm format:check && pnpm test"
+    "test:all": "pnpm format:check && pnpm typecheck && pnpm test"
   },
   "keywords": [],
   "author": "",
@@ -29,10 +30,16 @@
     "nodemailer": "10.6.1"
   },
   "devDependencies": {
+    "@types/cookie-parser": "1.4.10",
+    "@types/cors": "2.8.19",
+    "@types/express": "5.0.6",
+    "@types/jsonwebtoken": "9.0.10",
+    "@types/node": "26.6.6",
     "@types/supertest": "7.2.1",
     "mongodb-memory-server": "11.4.0",
     "prettier": "3.10.1",
     "supertest": "7.3.2",
+    "typescript": "6.0.3",
     "vitest": "5.1.1"
   },
   "volta": {
