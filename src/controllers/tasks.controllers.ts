@@ -214,6 +214,9 @@ export const updateTask: RequestHandler<
 
     reqTask.updatedAt = dayjs().format()
 
+    if (typeof reqTask.deliveredAt === 'string')
+      reqTask.deliveredAt = dayjs(reqTask.deliveredAt).format('YYYY-MM-DD')
+
     const updatedTask = await Task.findOneAndUpdate({ _id: id }, reqTask, {
       returnDocument: 'after'
     })

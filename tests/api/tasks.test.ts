@@ -407,7 +407,8 @@ describe('PATCH /tasks/:id', () => {
       updatedTask: {
         _id: task._id.toString(),
         title: 'New title',
-        timing: '02:30'
+        timing: '02:30',
+        deliveredAt: '2026-11-20'
       }
     })
     expect(
