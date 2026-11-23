@@ -6,67 +6,82 @@ import {
   resetPassTokenGenerator,
   tokenGenerator
 } from '../../src/utils/tokenManager.ts'
+import type { CookieSetter } from '../../src/utils/tokenManager.ts'
+import {
+  ACCESS_TOKEN_EXPIRES_IN,
+  ONE_DAY_IN_SECONDS,
+  REFRESH_TOKEN_EXPIRES_IN,
+  ROLE_PARTNER
+} from '../constants/api.ts'
+import { TOKEN_PAYLOAD_SCHEMA } from '../constants/schemas.ts'
 
 const UID = '6439b01cf35b6e22570cd000'
 const EMAIL = 'kili@wrkload.test'
-const ONE_DAY = 60 * 60 * 24
 
-const decode = (token: string) => jwt.decode(token) as jwt.JwtPayload
+const lifetime = (token: string) => {
+  const { exp, iat } = TOKEN_PAYLOAD_SCHEMA.parse(jwt.decode(token))
+  return exp - iat
+}
 
 const defined = <T>(value: T | undefined) => {
   if (value === undefined) throw new Error('The token was not signed')
   return value
 }
 
+const cookieSetter = () => ({ cookie: vi.fn<CookieSetter['cookie']>() })
+
+const lastCookie = ({ cookie }: ReturnType<typeof cookieSetter>) =>
+  defined(cookie.mock.lastCall)
+
 describe('tokenGenerator', () => {
   it('signs a 15 minutes access token', () => {
-    const { accessToken, expiresIn } = tokenGenerator(UID, 3, EMAIL)
+    const { accessToken, expiresIn } = tokenGenerator(UID, ROLE_PARTNER, EMAIL)
 
-    expect(expiresIn).toBe(60 * 15)
+    expect(expiresIn).toBe(ACCESS_TOKEN_EXPIRES_IN)
     expect(jwt.verify(accessToken, process.env.ACCESS_KEY ?? '')).toMatchObject(
-      { uid: UID, role: 3, email: EMAIL }
+      { uid: UID, role: ROLE_PARTNER, email: EMAIL }
     )
-
-    const payload = decode(accessToken)
-    expect((payload.exp ?? 0) - (payload.iat ?? 0)).toBe(expiresIn)
+    expect(lifetime(accessToken)).toBe(expiresIn)
   })
 })
 
 describe('refreshTokenGenerator', () => {
   it('signs a 30 days refresh token and sets it as a cookie', () => {
-    const res = { cookie: vi.fn() }
+    const res = cookieSetter()
 
     const { refreshToken, expiresIn } = defined(
-      refreshTokenGenerator(UID, 3, EMAIL, res)
+      refreshTokenGenerator(UID, ROLE_PARTNER, EMAIL, res)
     )
 
-    expect(expiresIn).toBe(ONE_DAY * 30)
+    expect(expiresIn).toBe(REFRESH_TOKEN_EXPIRES_IN)
     expect(
       jwt.verify(refreshToken, process.env.REFRESH_KEY ?? '')
-    ).toMatchObject({ uid: UID, role: 3, email: EMAIL })
-    expect(res.cookie).toHaveBeenCalledWith('refreshToken', refreshToken, {
+    ).toMatchObject({ uid: UID, role: ROLE_PARTNER, email: EMAIL })
+
+    const [name, value, options] = lastCookie(res)
+    expect(name).toBe('refreshToken')
+    expect(value).toBe(refreshToken)
+    expect(options).toEqual({
       sameSite: 'lax',
       httpOnly: false,
       secure: false,
-      expires: expect.any(Date)
+      expires: options.expires
     })
+    expect(options.expires).toBeInstanceOf(Date)
   })
 
   it('sets a secure cookie in production', () => {
     vi.stubEnv('NODE_ENV', 'production')
-    const res = { cookie: vi.fn() }
+    const res = cookieSetter()
 
-    refreshTokenGenerator(UID, 3, EMAIL, res)
+    refreshTokenGenerator(UID, ROLE_PARTNER, EMAIL, res)
 
-    expect(res.cookie).toHaveBeenCalledWith(
-      'refreshToken',
-      expect.any(String),
-      expect.objectContaining({
-        sameSite: 'none',
-        httpOnly: true,
-        secure: true
-      })
-    )
+    const [, , options] = lastCookie(res)
+    expect(options).toMatchObject({
+      sameSite: 'none',
+      httpOnly: true,
+      secure: true
+    })
   })
 })
 
@@ -77,9 +92,7 @@ describe('confirmationTokenGenerator', () => {
     expect(
       jwt.verify(token, process.env.CONFIRMATION_ACCOUNT_KEY ?? '')
     ).toMatchObject({ email: EMAIL })
-
-    const payload = decode(token)
-    expect((payload.exp ?? 0) - (payload.iat ?? 0)).toBe(ONE_DAY)
+    expect(lifetime(token)).toBe(ONE_DAY_IN_SECONDS)
   })
 })
 
@@ -90,7 +103,7 @@ describe('resetPassTokenGenerator', () => {
       'hash'
     )
 
-    expect(expiresIn).toBe(ONE_DAY)
+    expect(expiresIn).toBe(ONE_DAY_IN_SECONDS)
     expect(
       jwt.verify(
         resetPasswordToken,

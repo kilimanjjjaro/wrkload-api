@@ -13,26 +13,50 @@ import {
 import confirmAccountMail from '../templates/confirmAccountMail.ts'
 import resendConfirmationAccountLinkMail from '../templates/resendConfirmationAccountLinkMail.ts'
 import rememberPasswordMail from '../templates/rememberPasswordMail.ts'
+import {
+  HTTP_STATUS_CREATED,
+  HTTP_STATUS_OK,
+  ROLE_PARTNER,
+  TRIAL_ACCOUNT_ID
+} from '../constants/index.ts'
 import type {
-  ConfirmationTokenPayload,
-  ResetPasswordTokenPayload
-} from '../types/tokens.ts'
+  ChangePasswordBody,
+  EmailBody,
+  LoginBody,
+  RegisterBody,
+  ResetPasswordBody,
+  RouteParams
+} from '../types/requests.ts'
+import { routeParam } from '../utils/requests.ts'
 import { env } from '../utils/env.ts'
+import { logError } from '../utils/logger.ts'
+import {
+  readConfirmationTokenPayload,
+  readResetPasswordTokenPayload
+} from '../utils/tokenPayloads.ts'
 
-export const register: RequestHandler = async (req, res, next) => {
+const MAIL_FROM = '"wrkload" <wrkload@kilimanjjjaro.com>'
+
+export const register: RequestHandler<
+  RouteParams,
+  unknown,
+  RegisterBody
+> = async (req, res, next) => {
   try {
-    const { username, email, avatar, password } = req.body
-    let user = await User.findOne({ email })
+    const {
+      body: { username, email, avatar, password }
+    } = req
+    const existingUser = await User.findOne({ email })
 
-    if (user) throw new Error('User already exists')
+    if (existingUser !== null) throw new Error('User already exists')
 
-    user = new User({
-      username: username,
-      role: 3,
+    const user = new User({
+      username,
+      role: ROLE_PARTNER,
       registeredAt: dayjs().format(),
-      email: email,
-      avatar: avatar,
-      password: password,
+      email,
+      avatar,
+      password,
       confirmationToken: confirmationTokenGenerator(email),
       confirmationStatus: false
     })
@@ -40,25 +64,31 @@ export const register: RequestHandler = async (req, res, next) => {
     await user.save()
 
     await transporter.sendMail({
-      from: '"wrkload" <wrkload@kilimanjjjaro.com>',
+      from: MAIL_FROM,
       to: user.email,
       subject: 'Confirm your account',
       html: confirmAccountMail(user.confirmationToken)
     })
 
-    res.status(201).json({ status: 'ok' })
+    res.status(HTTP_STATUS_CREATED).json({ status: 'ok' })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }
 
-export const login: RequestHandler = async (req, res, next) => {
+export const login: RequestHandler<RouteParams, unknown, LoginBody> = async (
+  req,
+  res,
+  next
+) => {
   try {
-    const { email, password } = req.body
-    let user = await User.findOne({ email })
+    const {
+      body: { email, password }
+    } = req
+    const user = await User.findOne({ email })
 
-    if (!user) throw new Error('User not found')
+    if (user === null) throw new Error('User not found')
 
     if (!user.confirmationStatus) throw new Error('Account not confirmed')
 
@@ -87,10 +117,10 @@ export const login: RequestHandler = async (req, res, next) => {
     }
 
     res
-      .status(200)
+      .status(HTTP_STATUS_OK)
       .json({ status: 'ok', user: secureUser, accessToken, expiresIn })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }
@@ -103,30 +133,31 @@ export const refreshAccessToken: RequestHandler = (req, res, next) => {
       req.email
     )
 
-    res.status(201).json({ status: 'ok', accessToken, expiresIn })
+    res
+      .status(HTTP_STATUS_CREATED)
+      .json({ status: 'ok', accessToken, expiresIn })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }
 
 export const logout: RequestHandler = (req, res) => {
   res.clearCookie('refreshToken')
-  res.status(200).json({ status: 'ok' })
+  res.status(HTTP_STATUS_OK).json({ status: 'ok' })
 }
 
 export const confirmAccount: RequestHandler = async (req, res, next) => {
   try {
-    const { confirmationToken } = req.params as { confirmationToken: string }
+    const confirmationToken = routeParam(req.params.confirmationToken)
 
-    let user = await User.findOne({ confirmationToken })
+    const user = await User.findOne({ confirmationToken })
 
-    if (!user) throw new Error('Account already confirmed')
+    if (user === null) throw new Error('Account already confirmed')
 
-    const { email } = jwt.verify(
-      confirmationToken,
-      env('CONFIRMATION_ACCOUNT_KEY')
-    ) as ConfirmationTokenPayload
+    const { email } = readConfirmationTokenPayload(
+      jwt.verify(confirmationToken, env('CONFIRMATION_ACCOUNT_KEY'))
+    )
 
     if (email !== user.email) throw new Error('Invalid token')
 
@@ -135,23 +166,25 @@ export const confirmAccount: RequestHandler = async (req, res, next) => {
 
     await user.save()
 
-    res.status(201).json({ status: 'ok' })
+    res.status(HTTP_STATUS_CREATED).json({ status: 'ok' })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }
 
-export const reSendConfirmAccountLink: RequestHandler = async (
-  req,
-  res,
-  next
-) => {
+export const reSendConfirmAccountLink: RequestHandler<
+  RouteParams,
+  unknown,
+  EmailBody
+> = async (req, res, next) => {
   try {
-    const { email } = req.body
-    let user = await User.findOne({ email })
+    const {
+      body: { email }
+    } = req
+    const user = await User.findOne({ email })
 
-    if (!user) throw new Error('User not found')
+    if (user === null) throw new Error('User not found')
 
     if (user.confirmationStatus) throw new Error('Account already confirmed')
 
@@ -160,59 +193,69 @@ export const reSendConfirmAccountLink: RequestHandler = async (
     await user.save()
 
     await transporter.sendMail({
-      from: '"wrkload" <wrkload@kilimanjjjaro.com>',
+      from: MAIL_FROM,
       to: user.email,
       subject: 'Confirm your account',
       html: resendConfirmationAccountLinkMail(user.confirmationToken)
     })
 
-    res.status(201).json({ status: 'ok' })
+    res.status(HTTP_STATUS_CREATED).json({ status: 'ok' })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }
 
-export const changePassword: RequestHandler = async (req, res, next) => {
+export const changePassword: RequestHandler<
+  RouteParams,
+  unknown,
+  ChangePasswordBody
+> = async (req, res, next) => {
   try {
-    const { email, oldPassword, newPassword } = req.body
+    const {
+      body: { email, oldPassword, newPassword }
+    } = req
 
-    if (!newPassword) throw new Error('Empty fields')
+    if (newPassword === '') throw new Error('Empty fields')
 
-    let user = await User.findOne({ email })
+    const user = await User.findOne({ email })
 
-    if (!user) throw new Error('User not found')
+    if (user === null) throw new Error('User not found')
 
-    if (user._id.equals('6439b01cf35b6e22570cd842'))
+    if (user._id.equals(TRIAL_ACCOUNT_ID))
       throw new Error('Trial account detected')
 
-    let reqPass = await user.comparePassword(oldPassword)
+    if (!(await user.comparePassword(oldPassword)))
+      throw new Error('Wrong password')
 
-    if (!reqPass) throw new Error('Wrong password')
-
-    reqPass = await user.comparePassword(newPassword)
-
-    if (reqPass) throw new Error('Same new password')
+    if (await user.comparePassword(newPassword))
+      throw new Error('Same new password')
 
     user.password = newPassword
 
     await user.save()
 
-    res.status(201).json({ status: 'ok' })
+    res.status(HTTP_STATUS_CREATED).json({ status: 'ok' })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }
 
-export const rememberPassword: RequestHandler = async (req, res, next) => {
+export const rememberPassword: RequestHandler<
+  RouteParams,
+  unknown,
+  EmailBody
+> = async (req, res, next) => {
   try {
-    const { email } = req.body
-    let user = await User.findOne({ email })
+    const {
+      body: { email }
+    } = req
+    const user = await User.findOne({ email })
 
-    if (!user) throw new Error('User not found to reset password')
+    if (user === null) throw new Error('User not found to reset password')
 
-    if (user._id.equals('6439b01cf35b6e22570cd842'))
+    if (user._id.equals(TRIAL_ACCOUNT_ID))
       throw new Error('Trial account detected')
 
     const { resetPasswordToken } = resetPassTokenGenerator(
@@ -221,43 +264,49 @@ export const rememberPassword: RequestHandler = async (req, res, next) => {
     )
 
     await transporter.sendMail({
-      from: '"wrkload" <wrkload@kilimanjjjaro.com>',
+      from: MAIL_FROM,
       to: user.email,
       subject: 'Reset your password',
-      html: rememberPasswordMail({ id: user._id, resetPasswordToken })
+      html: rememberPasswordMail({
+        id: user._id.toString(),
+        resetPasswordToken
+      })
     })
 
-    res.status(200).json({ status: 'ok' })
+    res.status(HTTP_STATUS_OK).json({ status: 'ok' })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }
 
-export const resetPassword: RequestHandler = async (req, res, next) => {
+export const resetPassword: RequestHandler<
+  RouteParams,
+  unknown,
+  ResetPasswordBody
+> = async (req, res, next) => {
   try {
-    const { uid, resetPasswordToken } = req.params as {
-      uid: string
-      resetPasswordToken: string
-    }
-    const { newPassword } = req.body
+    const uid = routeParam(req.params.uid)
+    const resetPasswordToken = routeParam(req.params.resetPasswordToken)
+    const {
+      body: { newPassword }
+    } = req
 
-    if (!resetPasswordToken) throw new Error('Invalid reset link')
-    if (!newPassword) throw new Error('New password is required')
+    if (resetPasswordToken === '') throw new Error('Invalid reset link')
+    if (newPassword === '') throw new Error('New password is required')
 
-    let user = await User.findOne({ _id: uid })
+    const user = await User.findOne({ _id: uid })
 
-    if (!user) throw new Error('User not found')
+    if (user === null) throw new Error('User not found')
 
-    if (user._id.equals('6439b01cf35b6e22570cd842'))
+    if (user._id.equals(TRIAL_ACCOUNT_ID))
       throw new Error('Trial account detected')
 
     const token = env('RESET_PASSWORD_KEY') + user.password
 
-    const { uid: id } = jwt.verify(
-      resetPasswordToken,
-      token
-    ) as ResetPasswordTokenPayload
+    const { uid: id } = readResetPasswordTokenPayload(
+      jwt.verify(resetPasswordToken, token)
+    )
 
     if (!user._id.equals(id)) throw new Error('Invalid token')
 
@@ -265,9 +314,9 @@ export const resetPassword: RequestHandler = async (req, res, next) => {
 
     await user.save()
 
-    res.status(201).json({ status: 'ok' })
+    res.status(HTTP_STATUS_CREATED).json({ status: 'ok' })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }

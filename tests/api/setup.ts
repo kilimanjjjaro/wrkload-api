@@ -2,9 +2,10 @@ import { randomUUID } from 'node:crypto'
 import mongoose from 'mongoose'
 import { afterAll, afterEach, beforeAll, inject, vi } from 'vitest'
 
-vi.mock('../../src/utils/transporter.ts', () => ({
-  default: { sendMail: vi.fn().mockResolvedValue({}) }
-}))
+vi.mock('../../src/utils/transporter.ts', async () => {
+  const { sendMail } = await import('../utils/mail.ts')
+  return { default: { sendMail } }
+})
 
 beforeAll(async () => {
   await mongoose.connect(inject('mongoUri'), { dbName: `test-${randomUUID()}` })
@@ -13,7 +14,9 @@ beforeAll(async () => {
 
 afterEach(async () => {
   const collections = Object.values(mongoose.connection.collections)
-  await Promise.all(collections.map((collection) => collection.deleteMany({})))
+  await Promise.all(
+    collections.map(async (collection) => await collection.deleteMany({}))
+  )
 })
 
 afterAll(async () => {

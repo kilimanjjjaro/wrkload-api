@@ -1,16 +1,28 @@
-import type { Response } from 'express'
+import type { CookieOptions } from 'express'
 import jwt from 'jsonwebtoken'
 import type { Types } from 'mongoose'
+import {
+  ACCESS_TOKEN_EXPIRES_IN,
+  CONFIRMATION_TOKEN_EXPIRES_IN,
+  MS_PER_SECOND,
+  REFRESH_TOKEN_EXPIRES_IN,
+  RESET_PASSWORD_TOKEN_EXPIRES_IN
+} from '../constants/index.ts'
 import { env } from './env.ts'
+import { logError } from './logger.ts'
 
 type Uid = Types.ObjectId | string
+
+export interface CookieSetter {
+  cookie: (name: string, value: string, options: CookieOptions) => unknown
+}
 
 export const tokenGenerator = (
   uid: Uid | undefined,
   role: number | undefined,
   email: string | undefined
 ) => {
-  const expiresIn = 60 * 15
+  const expiresIn = ACCESS_TOKEN_EXPIRES_IN
 
   const accessToken = jwt.sign({ uid, role, email }, env('ACCESS_KEY'), {
     expiresIn
@@ -23,9 +35,10 @@ export const refreshTokenGenerator = (
   uid: Uid,
   role: number,
   email: string,
-  res: Pick<Response, 'cookie'>
+  res: CookieSetter
 ) => {
-  const expiresIn = 60 * 60 * 24 * 30
+  const expiresIn = REFRESH_TOKEN_EXPIRES_IN
+  const isProduction = process.env.NODE_ENV === 'production'
 
   try {
     const refreshToken = jwt.sign({ uid, role, email }, env('REFRESH_KEY'), {
@@ -33,37 +46,30 @@ export const refreshTokenGenerator = (
     })
 
     res.cookie('refreshToken', refreshToken, {
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      httpOnly: process.env.NODE_ENV === 'production',
-      secure: process.env.NODE_ENV === 'production',
-      expires: new Date(Date.now() + expiresIn * 1000)
+      sameSite: isProduction ? 'none' : 'lax',
+      httpOnly: isProduction,
+      secure: isProduction,
+      expires: new Date(Date.now() + expiresIn * MS_PER_SECOND)
     })
 
     return { refreshToken, expiresIn }
   } catch (error) {
-    console.error(error)
+    logError(error)
   }
 }
 
 export const confirmationTokenGenerator = (email: string) => {
-  const expiresIn = 60 * 60 * 24
-
   try {
-    const confirmationToken = jwt.sign(
-      { email },
-      env('CONFIRMATION_ACCOUNT_KEY'),
-      {
-        expiresIn
-      }
-    )
-    return confirmationToken
+    return jwt.sign({ email }, env('CONFIRMATION_ACCOUNT_KEY'), {
+      expiresIn: CONFIRMATION_TOKEN_EXPIRES_IN
+    })
   } catch (error) {
-    console.error(error)
+    logError(error)
   }
 }
 
 export const resetPassTokenGenerator = (uid: Uid, password: string) => {
-  const expiresIn = 60 * 60 * 24
+  const expiresIn = RESET_PASSWORD_TOKEN_EXPIRES_IN
   const token = env('RESET_PASSWORD_KEY') + password
 
   const resetPasswordToken = jwt.sign({ uid }, token, {

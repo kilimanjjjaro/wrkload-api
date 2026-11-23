@@ -3,53 +3,59 @@ import dayjs from 'dayjs'
 import { Project } from '../models/Project.ts'
 import { Task } from '../models/Task.ts'
 import { User } from '../models/User.ts'
-import { paginationOptions } from '../utils/pagination.ts'
+import {
+  EMPTY_LENGTH,
+  HTTP_STATUS_CREATED,
+  HTTP_STATUS_OK,
+  ROLE_ADMIN,
+  TRIAL_ACCOUNT_ID
+} from '../constants/index.ts'
+import type { ProjectBody, RouteParams, UpdateBody } from '../types/requests.ts'
+import { listQuery, queryText, routeParam } from '../utils/requests.ts'
+import { logError } from '../utils/logger.ts'
+import {
+  paginationOptions,
+  searchPattern,
+  updatedFields
+} from '../utils/pagination.ts'
 import { getBestProjectOfPastMonth } from '../utils/stats.ts'
 import { capitalize } from './tasks.controllers.ts'
 
+const READ_ONLY_FIELDS = ['authorId', 'id', '_id', 'createdAt']
+
 export const getProjects: RequestHandler = async (req, res, next) => {
   try {
-    let projects
-    const search = req.query.search as string | undefined
-    const projectPaginationOptions = paginationOptions(
-      'name authorId createdAt totalTasks',
-      req.query.page,
-      req.query.limit
-    )
-
     await User.findOneAndUpdate(
       { _id: req.uid },
       { lastActiveAt: dayjs().format() }
     )
 
-    if (search) {
-      const escapedString = search.replace(/^"|"$/g, '')
-      projects = await Project.paginate(
-        { authorId: req.uid, name: { $regex: escapedString, $options: 'i' } },
-        projectPaginationOptions
+    const name = searchPattern(queryText(req.query.search))
+    const projects = await Project.paginate(
+      { authorId: req.uid, ...(name === undefined ? {} : { name }) },
+      paginationOptions(
+        'name authorId createdAt totalTasks',
+        listQuery(req.query)
       )
-    } else {
-      projects = await Project.paginate(
-        { authorId: req.uid },
-        projectPaginationOptions
-      )
-    }
+    )
 
-    if (projects.docs.length < 1)
-      return res.status(200).json({
+    if (projects.docs.length === EMPTY_LENGTH) {
+      res.status(HTTP_STATUS_OK).json({
         status: 'ok',
         pagination: null,
         projects: []
       })
+      return
+    }
 
-    projects.docs.forEach((project) => {
+    for (const project of projects.docs) {
       void Task.find({ project: project.name, authorId: req.uid }).then(
         (tasks) => {
-          project.totalTasks = tasks.length
+          project.set('totalTasks', tasks.length)
           void project.save()
         }
       )
-    })
+    }
 
     const tasksForStats = await Task.paginate(
       { authorId: req.uid },
@@ -59,11 +65,9 @@ export const getProjects: RequestHandler = async (req, res, next) => {
       }
     )
 
-    const bestProjectOfPastMonth = await getBestProjectOfPastMonth(
-      tasksForStats.docs
-    )
+    const bestProjectOfPastMonth = getBestProjectOfPastMonth(tasksForStats.docs)
 
-    res.status(200).json({
+    res.status(HTTP_STATUS_OK).json({
       status: 'ok',
       pagination: {
         totalResults: projects.totalDocs,
@@ -78,23 +82,23 @@ export const getProjects: RequestHandler = async (req, res, next) => {
       }
     })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }
 
 export const getProject: RequestHandler = async (req, res, next) => {
   try {
-    const { id } = req.params as { id: string }
+    const id = routeParam(req.params.id)
     const project = await Project.findById(id)
 
-    if (!project) throw new Error('Project not found')
+    if (project === null) throw new Error('Project not found')
 
-    if (req.role !== 1 && !project.authorId?.equals(req.uid)) {
+    if (req.role !== ROLE_ADMIN && project.authorId?.equals(req.uid) !== true) {
       throw new Error("Can't read other authors projects")
     }
 
-    res.status(200).json({
+    res.status(HTTP_STATUS_OK).json({
       status: 'ok',
       project: {
         _id: project._id,
@@ -105,21 +109,27 @@ export const getProject: RequestHandler = async (req, res, next) => {
       }
     })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }
 
-export const createProject: RequestHandler = async (req, res, next) => {
+export const createProject: RequestHandler<
+  RouteParams,
+  unknown,
+  ProjectBody
+> = async (req, res, next) => {
   try {
-    const name = capitalize(req.body.name)
+    const {
+      body: { name: projectName }
+    } = req
+    const name = capitalize(projectName)
 
-    if (req.uid === '6439b01cf35b6e22570cd842')
-      throw new Error('Trial account detected')
+    if (req.uid === TRIAL_ACCOUNT_ID) throw new Error('Trial account detected')
 
     const exists = await Project.findOne({ name, authorId: req.uid })
 
-    if (exists) throw new Error('Project already exists')
+    if (exists !== null) throw new Error('Project already exists')
 
     const project = new Project({
       name,
@@ -129,67 +139,55 @@ export const createProject: RequestHandler = async (req, res, next) => {
 
     const newProject = await project.save()
 
-    res.status(201).json({ status: 'ok', newProject })
+    res.status(HTTP_STATUS_CREATED).json({ status: 'ok', newProject })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }
 
 export const deleteProject: RequestHandler = async (req, res, next) => {
   try {
-    const { id } = req.params as { id: string }
+    const id = routeParam(req.params.id)
 
-    if (req.uid === '6439b01cf35b6e22570cd842')
-      throw new Error('Trial account detected')
+    if (req.uid === TRIAL_ACCOUNT_ID) throw new Error('Trial account detected')
 
     const project = await Project.findOneAndDelete({
       _id: id,
       authorId: req.uid
     })
 
-    if (!project) throw new Error('Project not found')
+    if (project === null) throw new Error('Project not found')
 
     await Task.deleteMany({ project: project.name, authorId: req.uid })
 
-    res.status(200).json({ status: 'ok' })
+    res.status(HTTP_STATUS_OK).json({ status: 'ok' })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }
 
-export const updateProject: RequestHandler = async (req, res, next) => {
+export const updateProject: RequestHandler<
+  RouteParams,
+  unknown,
+  UpdateBody
+> = async (req, res, next) => {
   try {
-    let reqProject: Record<string, unknown> | undefined
-    const { id } = req.params as { id: string }
+    const id = routeParam(req.params.id)
 
-    if (req.uid === '6439b01cf35b6e22570cd842')
-      throw new Error('Trial account detected')
+    if (req.uid === TRIAL_ACCOUNT_ID) throw new Error('Trial account detected')
 
     const project = await Project.findById(id)
 
-    if (!project) throw new Error('Project not found')
+    if (project === null) throw new Error('Project not found')
 
-    if (!project.authorId?.equals(req.uid))
+    if (project.authorId?.equals(req.uid) !== true)
       throw new Error("Can't update other authors projects")
 
-    for (const key of Object.keys(req.body)) {
-      if (req.body[key]) {
-        reqProject = Object.assign({}, reqProject, {
-          [key]: req.body[key]
-        })
-      }
-    }
+    const reqProject = updatedFields(req.body)
 
-    if (reqProject === undefined) throw new Error('Nothing to update')
-
-    if (
-      reqProject.authorId ||
-      reqProject.id ||
-      reqProject._id ||
-      reqProject.createdAt
-    )
+    if (READ_ONLY_FIELDS.some((field) => Boolean(reqProject[field])))
       throw new Error("Can't update this data")
 
     const updatedProject = await Project.findOneAndUpdate(
@@ -198,9 +196,9 @@ export const updateProject: RequestHandler = async (req, res, next) => {
       { returnDocument: 'after' }
     )
 
-    res.status(200).json({ status: 'ok', updatedProject })
+    res.status(HTTP_STATUS_OK).json({ status: 'ok', updatedProject })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }

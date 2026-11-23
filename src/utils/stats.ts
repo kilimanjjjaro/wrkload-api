@@ -1,4 +1,10 @@
 import dayjs from 'dayjs'
+import {
+  DECIMAL_RADIX,
+  MINUTES_PER_HOUR,
+  PREVIOUS_MONTH_OFFSET,
+  SINGLE_BEST_PROJECT
+} from '../constants/index.ts'
 
 interface DeliveredTask {
   deliveredAt?: string | null
@@ -13,46 +19,42 @@ interface ProjectTask extends DeliveredTask {
 }
 
 const firstDayOfPastMonth = dayjs()
-  .subtract(1, 'month')
+  .subtract(PREVIOUS_MONTH_OFFSET, 'month')
   .startOf('month')
   .format()
-const lastDayOfPastMonth = dayjs().subtract(1, 'month').endOf('month').format()
+const lastDayOfPastMonth = dayjs()
+  .subtract(PREVIOUS_MONTH_OFFSET, 'month')
+  .endOf('month')
+  .format()
 const firstDayOfCurrentMonth = dayjs().startOf('month').format()
 const lastDayOfCurrentMonth = dayjs().endOf('month').format()
 
-export const getPastMonthTasks = <T extends DeliveredTask>(tasks: T[]) => {
-  return tasks.filter((task) => {
-    const formattedDate = dayjs(task.deliveredAt).format()
-    return (
-      formattedDate >= firstDayOfPastMonth &&
-      formattedDate <= lastDayOfPastMonth
-    )
-  })
+const isDeliveredBetween = (task: DeliveredTask, from: string, to: string) => {
+  const formattedDate = dayjs(task.deliveredAt).format()
+  return formattedDate >= from && formattedDate <= to
 }
 
-export const getCurrentMonthTasks = <T extends DeliveredTask>(tasks: T[]) => {
-  return tasks.filter((task) => {
-    const formattedDate = dayjs(task.deliveredAt).format()
-    return (
-      formattedDate >= firstDayOfCurrentMonth &&
-      formattedDate <= lastDayOfCurrentMonth
-    )
-  })
-}
+export const getPastMonthTasks = <T extends DeliveredTask>(tasks: T[]) =>
+  tasks.filter((task) =>
+    isDeliveredBetween(task, firstDayOfPastMonth, lastDayOfPastMonth)
+  )
+
+export const getCurrentMonthTasks = <T extends DeliveredTask>(tasks: T[]) =>
+  tasks.filter((task) =>
+    isDeliveredBetween(task, firstDayOfCurrentMonth, lastDayOfCurrentMonth)
+  )
 
 export const getTotalTasksTiming = (tasks: TimedTask[]) => {
   let totalMinutes = 0
 
-  tasks.forEach((task) => {
-    const splitTime = task.timing.split(':')
-    totalMinutes += parseInt(splitTime[0]) * 60 + parseInt(splitTime[1])
-  })
+  for (const task of tasks) {
+    const [hours, minutes] = task.timing.split(':')
+    totalMinutes +=
+      parseInt(hours, DECIMAL_RADIX) * MINUTES_PER_HOUR +
+      parseInt(minutes, DECIMAL_RADIX)
+  }
 
-  const hours = Math.floor(totalMinutes / 60)
-  const minutes = totalMinutes - hours * 60
-  const timing = `${hours}:${minutes}`
-
-  return parseInt(timing)
+  return Math.floor(totalMinutes / MINUTES_PER_HOUR)
 }
 
 export const isPerformanceBetter = (
@@ -68,26 +70,20 @@ export const isPerformanceBetter = (
   }
 }
 
-export const getBestProjectOfPastMonth = async (tasks: ProjectTask[]) => {
+export const getBestProjectOfPastMonth = (tasks: ProjectTask[]) => {
   const pastMonthTasks = getPastMonthTasks(tasks)
-
-  const numberOfTasksPerProject = pastMonthTasks.reduce<Record<string, number>>(
-    (acc, { project }) => {
-      acc[project] = (acc[project] ?? 0) + 1
-      return acc
-    },
-    {}
+  const projects = [...new Set(pastMonthTasks.map(({ project }) => project))]
+  const tasksPerProject = projects.map(
+    (project) =>
+      pastMonthTasks.filter((task) => task.project === project).length
+  )
+  const highestNumber = Math.max(...tasksPerProject)
+  const bestProjects = projects.filter(
+    (_, index) => tasksPerProject[index] === highestNumber
   )
 
-  const highestNumber = Math.max(...Object.values(numberOfTasksPerProject))
+  if (bestProjects.length > SINGLE_BEST_PROJECT) return ''
 
-  const bestProjects = Object.keys(numberOfTasksPerProject).filter(
-    (project) => numberOfTasksPerProject[project] === highestNumber
-  )
-
-  if (bestProjects.length > 1) {
-    return ''
-  } else {
-    return bestProjects[0] as string | undefined
-  }
+  const [bestProject] = bestProjects
+  return bestProject as string | undefined
 }

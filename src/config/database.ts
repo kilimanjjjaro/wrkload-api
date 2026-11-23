@@ -1,9 +1,10 @@
 import mongoose from 'mongoose'
 import { env } from '../utils/env.ts'
+import { logError, logInfo } from '../utils/logger.ts'
 
 try {
   await mongoose.connect(env('DATABASE'))
-  console.log('Database connected')
+  logInfo('Database connected')
 } catch (error) {
-  console.error(error)
+  logError(error)
 }

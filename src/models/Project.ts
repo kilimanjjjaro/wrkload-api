@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate-v2'
+import { NO_TASKS } from '../constants/index.ts'
 
 const projectSchema = new mongoose.Schema({
   name: {
@@ -20,7 +21,7 @@ const projectSchema = new mongoose.Schema({
   totalTasks: {
     type: Number,
     require: true,
-    default: 0
+    default: NO_TASKS
   }
 })
 

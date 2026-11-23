@@ -1,5 +1,10 @@
 import type { NextFunction, Request, Response } from 'express'
 import { check, param, query, validationResult } from 'express-validator'
+import {
+  DEFAULT_PAGE,
+  HTTP_STATUS_BAD_REQUEST,
+  PASSWORD_MIN_LENGTH
+} from '../constants/index.ts'
 
 export const manageValidationErrors = (
   req: Request,
@@ -9,7 +14,8 @@ export const manageValidationErrors = (
   const errors = validationResult(req)
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({ error: errors.array() })
+    res.status(HTTP_STATUS_BAD_REQUEST).json({ error: errors.array() })
+    return
   }
 
   next()
@@ -44,7 +50,7 @@ export const registryDataValidations = [
     .notEmpty()
     .withMessage('Password are required')
     .bail()
-    .isLength({ min: 8 })
+    .isLength({ min: PASSWORD_MIN_LENGTH })
     .withMessage('Password must have a minimum of 8 characters'),
   manageValidationErrors
 ]
@@ -79,7 +85,7 @@ export const loginDataValidations = [
     .notEmpty()
     .withMessage('Password are required')
     .bail()
-    .isLength({ min: 8 })
+    .isLength({ min: PASSWORD_MIN_LENGTH })
     .withMessage('Password must have a minimum of 8 characters'),
   manageValidationErrors
 ]
@@ -98,14 +104,14 @@ export const changePassDataValidations = [
     .notEmpty()
     .withMessage('Password are required')
     .bail()
-    .isLength({ min: 8 })
+    .isLength({ min: PASSWORD_MIN_LENGTH })
     .withMessage('Password must have a minimum of 8 characters'),
   check('newPassword')
     .trim()
     .notEmpty()
     .withMessage('New password are required')
     .bail()
-    .isLength({ min: 8 })
+    .isLength({ min: PASSWORD_MIN_LENGTH })
     .withMessage('New password must have a minimum of 8 characters'),
   manageValidationErrors
 ]
@@ -189,7 +195,7 @@ export const resetPassDataValidations = [
     .notEmpty()
     .withMessage('New password are required')
     .bail()
-    .isLength({ min: 8 })
+    .isLength({ min: PASSWORD_MIN_LENGTH })
     .withMessage('New password must have a minimum of 8 characters'),
   manageValidationErrors
 ]
@@ -202,20 +208,20 @@ export const tasksParamsValidations = [
     .escape()
     .notEmpty()
     .withMessage('Project parameter cannot be empty'),
-  query('page').trim().escape().default(1),
+  query('page').trim().escape().default(DEFAULT_PAGE),
   query('limit').trim().escape(),
   query('search').trim().unescape(),
   manageValidationErrors
 ]
 
 export const projectsParamsValidations = [
-  query('page').trim().escape().default(1),
+  query('page').trim().escape().default(DEFAULT_PAGE),
   query('limit').trim().escape(),
   manageValidationErrors
 ]
 
 export const usersParamsValidations = [
-  query('page').trim().escape().default(1),
+  query('page').trim().escape().default(DEFAULT_PAGE),
   query('limit').trim().escape(),
   manageValidationErrors
 ]

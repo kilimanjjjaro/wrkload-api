@@ -6,9 +6,31 @@ import app from '../../src/app.ts'
 import { Project } from '../../src/models/Project.ts'
 import { Task } from '../../src/models/Task.ts'
 import { User } from '../../src/models/User.ts'
-import { API, ROLES, TRIAL_ACCOUNT_ID } from '../constants/api.ts'
 import { createProject, createTask } from '../utils/tasks.ts'
 import { createUser, createUserWithToken } from '../utils/users.ts'
+import {
+  API,
+  DAYS_ACTIVE_BEFORE,
+  FIRST_PAGE,
+  HOURS_ACTIVE_EARLIER,
+  HTTP_STATUS_FORBIDDEN,
+  HTTP_STATUS_INTERNAL_SERVER_ERROR,
+  HTTP_STATUS_NOT_FOUND,
+  HTTP_STATUS_OK,
+  HTTP_STATUS_UNAUTHORIZED,
+  MINUTES_ACTIVE_RECENTLY,
+  NO_DOCUMENTS,
+  ROLE_ADMIN,
+  ROLE_PARTNER,
+  ROLE_TRIAL,
+  SECOND_PAGE,
+  TEST_AFTERNOON,
+  THREE_DOCUMENTS,
+  TRIAL_ACCOUNT_ID,
+  TWO_DOCUMENTS
+} from '../constants/api.ts'
+import { USERS_SCHEMA } from '../constants/schemas.ts'
+import { body, parseBody } from '../utils/http.ts'
 
 afterEach(() => {
   vi.useRealTimers()
@@ -18,69 +40,68 @@ describe('GET /users', () => {
   it('lists the users for an admin and flags the recently active ones', async () => {
     const { authorization } = await createUserWithToken({
       username: 'admin',
-      role: ROLES.admin
+      role: ROLE_ADMIN
     })
     await createUser({
       username: 'active',
-      lastActiveAt: dayjs().subtract(10, 'minute').format()
+      lastActiveAt: dayjs().subtract(MINUTES_ACTIVE_RECENTLY, 'minute').format()
     })
     await createUser({
       username: 'inactive',
-      lastActiveAt: dayjs().subtract(2, 'day').format()
+      lastActiveAt: dayjs().subtract(DAYS_ACTIVE_BEFORE, 'day').format()
     })
 
     const response = await request(app)
       .get(API.users)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(200)
-    expect(response.body.pagination).toMatchObject({ totalResults: 3 })
+    expect(response.status).toBe(HTTP_STATUS_OK)
+    expect(body(response)).toMatchObject({
+      pagination: { totalResults: THREE_DOCUMENTS }
+    })
 
     const users = Object.fromEntries(
-      response.body.users.map(
-        (user: { username: string; recentlyActive: boolean }) => [
-          user.username,
-          user.recentlyActive
-        ]
+      parseBody(USERS_SCHEMA, response).users.map(
+        ({ username, recentlyActive }) => [username, recentlyActive]
       )
     )
     expect(users).toEqual({ admin: false, active: true, inactive: false })
-    expect(response.body.users[0]).not.toHaveProperty('password')
+    expect(body(response)).not.toHaveProperty('users.0.password')
   })
 
   it.fails(
     'does not flag a user active more than an hour ago today',
     async () => {
-      vi.useFakeTimers({ toFake: ['Date'], now: new Date(2026, 10, 23, 15) })
-      const { authorization } = await createUserWithToken({ role: ROLES.admin })
+      vi.useFakeTimers({ toFake: ['Date'], now: TEST_AFTERNOON })
+      const { authorization } = await createUserWithToken({ role: ROLE_ADMIN })
       await createUser({
         username: 'inactive',
-        lastActiveAt: dayjs().subtract(2, 'hour').format()
+        lastActiveAt: dayjs().subtract(HOURS_ACTIVE_EARLIER, 'hour').format()
       })
 
       const response = await request(app)
         .get(`${API.users}?search=inactive`)
         .set('Authorization', authorization)
 
-      expect(response.body.users[0].recentlyActive).toBe(false)
+      expect(body(response)).toHaveProperty('users.0.recentlyActive', false)
     }
   )
 
   it('lets the trial account list the users', async () => {
     const { authorization } = await createUserWithToken({
       _id: TRIAL_ACCOUNT_ID,
-      role: ROLES.trial
+      role: ROLE_TRIAL
     })
 
     const response = await request(app)
       .get(API.users)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(HTTP_STATUS_OK)
   })
 
   it('searches and paginates the users', async () => {
-    const { authorization } = await createUserWithToken({ role: ROLES.admin })
+    const { authorization } = await createUserWithToken({ role: ROLE_ADMIN })
     await createUser({ username: 'kili one' })
     await createUser({ username: 'KILI two' })
 
@@ -88,14 +109,16 @@ describe('GET /users', () => {
       .get(`${API.users}?search="kili"&limit=1&page=2`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(HTTP_STATUS_OK)
     expect(
-      response.body.users.map((user: { username: string }) => user.username)
+      parseBody(USERS_SCHEMA, response).users.map(({ username }) => username)
     ).toEqual(['KILI two'])
-    expect(response.body.pagination).toMatchObject({
-      totalResults: 2,
-      page: 2,
-      prevPage: 1
+    expect(body(response)).toMatchObject({
+      pagination: {
+        totalResults: TWO_DOCUMENTS,
+        page: SECOND_PAGE,
+        prevPage: FIRST_PAGE
+      }
     })
   })
 
@@ -106,8 +129,8 @@ describe('GET /users', () => {
       .get(API.users)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('users/permission-denied')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'users/permission-denied' })
   })
 })
 
@@ -119,14 +142,16 @@ describe('GET /users/:uid', () => {
       .get(`${API.users}/${user._id.toString()}`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(200)
-    expect(response.body.user).toMatchObject({
-      _id: user._id.toString(),
-      username: user.username,
-      email: user.email,
-      role: ROLES.partner
+    expect(response.status).toBe(HTTP_STATUS_OK)
+    expect(body(response)).toMatchObject({
+      user: {
+        _id: user._id.toString(),
+        username: user.username,
+        email: user.email,
+        role: ROLE_PARTNER
+      }
     })
-    expect(response.body.user).not.toHaveProperty('password')
+    expect(body(response)).not.toHaveProperty('user.password')
   })
 
   it('rejects another user for a partner', async () => {
@@ -137,30 +162,30 @@ describe('GET /users/:uid', () => {
       .get(`${API.users}/${other._id.toString()}`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('users/permission-denied')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'users/permission-denied' })
   })
 
   it('returns another user for an admin', async () => {
-    const { authorization } = await createUserWithToken({ role: ROLES.admin })
+    const { authorization } = await createUserWithToken({ role: ROLE_ADMIN })
     const other = await createUser()
 
     const response = await request(app)
       .get(`${API.users}/${other._id.toString()}`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(HTTP_STATUS_OK)
   })
 
   it('returns 404 for a missing user', async () => {
-    const { authorization } = await createUserWithToken({ role: ROLES.admin })
+    const { authorization } = await createUserWithToken({ role: ROLE_ADMIN })
 
     const response = await request(app)
       .get(`${API.users}/${new mongoose.Types.ObjectId().toString()}`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(404)
-    expect(response.body.code).toBe('users/user-not-found')
+    expect(response.status).toBe(HTTP_STATUS_NOT_FOUND)
+    expect(body(response)).toMatchObject({ code: 'users/user-not-found' })
   })
 })
 
@@ -173,7 +198,7 @@ describe('PATCH /users/:uid', () => {
       .set('Authorization', authorization)
       .send({ username: 'New name', avatar: 'https://wrkload.test/new.png' })
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(HTTP_STATUS_OK)
     expect(response.body).toEqual({
       status: 'ok',
       user: {
@@ -181,7 +206,7 @@ describe('PATCH /users/:uid', () => {
         email: user.email,
         username: 'New name',
         avatar: 'https://wrkload.test/new.png',
-        role: ROLES.partner
+        role: ROLE_PARTNER
       }
     })
   })
@@ -194,25 +219,25 @@ describe('PATCH /users/:uid', () => {
       .set('Authorization', authorization)
       .send({ username: '' })
 
-    expect(response.status).toBe(500)
-    expect(response.body.code).toBe('server/unhandled-error')
+    expect(response.status).toBe(HTTP_STATUS_INTERNAL_SERVER_ERROR)
+    expect(body(response)).toMatchObject({ code: 'server/unhandled-error' })
   })
 
-  it('rejects changing the password or the role', async () => {
-    const { user, authorization } = await createUserWithToken()
+  it.each([{ password: 'new-password' }, { role: ROLE_ADMIN }])(
+    'rejects changing %o',
+    async (changes) => {
+      const { user, authorization } = await createUserWithToken()
 
-    for (const body of [{ password: 'new-password' }, { role: ROLES.admin }]) {
       const response = await request(app)
         .patch(`${API.users}/${user._id.toString()}`)
         .set('Authorization', authorization)
-        .send({ username: 'New name', ...body })
+        .send({ username: 'New name', ...changes })
 
-      expect(response.status).toBe(401)
-      expect(response.body.code).toBe('users/permission-denied')
+      expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+      expect(body(response)).toMatchObject({ code: 'users/permission-denied' })
+      expect((await User.findById(user._id))?.role).toBe(ROLE_PARTNER)
     }
-
-    expect((await User.findById(user._id))?.role).toBe(ROLES.partner)
-  })
+  )
 
   it.fails('rejects changing the email or the confirmation', async () => {
     const { user, authorization } = await createUserWithToken({
@@ -230,7 +255,7 @@ describe('PATCH /users/:uid', () => {
   })
 
   it('rejects another user', async () => {
-    const { authorization } = await createUserWithToken({ role: ROLES.admin })
+    const { authorization } = await createUserWithToken({ role: ROLE_ADMIN })
     const other = await createUser()
 
     const response = await request(app)
@@ -238,14 +263,14 @@ describe('PATCH /users/:uid', () => {
       .set('Authorization', authorization)
       .send({ username: 'New name' })
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('users/permission-denied')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'users/permission-denied' })
   })
 
   it('rejects the trial account', async () => {
     const { authorization } = await createUserWithToken({
       _id: TRIAL_ACCOUNT_ID,
-      role: ROLES.trial
+      role: ROLE_TRIAL
     })
 
     const response = await request(app)
@@ -253,14 +278,14 @@ describe('PATCH /users/:uid', () => {
       .set('Authorization', authorization)
       .send({ username: 'New name' })
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('trial/permission-denied')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'trial/permission-denied' })
   })
 })
 
 describe('DELETE /users/:uid', () => {
   it('deletes the user with their projects and tasks', async () => {
-    const { authorization } = await createUserWithToken({ role: ROLES.admin })
+    const { authorization } = await createUserWithToken({ role: ROLE_ADMIN })
     const other = await createUser()
     await createProject(other._id)
     await createTask(other._id)
@@ -269,10 +294,14 @@ describe('DELETE /users/:uid', () => {
       .delete(`${API.users}/${other._id.toString()}`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(HTTP_STATUS_OK)
     expect(await User.findById(other._id)).toBeNull()
-    expect(await Project.countDocuments({ authorId: other._id })).toBe(0)
-    expect(await Task.countDocuments({ authorId: other._id })).toBe(0)
+    expect(await Project.countDocuments({ authorId: other._id })).toBe(
+      NO_DOCUMENTS
+    )
+    expect(await Task.countDocuments({ authorId: other._id })).toBe(
+      NO_DOCUMENTS
+    )
   })
 
   it.fails('rejects a partner deleting another user', async () => {
@@ -283,30 +312,30 @@ describe('DELETE /users/:uid', () => {
       .delete(`${API.users}/${other._id.toString()}`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(401)
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
     expect(await User.findById(other._id)).not.toBeNull()
   })
 
   it('does not delete the trial account', async () => {
-    const { authorization } = await createUserWithToken({ role: ROLES.admin })
-    await createUser({ _id: TRIAL_ACCOUNT_ID, role: ROLES.trial })
+    const { authorization } = await createUserWithToken({ role: ROLE_ADMIN })
+    await createUser({ _id: TRIAL_ACCOUNT_ID, role: ROLE_TRIAL })
 
     const response = await request(app)
       .delete(`${API.users}/${TRIAL_ACCOUNT_ID}`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('trial/permission-denied')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'trial/permission-denied' })
   })
 
   it('returns 403 for a missing user', async () => {
-    const { authorization } = await createUserWithToken({ role: ROLES.admin })
+    const { authorization } = await createUserWithToken({ role: ROLE_ADMIN })
 
     const response = await request(app)
       .delete(`${API.users}/${new mongoose.Types.ObjectId().toString()}`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(403)
-    expect(response.body.code).toBe('auth/user-not-found')
+    expect(response.status).toBe(HTTP_STATUS_FORBIDDEN)
+    expect(body(response)).toMatchObject({ code: 'auth/user-not-found' })
   })
 })

@@ -1,5 +1,4 @@
 import { vi } from 'vitest'
-import transporter from '../../src/utils/transporter.ts'
 
 interface SentMail {
   from: string
@@ -8,20 +7,26 @@ interface SentMail {
   html: string
 }
 
-export const sendMail = vi.mocked(transporter.sendMail)
+export const sendMail = vi
+  .fn<(mail: SentMail) => Promise<object>>()
+  .mockResolvedValue({})
 
-export const lastSentMail = (): SentMail => {
-  const call = sendMail.mock.lastCall
+export const lastSentMail = () => {
+  const {
+    mock: { lastCall }
+  } = sendMail
 
-  if (call === undefined) throw new Error('No mail was sent')
+  if (lastCall === undefined) throw new Error('No mail was sent')
 
-  return call[0] as SentMail
+  const [mail] = lastCall
+  return mail
 }
 
 export const findLink = (html: string, path: string) => {
-  const match = html.match(new RegExp(`href="([^"]*/${path}/[^"]+)"`))
+  const match = new RegExp(`href="([^"]*/${path}/[^"]+)"`, 'v').exec(html)
 
   if (match === null) throw new Error(`No ${path} link in the mail`)
 
-  return new URL(match[1])
+  const [, link] = match
+  return new URL(link)
 }

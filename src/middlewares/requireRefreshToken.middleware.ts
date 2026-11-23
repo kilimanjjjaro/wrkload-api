@@ -1,7 +1,8 @@
 import type { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import { env } from '../utils/env.ts'
-import type { TokenPayload } from '../types/tokens.ts'
+import { logError } from '../utils/logger.ts'
+import { readTokenPayload } from '../utils/tokenPayloads.ts'
 
 export const requireRefreshToken = (
   req: Request,
@@ -9,14 +10,15 @@ export const requireRefreshToken = (
   next: NextFunction
 ) => {
   try {
-    const refreshToken = req.cookies.refreshToken as string | undefined
+    const cookies: Record<string, unknown> = req.cookies
+    const { refreshToken } = cookies
 
-    if (!refreshToken) throw new Error('Token not found')
+    if (typeof refreshToken !== 'string' || refreshToken === '')
+      throw new Error('Token not found')
 
-    const { uid, role, email } = jwt.verify(
-      refreshToken,
-      env('REFRESH_KEY')
-    ) as TokenPayload
+    const { uid, role, email } = readTokenPayload(
+      jwt.verify(refreshToken, env('REFRESH_KEY'))
+    )
 
     req.uid = uid
     req.role = role
@@ -24,7 +26,7 @@ export const requireRefreshToken = (
 
     next()
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }

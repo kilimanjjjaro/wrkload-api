@@ -3,58 +3,60 @@ import dayjs from 'dayjs'
 import { Task } from '../models/Task.ts'
 import { User } from '../models/User.ts'
 import {
+  EMPTY_LENGTH,
+  FIRST_INDEX,
+  FIRST_LETTER_LENGTH,
+  HTTP_STATUS_CREATED,
+  HTTP_STATUS_OK,
+  ROLE_ADMIN,
+  TRIAL_ACCOUNT_ID
+} from '../constants/index.ts'
+import type { RouteParams, TaskBody, UpdateBody } from '../types/requests.ts'
+import { listQuery, queryText, routeParam } from '../utils/requests.ts'
+import { logError } from '../utils/logger.ts'
+import {
+  paginationOptions,
+  searchPattern,
+  updatedFields
+} from '../utils/pagination.ts'
+import {
   getCurrentMonthTasks,
   getPastMonthTasks,
   getTotalTasksTiming,
   isPerformanceBetter
 } from '../utils/stats.ts'
-import { paginationOptions } from '../utils/pagination.ts'
 
-export const capitalize = (string: string) => {
-  const words = string.split(' ')
-  const capitalizedWords = words.map((word) => {
-    return word.charAt(0).toUpperCase() + word.slice(1)
-  })
-  return capitalizedWords.join(' ')
-}
+const READ_ONLY_FIELDS = ['authorId', 'id', '_id', 'createdAt', 'updatedAt']
+
+export const capitalize = (string: string) =>
+  string
+    .split(' ')
+    .map(
+      (word) =>
+        word.charAt(FIRST_INDEX).toUpperCase() + word.slice(FIRST_LETTER_LENGTH)
+    )
+    .join(' ')
 
 export const getTasks: RequestHandler = async (req, res, next) => {
   try {
-    let tasks
-    const project = capitalize(req.query.project as string)
-    const search = req.query.search as string | undefined
-    const tasksPaginationOptions = paginationOptions(
-      'title authorId createdAt updatedAt project timing deliveredAt description',
-      req.query.page,
-      req.query.limit
-    )
-    let totalPastMonthTiming = 0
-    let totalCurrentMonthTiming = 0
+    const project = capitalize(queryText(req.query.project) ?? '')
 
     await User.findOneAndUpdate(
       { _id: req.uid },
       { lastActiveAt: dayjs().format() }
     )
 
-    if (search) {
-      const escapedString = search.replace(/^"|"$/g, '')
-      tasks = await Task.paginate(
-        {
-          authorId: req.uid,
-          project,
-          title: { $regex: escapedString, $options: 'i' }
-        },
-        tasksPaginationOptions
+    const title = searchPattern(queryText(req.query.search))
+    const tasks = await Task.paginate(
+      { authorId: req.uid, project, ...(title === undefined ? {} : { title }) },
+      paginationOptions(
+        'title authorId createdAt updatedAt project timing deliveredAt description',
+        listQuery(req.query)
       )
-    } else {
-      tasks = await Task.paginate(
-        { authorId: req.uid, project },
-        tasksPaginationOptions
-      )
-    }
+    )
 
-    if (tasks.docs.length < 1) {
-      res.status(200).json({
+    if (tasks.docs.length === EMPTY_LENGTH) {
+      res.status(HTTP_STATUS_OK).json({
         status: 'ok',
         pagination: null,
         tasks: [],
@@ -72,18 +74,11 @@ export const getTasks: RequestHandler = async (req, res, next) => {
     )
 
     const pastMonthTasks = getPastMonthTasks(tasksForStats.docs)
-
-    if (pastMonthTasks.length >= 1) {
-      totalPastMonthTiming = getTotalTasksTiming(pastMonthTasks)
-    }
-
     const currentMonthTasks = getCurrentMonthTasks(tasksForStats.docs)
+    const totalPastMonthTiming = getTotalTasksTiming(pastMonthTasks)
+    const totalCurrentMonthTiming = getTotalTasksTiming(currentMonthTasks)
 
-    if (currentMonthTasks.length >= 1) {
-      totalCurrentMonthTiming = getTotalTasksTiming(currentMonthTasks)
-    }
-
-    res.status(200).json({
+    res.status(HTTP_STATUS_OK).json({
       status: 'ok',
       pagination: {
         totalResults: tasks.totalDocs,
@@ -105,23 +100,23 @@ export const getTasks: RequestHandler = async (req, res, next) => {
       }
     })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }
 
 export const getTask: RequestHandler = async (req, res, next) => {
   try {
-    const { id } = req.params as { id: string }
+    const id = routeParam(req.params.id)
     const task = await Task.findById(id)
 
-    if (!task) throw new Error('Task not found')
+    if (task === null) throw new Error('Task not found')
 
-    if (req.role !== 1 && !task.authorId?.equals(req.uid)) {
+    if (req.role !== ROLE_ADMIN && task.authorId?.equals(req.uid) !== true) {
       throw new Error("Can't read other authors tasks")
     }
 
-    res.status(200).json({
+    res.status(HTTP_STATUS_OK).json({
       status: 'ok',
       task: {
         _id: task._id,
@@ -136,17 +131,22 @@ export const getTask: RequestHandler = async (req, res, next) => {
       }
     })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }
 
-export const createTask: RequestHandler = async (req, res, next) => {
+export const createTask: RequestHandler<
+  RouteParams,
+  unknown,
+  TaskBody
+> = async (req, res, next) => {
   try {
-    const { title, project, timing, deliveredAt, description } = req.body
+    const {
+      body: { title, project, timing, deliveredAt, description }
+    } = req
 
-    if (req.uid === '6439b01cf35b6e22570cd842')
-      throw new Error('Trial account detected')
+    if (req.uid === TRIAL_ACCOUNT_ID) throw new Error('Trial account detected')
 
     const task = new Task({
       title,
@@ -160,63 +160,50 @@ export const createTask: RequestHandler = async (req, res, next) => {
 
     const newTask = await task.save()
 
-    res.status(201).json({ status: 'ok', newTask })
+    res.status(HTTP_STATUS_CREATED).json({ status: 'ok', newTask })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }
 
 export const deleteTask: RequestHandler = async (req, res, next) => {
   try {
-    const { id } = req.params as { id: string }
+    const id = routeParam(req.params.id)
 
-    if (req.uid === '6439b01cf35b6e22570cd842')
-      throw new Error('Trial account detected')
+    if (req.uid === TRIAL_ACCOUNT_ID) throw new Error('Trial account detected')
 
     const task = await Task.findOneAndDelete({ _id: id, authorId: req.uid })
 
-    if (!task) throw new Error('Task not found')
+    if (task === null) throw new Error('Task not found')
 
-    res.status(200).json({ status: 'ok' })
+    res.status(HTTP_STATUS_OK).json({ status: 'ok' })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }
 
-export const updateTask: RequestHandler = async (req, res, next) => {
+export const updateTask: RequestHandler<
+  RouteParams,
+  unknown,
+  UpdateBody
+> = async (req, res, next) => {
   try {
-    let reqTask: Record<string, unknown> | undefined
-    const { id } = req.params as { id: string }
+    const id = routeParam(req.params.id)
 
-    if (req.uid === '6439b01cf35b6e22570cd842')
-      throw new Error('Trial account detected')
+    if (req.uid === TRIAL_ACCOUNT_ID) throw new Error('Trial account detected')
 
     const task = await Task.findById(id)
 
-    if (!task) throw new Error('Task not found')
+    if (task === null) throw new Error('Task not found')
 
-    if (!task.authorId?.equals(req.uid))
+    if (task.authorId?.equals(req.uid) !== true)
       throw new Error("Can't update other authors tasks")
 
-    for (const key of Object.keys(req.body)) {
-      if (req.body[key]) {
-        reqTask = Object.assign({}, reqTask, {
-          [key]: req.body[key]
-        })
-      }
-    }
+    const reqTask = updatedFields(req.body)
 
-    if (reqTask === undefined) throw new Error('Nothing to update')
-
-    if (
-      reqTask.authorId ||
-      reqTask.id ||
-      reqTask._id ||
-      reqTask.createdAt ||
-      reqTask.updatedAt
-    )
+    if (READ_ONLY_FIELDS.some((field) => Boolean(reqTask[field])))
       throw new Error("Can't update this data")
 
     reqTask.updatedAt = dayjs().format()
@@ -225,9 +212,9 @@ export const updateTask: RequestHandler = async (req, res, next) => {
       returnDocument: 'after'
     })
 
-    res.status(200).json({ status: 'ok', updatedTask })
+    res.status(HTTP_STATUS_OK).json({ status: 'ok', updatedTask })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }

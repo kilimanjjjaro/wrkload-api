@@ -2,33 +2,40 @@ import type { RequestHandler } from 'express'
 import { User } from '../models/User.ts'
 import { Project } from '../models/Project.ts'
 import { Task } from '../models/Task.ts'
-import { paginationOptions } from '../utils/pagination.ts'
+import {
+  EMPTY_LENGTH,
+  HTTP_STATUS_OK,
+  RECENT_ACTIVITY_HOURS,
+  ROLE_PARTNER,
+  TRIAL_ACCOUNT_ID
+} from '../constants/index.ts'
+import type { RouteParams, UpdateBody } from '../types/requests.ts'
+import { listQuery, queryText, routeParam } from '../utils/requests.ts'
+import { logError } from '../utils/logger.ts'
+import {
+  paginationOptions,
+  searchPattern,
+  updatedFields
+} from '../utils/pagination.ts'
 import dayjs from 'dayjs'
+
+const PROTECTED_FIELDS = ['id', '_id', 'password', 'role']
 
 export const getUsers: RequestHandler = async (req, res, next) => {
   try {
-    if (req.role === 3) throw new Error('Permission denied')
+    if (req.role === ROLE_PARTNER) throw new Error('Permission denied')
 
-    let users
-    const search = req.query.search as string | undefined
-    const usersPaginationOptions = paginationOptions(
-      'username role registeredAt lastActiveAt recentlyActive email avatar confirmationToken confirmationStatus',
-      req.query.page,
-      req.query.limit
+    const username = searchPattern(queryText(req.query.search))
+    const users = await User.paginate(
+      username === undefined ? {} : { username },
+      paginationOptions(
+        'username role registeredAt lastActiveAt recentlyActive email avatar confirmationToken confirmationStatus',
+        listQuery(req.query)
+      )
     )
 
-    if (search) {
-      const escapedString = search.replace(/^"|"$/g, '')
-      users = await User.paginate(
-        { username: { $regex: escapedString, $options: 'i' } },
-        usersPaginationOptions
-      )
-    } else {
-      users = await User.paginate({}, usersPaginationOptions)
-    }
-
-    if (users.docs.length < 1) {
-      res.status(200).json({
+    if (users.docs.length === EMPTY_LENGTH) {
+      res.status(HTTP_STATUS_OK).json({
         status: 'ok',
         pagination: null,
         users: []
@@ -36,17 +43,15 @@ export const getUsers: RequestHandler = async (req, res, next) => {
       return
     }
 
-    const lastHour = dayjs().subtract(1, 'hour').format('YYYY-MM-DD HH:mm:ss')
+    const lastHour = dayjs()
+      .subtract(RECENT_ACTIVITY_HOURS, 'hour')
+      .format('YYYY-MM-DD HH:mm:ss')
 
-    users.docs.forEach((user) => {
-      if (user.lastActiveAt > lastHour) {
-        user.recentlyActive = true
-      } else {
-        user.recentlyActive = false
-      }
-    })
+    for (const user of users.docs) {
+      user.recentlyActive = user.lastActiveAt > lastHour
+    }
 
-    res.status(200).json({
+    res.status(HTTP_STATUS_OK).json({
       status: 'ok',
       pagination: {
         totalResults: users.totalDocs,
@@ -58,22 +63,22 @@ export const getUsers: RequestHandler = async (req, res, next) => {
       users: users.docs
     })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }
 
 export const getUser: RequestHandler = async (req, res, next) => {
   try {
-    const { uid } = req.params as { uid: string }
+    const uid = routeParam(req.params.uid)
     const user = await User.findById(uid)
 
-    if (!user) throw new Error("User doesn't exist")
+    if (user === null) throw new Error("User doesn't exist")
 
-    if (!user._id.equals(req.uid) && req.role === 3)
+    if (!user._id.equals(req.uid) && req.role === ROLE_PARTNER)
       throw new Error('Permission denied')
 
-    res.status(200).json({
+    res.status(HTTP_STATUS_OK).json({
       status: 'ok',
       user: {
         _id: user._id,
@@ -89,64 +94,58 @@ export const getUser: RequestHandler = async (req, res, next) => {
       }
     })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }
+
 export const deleteUser: RequestHandler = async (req, res, next) => {
   try {
-    const { uid } = req.params as { uid: string }
+    const uid = routeParam(req.params.uid)
 
-    if (uid === '6439b01cf35b6e22570cd842')
-      throw new Error('Trial account detected')
+    if (uid === TRIAL_ACCOUNT_ID) throw new Error('Trial account detected')
 
     const user = await User.findOneAndDelete({ _id: uid })
 
-    if (!user) throw new Error('User not found')
+    if (user === null) throw new Error('User not found')
 
     await Task.deleteMany({ authorId: uid })
 
     await Project.deleteMany({ authorId: uid })
 
-    res.status(200).json({ status: 'ok' })
+    res.status(HTTP_STATUS_OK).json({ status: 'ok' })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }
 
-export const updateUser: RequestHandler = async (req, res, next) => {
+export const updateUser: RequestHandler<
+  RouteParams,
+  unknown,
+  UpdateBody
+> = async (req, res, next) => {
   try {
-    let reqUser: Record<string, unknown> | undefined
-    const { uid } = req.params as { uid: string }
+    const uid = routeParam(req.params.uid)
 
-    if (uid === '6439b01cf35b6e22570cd842')
-      throw new Error('Trial account detected')
+    if (uid === TRIAL_ACCOUNT_ID) throw new Error('Trial account detected')
 
     const user = await User.findById(uid)
 
-    if (!user) throw new Error('User not found')
-
-    for (const key of Object.keys(req.body)) {
-      if (req.body[key]) {
-        reqUser = Object.assign({}, reqUser, {
-          [key]: req.body[key]
-        })
-      }
-    }
+    if (user === null) throw new Error('User not found')
 
     if (!user._id.equals(req.uid)) throw new Error('Permission denied')
 
-    if (reqUser === undefined) throw new Error('Nothing to update')
+    const reqUser = updatedFields(req.body)
 
-    if (reqUser.id || reqUser._id || reqUser.password || reqUser.role)
+    if (PROTECTED_FIELDS.some((field) => Boolean(reqUser[field])))
       throw new Error('Permission denied')
 
     const updatedUser = await User.findOneAndUpdate({ _id: uid }, reqUser, {
       returnDocument: 'after'
     })
 
-    if (!updatedUser) throw new Error('User not found')
+    if (updatedUser === null) throw new Error('User not found')
 
     const secureUser = {
       _id: updatedUser._id,
@@ -156,9 +155,9 @@ export const updateUser: RequestHandler = async (req, res, next) => {
       role: updatedUser.role
     }
 
-    res.status(200).json({ status: 'ok', user: secureUser })
+    res.status(HTTP_STATUS_OK).json({ status: 'ok', user: secureUser })
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }

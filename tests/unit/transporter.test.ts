@@ -1,4 +1,7 @@
+import type Nodemailer from 'nodemailer'
 import { describe, expect, it, vi } from 'vitest'
+import { SINGLE_CALL, SMTP_SSL_PORT } from '../constants/api.ts'
+import { STREAMED_MAIL_SCHEMA } from '../constants/schemas.ts'
 
 const { createTransport, verify } = vi.hoisted(() => ({
   createTransport: vi.fn(),
@@ -6,10 +9,10 @@ const { createTransport, verify } = vi.hoisted(() => ({
 }))
 
 vi.mock('nodemailer', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('nodemailer')>()
+  const actual = await importOriginal<{ default: typeof Nodemailer }>()
 
   createTransport.mockImplementation(() => {
-    const transport = actual.createTransport({
+    const transport = actual.default.createTransport({
       streamTransport: true,
       buffer: true
     })
@@ -35,13 +38,13 @@ describe('transporter', () => {
         {
           service: 'Gmail',
           host: 'smtp.gmail.com',
-          port: 465,
+          port: SMTP_SSL_PORT,
           secure: true,
           auth: { user: 'wrkload@gmail.test', pass: 'app-password' }
         }
       ]
     ])
-    expect(verifyCalls).toHaveLength(1)
+    expect(verifyCalls).toHaveLength(SINGLE_CALL)
   })
 
   it('builds the html mails the controllers send', async () => {
@@ -57,7 +60,7 @@ describe('transporter', () => {
       to: ['kili@wrkload.test']
     })
 
-    const message = info.message.toString()
+    const message = STREAMED_MAIL_SCHEMA.parse(info).message.toString()
     expect(message).toContain('From: wrkload <wrkload@kilimanjjjaro.com>')
     expect(message).toContain('To: kili@wrkload.test')
     expect(message).toContain('Subject: Confirm your account')

@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   checks:
-    name: Format, typecheck, tests and security audit
+    name: Format, typecheck, lint, tests and security audit
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -32,6 +32,8 @@ jobs:
       - run: pnpm format:check
 
       - run: pnpm typecheck
+
+      - run: pnpm lint
 
       - run: pnpm test
 

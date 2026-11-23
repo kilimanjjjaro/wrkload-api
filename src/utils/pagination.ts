@@ -1,17 +1,31 @@
 import type { PaginateOptions } from 'mongoose'
+import { DECIMAL_RADIX, EMPTY_LENGTH } from '../constants/index.ts'
+import type { ListQuery } from '../types/requests.ts'
 
 export const paginationOptions = (
   select: string,
-  page: unknown,
-  limit: unknown
+  { page, limit }: ListQuery
 ): PaginateOptions => {
-  if (!limit) return { select, pagination: false }
+  if (limit === undefined || limit === '') return { select, pagination: false }
 
   return {
     select,
-    page: parseInt(String(page), 10),
+    page: parseInt(String(page), DECIMAL_RADIX),
     limit: Number.isNaN(Number(limit))
       ? Number.NaN
-      : parseInt(String(limit), 10)
+      : parseInt(limit, DECIMAL_RADIX)
   }
+}
+
+export const searchPattern = (search: string | undefined) =>
+  search === undefined || search.length === EMPTY_LENGTH
+    ? undefined
+    : { $regex: search.replace(/^"|"$/gv, ''), $options: 'i' }
+
+export const updatedFields = (body: Record<string, unknown>) => {
+  const entries = Object.entries(body).filter(([, value]) => Boolean(value))
+
+  if (entries.length === EMPTY_LENGTH) throw new Error('Nothing to update')
+
+  return Object.fromEntries(entries)
 }

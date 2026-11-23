@@ -3,16 +3,25 @@ import request from 'supertest'
 import { describe, expect, it } from 'vitest'
 import app from '../../src/app.ts'
 import { User } from '../../src/models/User.ts'
+import { findLink, lastSentMail, sendMail } from '../utils/mail.ts'
+import { bearer, createUser } from '../utils/users.ts'
 import {
   ACCESS_TOKEN_EXPIRES_IN,
   API,
   DEFAULT_PASSWORD,
+  HTTP_STATUS_BAD_REQUEST,
+  HTTP_STATUS_CREATED,
+  HTTP_STATUS_FORBIDDEN,
+  HTTP_STATUS_OK,
+  HTTP_STATUS_UNAUTHORIZED,
   LEGACY_PASSWORD_HASH,
-  ROLES,
+  NO_DOCUMENTS,
+  ROLE_PARTNER,
+  ROLE_TRIAL,
   TRIAL_ACCOUNT_ID
 } from '../constants/api.ts'
-import { findLink, lastSentMail, sendMail } from '../utils/mail.ts'
-import { bearer, createUser } from '../utils/users.ts'
+import { ACCESS_TOKEN_SCHEMA } from '../constants/schemas.ts'
+import { body, parseBody, validationErrorPaths } from '../utils/http.ts'
 
 const NEW_PASSWORD = 'another-secret-password'
 
@@ -41,12 +50,12 @@ describe('POST /auth/register', () => {
       .post(`${API.auth}/register`)
       .send(registerBody)
 
-    expect(response.status).toBe(201)
+    expect(response.status).toBe(HTTP_STATUS_CREATED)
     expect(response.body).toEqual({ status: 'ok' })
 
     const user = await User.findOne({ email: 'kili@wrkload.test' })
     expect(user).not.toBeNull()
-    expect(user?.role).toBe(ROLES.partner)
+    expect(user?.role).toBe(ROLE_PARTNER)
     expect(user?.confirmationStatus).toBe(false)
     expect(user?.password).not.toBe(DEFAULT_PASSWORD)
     expect(await user?.comparePassword(DEFAULT_PASSWORD)).toBe(true)
@@ -67,8 +76,8 @@ describe('POST /auth/register', () => {
       .post(`${API.auth}/register`)
       .send(registerBody)
 
-    expect(response.status).toBe(403)
-    expect(response.body.code).toBe('auth/email-already-exists')
+    expect(response.status).toBe(HTTP_STATUS_FORBIDDEN)
+    expect(body(response)).toMatchObject({ code: 'auth/email-already-exists' })
     expect(sendMail).not.toHaveBeenCalled()
   })
 
@@ -77,11 +86,14 @@ describe('POST /auth/register', () => {
       .post(`${API.auth}/register`)
       .send({ username: '', email: 'not-an-email', avatar: '', password: '1' })
 
-    expect(response.status).toBe(400)
-    expect(
-      response.body.error.map((error: { path: string }) => error.path)
-    ).toEqual(['username', 'email', 'avatar', 'password'])
-    expect(await User.countDocuments()).toBe(0)
+    expect(response.status).toBe(HTTP_STATUS_BAD_REQUEST)
+    expect(validationErrorPaths(response)).toEqual([
+      'username',
+      'email',
+      'avatar',
+      'password'
+    ])
+    expect(await User.countDocuments()).toBe(NO_DOCUMENTS)
   })
 })
 
@@ -91,7 +103,8 @@ describe('POST /auth/login', () => {
 
     const response = await login('KILI@wrkload.test')
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(HTTP_STATUS_OK)
+    const { accessToken } = parseBody(ACCESS_TOKEN_SCHEMA, response)
     expect(response.body).toEqual({
       status: 'ok',
       user: {
@@ -101,14 +114,11 @@ describe('POST /auth/login', () => {
         avatar: user.avatar,
         role: user.role
       },
-      accessToken: expect.any(String),
+      accessToken,
       expiresIn: ACCESS_TOKEN_EXPIRES_IN
     })
 
-    const payload = jwt.verify(
-      response.body.accessToken,
-      process.env.ACCESS_KEY ?? ''
-    )
+    const payload = jwt.verify(accessToken, process.env.ACCESS_KEY ?? '')
     expect(payload).toMatchObject({
       uid: user._id.toString(),
       role: user.role,
@@ -130,14 +140,16 @@ describe('POST /auth/login', () => {
       { $set: { password: LEGACY_PASSWORD_HASH } }
     )
 
-    expect((await login(user.email)).status).toBe(200)
-    expect((await login(user.email, 'wrong-password')).status).toBe(403)
+    expect((await login(user.email)).status).toBe(HTTP_STATUS_OK)
+    expect((await login(user.email, 'wrong-password')).status).toBe(
+      HTTP_STATUS_FORBIDDEN
+    )
   })
 
   it('rejects an unknown email', async () => {
     const response = await login('nobody@wrkload.test')
 
-    expect(response.status).toBe(403)
+    expect(response.status).toBe(HTTP_STATUS_FORBIDDEN)
     expect(response.body).toEqual({
       status: 'error',
       code: 'auth/user-not-found',
@@ -150,8 +162,8 @@ describe('POST /auth/login', () => {
 
     const response = await login(user.email)
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('auth/account-not-confirmed')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'auth/account-not-confirmed' })
   })
 
   it('rejects a wrong password', async () => {
@@ -159,17 +171,15 @@ describe('POST /auth/login', () => {
 
     const response = await login(user.email, 'wrong-password')
 
-    expect(response.status).toBe(403)
-    expect(response.body.code).toBe('auth/invalid-credentials')
+    expect(response.status).toBe(HTTP_STATUS_FORBIDDEN)
+    expect(body(response)).toMatchObject({ code: 'auth/invalid-credentials' })
   })
 
   it('validates the fields', async () => {
     const response = await login('not-an-email', 'short')
 
-    expect(response.status).toBe(400)
-    expect(
-      response.body.error.map((error: { path: string }) => error.path)
-    ).toEqual(['email', 'password'])
+    expect(response.status).toBe(HTTP_STATUS_BAD_REQUEST)
+    expect(validationErrorPaths(response)).toEqual(['email', 'password'])
   })
 })
 
@@ -178,27 +188,29 @@ describe('GET /auth/refreshToken', () => {
     const user = await createUser()
     const loginResponse = await login(user.email)
     const cookie = refreshTokenCookie(loginResponse.headers['set-cookie'])
+    const [cookiePair] = cookie.split(';')
 
     const response = await request(app)
       .get(`${API.auth}/refreshToken`)
-      .set('Cookie', cookie.split(';')[0])
+      .set('Cookie', cookiePair)
 
-    expect(response.status).toBe(201)
+    expect(response.status).toBe(HTTP_STATUS_CREATED)
+    const { accessToken } = parseBody(ACCESS_TOKEN_SCHEMA, response)
     expect(response.body).toEqual({
       status: 'ok',
-      accessToken: expect.any(String),
+      accessToken,
       expiresIn: ACCESS_TOKEN_EXPIRES_IN
     })
-    expect(
-      jwt.verify(response.body.accessToken, process.env.ACCESS_KEY ?? '')
-    ).toMatchObject({ uid: user._id.toString(), email: user.email })
+    expect(jwt.verify(accessToken, process.env.ACCESS_KEY ?? '')).toMatchObject(
+      { uid: user._id.toString(), email: user.email }
+    )
   })
 
   it('rejects a request without the cookie', async () => {
     const response = await request(app).get(`${API.auth}/refreshToken`)
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('token/token-not-found')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'token/token-not-found' })
   })
 
   it('rejects a refresh token signed with another key', async () => {
@@ -208,8 +220,8 @@ describe('GET /auth/refreshToken', () => {
       .get(`${API.auth}/refreshToken`)
       .set('Cookie', `refreshToken=${token}`)
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('token/invalid-signature')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'token/invalid-signature' })
   })
 })
 
@@ -217,7 +229,7 @@ describe('GET /auth/logout', () => {
   it('clears the refresh token cookie', async () => {
     const response = await request(app).get(`${API.auth}/logout`)
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(HTTP_STATUS_OK)
     expect(response.body).toEqual({ status: 'ok' })
     expect(refreshTokenCookie(response.headers['set-cookie'])).toContain(
       'Expires=Thu, 01 Jan 1970'
@@ -232,12 +244,12 @@ describe('PATCH /auth/confirm-account/:confirmationToken', () => {
 
     const response = await request(app).patch(`${API.auth}${link.pathname}`)
 
-    expect(response.status).toBe(201)
+    expect(response.status).toBe(HTTP_STATUS_CREATED)
 
     const user = await User.findOne({ email: 'kili@wrkload.test' })
     expect(user?.confirmationStatus).toBe(true)
     expect(user?.confirmationToken).toBe('')
-    expect((await login('kili@wrkload.test')).status).toBe(200)
+    expect((await login('kili@wrkload.test')).status).toBe(HTTP_STATUS_OK)
   })
 
   it('rejects a link that was already used', async () => {
@@ -247,8 +259,10 @@ describe('PATCH /auth/confirm-account/:confirmationToken', () => {
 
     const response = await request(app).patch(`${API.auth}${link.pathname}`)
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('auth/account-already-confirmed')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({
+      code: 'auth/account-already-confirmed'
+    })
   })
 })
 
@@ -260,7 +274,7 @@ describe('POST /auth/resend-confirm-account', () => {
       .post(`${API.auth}/resend-confirm-account`)
       .send({ email: user.email })
 
-    expect(response.status).toBe(201)
+    expect(response.status).toBe(HTTP_STATUS_CREATED)
 
     const updated = await User.findById(user._id)
     const mail = lastSentMail()
@@ -277,8 +291,10 @@ describe('POST /auth/resend-confirm-account', () => {
       .post(`${API.auth}/resend-confirm-account`)
       .send({ email: user.email })
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('auth/account-already-confirmed')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({
+      code: 'auth/account-already-confirmed'
+    })
   })
 
   it('rejects an unknown email', async () => {
@@ -286,8 +302,8 @@ describe('POST /auth/resend-confirm-account', () => {
       .post(`${API.auth}/resend-confirm-account`)
       .send({ email: 'nobody@wrkload.test' })
 
-    expect(response.status).toBe(403)
-    expect(response.body.code).toBe('auth/user-not-found')
+    expect(response.status).toBe(HTTP_STATUS_FORBIDDEN)
+    expect(body(response)).toMatchObject({ code: 'auth/user-not-found' })
   })
 })
 
@@ -309,9 +325,9 @@ describe('PATCH /auth/change-password', () => {
       newPassword: NEW_PASSWORD
     })
 
-    expect(response.status).toBe(201)
-    expect((await login(user.email, NEW_PASSWORD)).status).toBe(200)
-    expect((await login(user.email)).status).toBe(403)
+    expect(response.status).toBe(HTTP_STATUS_CREATED)
+    expect((await login(user.email, NEW_PASSWORD)).status).toBe(HTTP_STATUS_OK)
+    expect((await login(user.email)).status).toBe(HTTP_STATUS_FORBIDDEN)
   })
 
   it('requires an access token', async () => {
@@ -323,8 +339,8 @@ describe('PATCH /auth/change-password', () => {
         newPassword: NEW_PASSWORD
       })
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('token/token-not-found')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'token/token-not-found' })
   })
 
   it('rejects a wrong old password', async () => {
@@ -335,8 +351,8 @@ describe('PATCH /auth/change-password', () => {
       newPassword: NEW_PASSWORD
     })
 
-    expect(response.status).toBe(403)
-    expect(response.body.code).toBe('auth/invalid-credentials')
+    expect(response.status).toBe(HTTP_STATUS_FORBIDDEN)
+    expect(body(response)).toMatchObject({ code: 'auth/invalid-credentials' })
   })
 
   it('rejects the same password', async () => {
@@ -347,20 +363,20 @@ describe('PATCH /auth/change-password', () => {
       newPassword: DEFAULT_PASSWORD
     })
 
-    expect(response.status).toBe(403)
-    expect(response.body.code).toBe('auth/invalid-credentials')
+    expect(response.status).toBe(HTTP_STATUS_FORBIDDEN)
+    expect(body(response)).toMatchObject({ code: 'auth/invalid-credentials' })
   })
 
   it('rejects the trial account', async () => {
-    const user = await createUser({ _id: TRIAL_ACCOUNT_ID, role: ROLES.trial })
+    const user = await createUser({ _id: TRIAL_ACCOUNT_ID, role: ROLE_TRIAL })
 
     const response = await changePassword(user, {
       oldPassword: DEFAULT_PASSWORD,
       newPassword: NEW_PASSWORD
     })
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('trial/permission-denied')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'trial/permission-denied' })
   })
 })
 
@@ -373,7 +389,7 @@ describe('password reset', () => {
 
     const rememberResponse = await rememberPassword(user.email)
 
-    expect(rememberResponse.status).toBe(200)
+    expect(rememberResponse.status).toBe(HTTP_STATUS_OK)
 
     const mail = lastSentMail()
     expect(mail.to).toBe(user.email)
@@ -381,39 +397,41 @@ describe('password reset', () => {
 
     const link = findLink(mail.html, 'reset-password')
     expect(link.pathname).toMatch(
-      new RegExp(`^/reset-password/${user._id.toString()}/[^/]+$`)
+      new RegExp(`^/reset-password/${user._id.toString()}/[^\\/]+$`, 'v')
     )
 
     const resetResponse = await request(app)
       .patch(`${API.auth}${link.pathname}`)
       .send({ newPassword: NEW_PASSWORD })
 
-    expect(resetResponse.status).toBe(201)
-    expect((await login(user.email, NEW_PASSWORD)).status).toBe(200)
+    expect(resetResponse.status).toBe(HTTP_STATUS_CREATED)
+    expect((await login(user.email, NEW_PASSWORD)).status).toBe(HTTP_STATUS_OK)
 
     const reusedResponse = await request(app)
       .patch(`${API.auth}${link.pathname}`)
       .send({ newPassword: 'yet-another-password' })
 
-    expect(reusedResponse.status).toBe(401)
-    expect(reusedResponse.body.code).toBe('token/invalid-signature')
+    expect(reusedResponse.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(reusedResponse)).toMatchObject({
+      code: 'token/invalid-signature'
+    })
   })
 
   it('rejects an unknown email', async () => {
     const response = await rememberPassword('nobody@wrkload.test')
 
-    expect(response.status).toBe(403)
-    expect(response.body.code).toBe('auth/user-not-found')
+    expect(response.status).toBe(HTTP_STATUS_FORBIDDEN)
+    expect(body(response)).toMatchObject({ code: 'auth/user-not-found' })
     expect(sendMail).not.toHaveBeenCalled()
   })
 
   it('rejects the trial account', async () => {
-    const user = await createUser({ _id: TRIAL_ACCOUNT_ID, role: ROLES.trial })
+    const user = await createUser({ _id: TRIAL_ACCOUNT_ID, role: ROLE_TRIAL })
 
     const response = await rememberPassword(user.email)
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('trial/permission-denied')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'trial/permission-denied' })
   })
 
   it('requires a new password with at least 8 characters', async () => {
@@ -423,7 +441,8 @@ describe('password reset', () => {
       .patch(`${API.auth}/reset-password/${user._id.toString()}/token`)
       .send({ newPassword: 'short' })
 
-    expect(response.status).toBe(400)
-    expect(response.body.error[0].path).toBe('newPassword')
+    expect(response.status).toBe(HTTP_STATUS_BAD_REQUEST)
+    const [firstPath] = validationErrorPaths(response)
+    expect(firstPath).toBe('newPassword')
   })
 })

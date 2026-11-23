@@ -5,9 +5,29 @@ import { describe, expect, it, vi } from 'vitest'
 import app from '../../src/app.ts'
 import { Project } from '../../src/models/Project.ts'
 import { Task } from '../../src/models/Task.ts'
-import { API, ROLES, TRIAL_ACCOUNT_ID } from '../constants/api.ts'
 import { createProject, createTask } from '../utils/tasks.ts'
 import { createUserWithToken } from '../utils/users.ts'
+import {
+  API,
+  FIRST_PAGE,
+  FIRST_VERSION,
+  HTTP_STATUS_BAD_REQUEST,
+  HTTP_STATUS_CREATED,
+  HTTP_STATUS_FORBIDDEN,
+  HTTP_STATUS_NOT_FOUND,
+  HTTP_STATUS_OK,
+  HTTP_STATUS_UNAUTHORIZED,
+  NO_DOCUMENTS,
+  NO_TASKS,
+  PREVIOUS_MONTH_OFFSET,
+  ROLE_TRIAL,
+  SECOND_PAGE,
+  SINGLE_DOCUMENT,
+  TRIAL_ACCOUNT_ID,
+  TWO_DOCUMENTS
+} from '../constants/api.ts'
+import { NEW_PROJECT_SCHEMA, PROJECTS_SCHEMA } from '../constants/schemas.ts'
+import { body, parseBody, validationErrorPaths } from '../utils/http.ts'
 
 describe('POST /projects', () => {
   it('creates a project with a capitalized name', async () => {
@@ -18,16 +38,17 @@ describe('POST /projects', () => {
       .set('Authorization', authorization)
       .send({ name: 'landing page' })
 
-    expect(response.status).toBe(201)
+    expect(response.status).toBe(HTTP_STATUS_CREATED)
+    const { newProject } = parseBody(NEW_PROJECT_SCHEMA, response)
     expect(response.body).toEqual({
       status: 'ok',
       newProject: {
-        _id: expect.any(String),
-        __v: 0,
+        _id: newProject._id,
+        __v: FIRST_VERSION,
         name: 'Landing Page',
         authorId: user._id.toString(),
-        createdAt: expect.any(String),
-        totalTasks: 0
+        createdAt: newProject.createdAt,
+        totalTasks: NO_TASKS
       }
     })
   })
@@ -41,8 +62,10 @@ describe('POST /projects', () => {
       .set('Authorization', authorization)
       .send({ name: 'web' })
 
-    expect(response.status).toBe(403)
-    expect(response.body.code).toBe('projects/project-already-exists')
+    expect(response.status).toBe(HTTP_STATUS_FORBIDDEN)
+    expect(body(response)).toMatchObject({
+      code: 'projects/project-already-exists'
+    })
   })
 
   it('lets another user use the same name', async () => {
@@ -54,7 +77,7 @@ describe('POST /projects', () => {
       .set('Authorization', authorization)
       .send({ name: 'web' })
 
-    expect(response.status).toBe(201)
+    expect(response.status).toBe(HTTP_STATUS_CREATED)
   })
 
   it('requires the name', async () => {
@@ -65,14 +88,15 @@ describe('POST /projects', () => {
       .set('Authorization', authorization)
       .send({ name: ' ' })
 
-    expect(response.status).toBe(400)
-    expect(response.body.error[0].path).toBe('name')
+    expect(response.status).toBe(HTTP_STATUS_BAD_REQUEST)
+    const [firstPath] = validationErrorPaths(response)
+    expect(firstPath).toBe('name')
   })
 
   it('rejects the trial account', async () => {
     const { authorization } = await createUserWithToken({
       _id: TRIAL_ACCOUNT_ID,
-      role: ROLES.trial
+      role: ROLE_TRIAL
     })
 
     const response = await request(app)
@@ -80,15 +104,17 @@ describe('POST /projects', () => {
       .set('Authorization', authorization)
       .send({ name: 'web' })
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('trial/permission-denied')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'trial/permission-denied' })
   })
 })
 
 describe('GET /projects', () => {
   it('lists the projects of the user with the best project of the past month', async () => {
     const { user, authorization } = await createUserWithToken()
-    const pastMonth = dayjs().subtract(1, 'month').format('YYYY-MM-DD')
+    const pastMonth = dayjs()
+      .subtract(PREVIOUS_MONTH_OFFSET, 'month')
+      .format('YYYY-MM-DD')
     await createProject(user._id, 'Web')
     await createProject(user._id, 'App')
     await createProject(new mongoose.Types.ObjectId(), 'Other')
@@ -100,18 +126,20 @@ describe('GET /projects', () => {
       .get(API.projects)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(HTTP_STATUS_OK)
     expect(
-      response.body.projects.map((project: { name: string }) => project.name)
+      parseBody(PROJECTS_SCHEMA, response).projects.map(({ name }) => name)
     ).toEqual(['Web', 'App'])
-    expect(response.body.pagination).toEqual({
-      totalResults: 2,
-      resultsPerPage: 2,
+    expect(body(response)).toHaveProperty('pagination', {
+      totalResults: TWO_DOCUMENTS,
+      resultsPerPage: TWO_DOCUMENTS,
       prevPage: null,
-      page: 1,
+      page: FIRST_PAGE,
       nextPage: null
     })
-    expect(response.body.stats).toEqual({ bestProjectOfPastMonth: 'Web' })
+    expect(body(response)).toHaveProperty('stats', {
+      bestProjectOfPastMonth: 'Web'
+    })
   })
 
   it('updates the total tasks of each project in the background', async () => {
@@ -123,7 +151,9 @@ describe('GET /projects', () => {
     await request(app).get(API.projects).set('Authorization', authorization)
 
     await vi.waitFor(async () => {
-      expect((await Project.findById(project._id))?.totalTasks).toBe(2)
+      expect((await Project.findById(project._id))?.totalTasks).toBe(
+        TWO_DOCUMENTS
+      )
     })
   })
 
@@ -137,15 +167,17 @@ describe('GET /projects', () => {
       .get(`${API.projects}?search="web"&page=2&limit=1`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(HTTP_STATUS_OK)
     expect(
-      response.body.projects.map((project: { name: string }) => project.name)
+      parseBody(PROJECTS_SCHEMA, response).projects.map(({ name }) => name)
     ).toEqual(['Web Two'])
-    expect(response.body.pagination).toMatchObject({
-      totalResults: 2,
-      page: 2,
-      prevPage: 1,
-      nextPage: null
+    expect(body(response)).toMatchObject({
+      pagination: {
+        totalResults: TWO_DOCUMENTS,
+        page: SECOND_PAGE,
+        prevPage: FIRST_PAGE,
+        nextPage: null
+      }
     })
   })
 
@@ -156,7 +188,7 @@ describe('GET /projects', () => {
       .get(API.projects)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(HTTP_STATUS_OK)
     expect(response.body).toEqual({
       status: 'ok',
       pagination: null,
@@ -174,7 +206,7 @@ describe('GET /projects/:id', () => {
       .get(`${API.projects}/${project._id.toString()}`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(HTTP_STATUS_OK)
     expect(response.body).toEqual({
       status: 'ok',
       project: {
@@ -182,7 +214,7 @@ describe('GET /projects/:id', () => {
         name: project.name,
         authorId: user._id.toString(),
         createdAt: project.createdAt,
-        totalTasks: 0
+        totalTasks: NO_TASKS
       }
     })
   })
@@ -195,8 +227,8 @@ describe('GET /projects/:id', () => {
       .get(`${API.projects}/${project._id.toString()}`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('projects/permission-denied')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'projects/permission-denied' })
   })
 
   it('returns 404 for a missing project', async () => {
@@ -206,8 +238,8 @@ describe('GET /projects/:id', () => {
       .get(`${API.projects}/${new mongoose.Types.ObjectId().toString()}`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(404)
-    expect(response.body.code).toBe('projects/project-not-found')
+    expect(response.status).toBe(HTTP_STATUS_NOT_FOUND)
+    expect(body(response)).toMatchObject({ code: 'projects/project-not-found' })
   })
 })
 
@@ -221,10 +253,12 @@ describe('PATCH /projects/:id', () => {
       .set('Authorization', authorization)
       .send({ name: 'Mobile' })
 
-    expect(response.status).toBe(200)
-    expect(response.body.updatedProject).toMatchObject({
-      _id: project._id.toString(),
-      name: 'Mobile'
+    expect(response.status).toBe(HTTP_STATUS_OK)
+    expect(body(response)).toMatchObject({
+      updatedProject: {
+        _id: project._id.toString(),
+        name: 'Mobile'
+      }
     })
   })
 
@@ -237,8 +271,8 @@ describe('PATCH /projects/:id', () => {
       .set('Authorization', authorization)
       .send({ name: 'Mobile', authorId: new mongoose.Types.ObjectId() })
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('tasks/permission-denied')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'tasks/permission-denied' })
   })
 
   it('rejects a project of another user', async () => {
@@ -250,8 +284,8 @@ describe('PATCH /projects/:id', () => {
       .set('Authorization', authorization)
       .send({ name: 'Mobile' })
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('projects/permission-denied')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'projects/permission-denied' })
   })
 })
 
@@ -266,8 +300,8 @@ describe('DELETE /projects/:id', () => {
       .delete(`${API.projects}/${project._id.toString()}`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(200)
-    expect(await Project.countDocuments()).toBe(0)
+    expect(response.status).toBe(HTTP_STATUS_OK)
+    expect(await Project.countDocuments()).toBe(NO_DOCUMENTS)
     expect(
       (await Task.find()).map((task: { project: string }) => task.project)
     ).toEqual(['App'])
@@ -281,7 +315,7 @@ describe('DELETE /projects/:id', () => {
       .delete(`${API.projects}/${project._id.toString()}`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(404)
-    expect(await Project.countDocuments()).toBe(1)
+    expect(response.status).toBe(HTTP_STATUS_NOT_FOUND)
+    expect(await Project.countDocuments()).toBe(SINGLE_DOCUMENT)
   })
 })

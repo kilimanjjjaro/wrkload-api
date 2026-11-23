@@ -6,9 +6,40 @@ import { describe, expect, it } from 'vitest'
 import app from '../../src/app.ts'
 import { Task } from '../../src/models/Task.ts'
 import { User } from '../../src/models/User.ts'
-import { API, ROLES, TRIAL_ACCOUNT_ID } from '../constants/api.ts'
 import { createTask } from '../utils/tasks.ts'
 import { createUserWithToken, signAccessToken } from '../utils/users.ts'
+import {
+  API,
+  CURRENT_MONTH_HOURS,
+  EXPIRED_TOKEN_EXPIRES_IN,
+  FIRST_PAGE,
+  FIRST_VERSION,
+  FIVE_DOCUMENTS,
+  HTTP_STATUS_BAD_REQUEST,
+  HTTP_STATUS_CREATED,
+  HTTP_STATUS_FORBIDDEN,
+  HTTP_STATUS_NOT_FOUND,
+  HTTP_STATUS_OK,
+  HTTP_STATUS_UNAUTHORIZED,
+  NO_DOCUMENTS,
+  PAST_MONTH_HOURS,
+  PREVIOUS_MONTH_OFFSET,
+  ROLE_ADMIN,
+  ROLE_PARTNER,
+  ROLE_TRIAL,
+  SECOND_PAGE,
+  SINGLE_DOCUMENT,
+  THIRD_PAGE,
+  THREE_DOCUMENTS,
+  TRIAL_ACCOUNT_ID,
+  TWO_DOCUMENTS
+} from '../constants/api.ts'
+import {
+  NEW_TASK_SCHEMA,
+  TASKS_SCHEMA,
+  UPDATED_AT_SCHEMA
+} from '../constants/schemas.ts'
+import { body, parseBody, validationErrorPaths } from '../utils/http.ts'
 
 const taskBody = {
   title: 'Landing page',
@@ -22,7 +53,7 @@ describe('access token', () => {
   it('rejects a request without the authorization header', async () => {
     const response = await request(app).get(`${API.tasks}?project=web`)
 
-    expect(response.status).toBe(401)
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
     expect(response.body).toEqual({
       status: 'error',
       code: 'token/token-not-found',
@@ -35,8 +66,8 @@ describe('access token', () => {
       .get(`${API.tasks}?project=web`)
       .set('Authorization', 'Bearer not-a-jwt')
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('token/invalid-token-format')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'token/invalid-token-format' })
   })
 
   it('rejects a token signed with another key', async () => {
@@ -46,22 +77,22 @@ describe('access token', () => {
       .get(`${API.tasks}?project=web`)
       .set('Authorization', `Bearer ${token}`)
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('token/invalid-signature')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'token/invalid-signature' })
   })
 
   it('rejects an expired token', async () => {
     const token = signAccessToken(
-      { _id: 'x', role: ROLES.partner, email: 'kili@wrkload.test' },
-      { expiresIn: -1 }
+      { _id: 'x', role: ROLE_PARTNER, email: 'kili@wrkload.test' },
+      { expiresIn: EXPIRED_TOKEN_EXPIRES_IN }
     )
 
     const response = await request(app)
       .get(`${API.tasks}?project=web`)
       .set('Authorization', `Bearer ${token}`)
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('token/token-expired')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'token/token-expired' })
   })
 })
 
@@ -74,15 +105,16 @@ describe('POST /tasks', () => {
       .set('Authorization', authorization)
       .send(taskBody)
 
-    expect(response.status).toBe(201)
+    expect(response.status).toBe(HTTP_STATUS_CREATED)
+    const { newTask } = parseBody(NEW_TASK_SCHEMA, response)
     expect(response.body).toEqual({
       status: 'ok',
       newTask: {
-        _id: expect.any(String),
-        __v: 0,
+        _id: newTask._id,
+        __v: FIRST_VERSION,
         title: 'Landing page',
         authorId: user._id.toString(),
-        createdAt: expect.any(String),
+        createdAt: newTask.createdAt,
         updatedAt: '',
         project: 'Web',
         timing: '02:30',
@@ -90,7 +122,9 @@ describe('POST /tasks', () => {
         description: 'Hero &amp; footer'
       }
     })
-    expect(await Task.countDocuments({ authorId: user._id })).toBe(1)
+    expect(await Task.countDocuments({ authorId: user._id })).toBe(
+      SINGLE_DOCUMENT
+    )
   })
 
   it('validates the fields', async () => {
@@ -101,16 +135,14 @@ describe('POST /tasks', () => {
       .set('Authorization', authorization)
       .send({ ...taskBody, title: ' ', deliveredAt: 'yesterday' })
 
-    expect(response.status).toBe(400)
-    expect(
-      response.body.error.map((error: { path: string }) => error.path)
-    ).toEqual(['title', 'deliveredAt'])
+    expect(response.status).toBe(HTTP_STATUS_BAD_REQUEST)
+    expect(validationErrorPaths(response)).toEqual(['title', 'deliveredAt'])
   })
 
   it('rejects the trial account', async () => {
     const { authorization } = await createUserWithToken({
       _id: TRIAL_ACCOUNT_ID,
-      role: ROLES.trial
+      role: ROLE_TRIAL
     })
 
     const response = await request(app)
@@ -118,9 +150,9 @@ describe('POST /tasks', () => {
       .set('Authorization', authorization)
       .send(taskBody)
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('trial/permission-denied')
-    expect(await Task.countDocuments()).toBe(0)
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'trial/permission-denied' })
+    expect(await Task.countDocuments()).toBe(NO_DOCUMENTS)
   })
 })
 
@@ -128,7 +160,9 @@ describe('GET /tasks', () => {
   it('lists the tasks of a project with the monthly stats', async () => {
     const { user, authorization } = await createUserWithToken()
     const today = dayjs().format('YYYY-MM-DD')
-    const pastMonth = dayjs().subtract(1, 'month').format('YYYY-MM-DD')
+    const pastMonth = dayjs()
+      .subtract(PREVIOUS_MONTH_OFFSET, 'month')
+      .format('YYYY-MM-DD')
     await createTask(user._id, { timing: '02:30', deliveredAt: today })
     await createTask(user._id, { timing: '01:45', deliveredAt: today })
     await createTask(user._id, { timing: '01:00', deliveredAt: pastMonth })
@@ -139,21 +173,21 @@ describe('GET /tasks', () => {
       .get(`${API.tasks}?project=web`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(200)
-    expect(response.body.status).toBe('ok')
-    expect(response.body.tasks).toHaveLength(3)
-    expect(response.body.pagination).toEqual({
-      totalResults: 3,
-      resultsPerPage: 3,
+    expect(response.status).toBe(HTTP_STATUS_OK)
+    expect(body(response)).toHaveProperty('status', 'ok')
+    expect(body(response)).toHaveProperty('tasks.length', THREE_DOCUMENTS)
+    expect(body(response)).toHaveProperty('pagination', {
+      totalResults: THREE_DOCUMENTS,
+      resultsPerPage: THREE_DOCUMENTS,
       prevPage: null,
-      page: 1,
+      page: FIRST_PAGE,
       nextPage: null
     })
-    expect(response.body.stats).toEqual({
-      totalPastMonthTiming: 1,
-      totalTasksPastMonth: 1,
-      totalCurrentMonthTiming: 4,
-      totalTasksCurrentMonth: 2,
+    expect(body(response)).toHaveProperty('stats', {
+      totalPastMonthTiming: PAST_MONTH_HOURS,
+      totalTasksPastMonth: SINGLE_DOCUMENT,
+      totalCurrentMonthTiming: CURRENT_MONTH_HOURS,
+      totalTasksCurrentMonth: TWO_DOCUMENTS,
       performance: 'better'
     })
 
@@ -170,26 +204,31 @@ describe('GET /tasks', () => {
       .query({ project: '  web  ' })
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(200)
-    expect(response.body.tasks).toHaveLength(1)
+    expect(response.status).toBe(HTTP_STATUS_OK)
+    expect(body(response)).toHaveProperty('tasks.length', SINGLE_DOCUMENT)
   })
 
   it('paginates the tasks', async () => {
     const { user, authorization } = await createUserWithToken()
-    for (let index = 0; index < 5; index++) await createTask(user._id)
+    await Promise.all(
+      Array.from(
+        { length: FIVE_DOCUMENTS },
+        async () => await createTask(user._id)
+      )
+    )
 
     const response = await request(app)
       .get(`${API.tasks}?project=web&page=2&limit=2`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(200)
-    expect(response.body.tasks).toHaveLength(2)
-    expect(response.body.pagination).toEqual({
-      totalResults: 5,
-      resultsPerPage: 2,
-      prevPage: 1,
-      page: 2,
-      nextPage: 3
+    expect(response.status).toBe(HTTP_STATUS_OK)
+    expect(body(response)).toHaveProperty('tasks.length', TWO_DOCUMENTS)
+    expect(body(response)).toHaveProperty('pagination', {
+      totalResults: FIVE_DOCUMENTS,
+      resultsPerPage: TWO_DOCUMENTS,
+      prevPage: FIRST_PAGE,
+      page: SECOND_PAGE,
+      nextPage: THIRD_PAGE
     })
   })
 
@@ -202,9 +241,9 @@ describe('GET /tasks', () => {
       .get(`${API.tasks}?project=web&search="LANDING"`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(HTTP_STATUS_OK)
     expect(
-      response.body.tasks.map((task: { title: string }) => task.title)
+      parseBody(TASKS_SCHEMA, response).tasks.map(({ title }) => title)
     ).toEqual(['Landing page'])
   })
 
@@ -219,8 +258,8 @@ describe('GET /tasks', () => {
         .query({ project: 'web', search: 'L.nding' })
         .set('Authorization', authorization)
 
-      expect(response.status).toBe(200)
-      expect(response.body.tasks).toEqual([])
+      expect(response.status).toBe(HTTP_STATUS_OK)
+      expect(body(response)).toHaveProperty('tasks', [])
     }
   )
 
@@ -231,7 +270,7 @@ describe('GET /tasks', () => {
       .get(`${API.tasks}?project=web`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(HTTP_STATUS_OK)
     expect(response.body).toEqual({
       status: 'ok',
       pagination: null,
@@ -247,8 +286,9 @@ describe('GET /tasks', () => {
       .get(API.tasks)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(400)
-    expect(response.body.error[0].path).toBe('project')
+    expect(response.status).toBe(HTTP_STATUS_BAD_REQUEST)
+    const [firstPath] = validationErrorPaths(response)
+    expect(firstPath).toBe('project')
   })
 })
 
@@ -261,7 +301,7 @@ describe('GET /tasks/:id', () => {
       .get(`${API.tasks}/${task._id.toString()}`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(HTTP_STATUS_OK)
     expect(response.body).toEqual({
       status: 'ok',
       task: {
@@ -286,19 +326,19 @@ describe('GET /tasks/:id', () => {
       .get(`${API.tasks}/${task._id.toString()}`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('tasks/permission-denied')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'tasks/permission-denied' })
   })
 
   it('lets an admin read a task of another user', async () => {
-    const { authorization } = await createUserWithToken({ role: ROLES.admin })
+    const { authorization } = await createUserWithToken({ role: ROLE_ADMIN })
     const task = await createTask(new mongoose.Types.ObjectId())
 
     const response = await request(app)
       .get(`${API.tasks}/${task._id.toString()}`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(HTTP_STATUS_OK)
   })
 
   it('returns 404 for a missing task', async () => {
@@ -308,8 +348,8 @@ describe('GET /tasks/:id', () => {
       .get(`${API.tasks}/${new mongoose.Types.ObjectId().toString()}`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(404)
-    expect(response.body.code).toBe('tasks/task-not-found')
+    expect(response.status).toBe(HTTP_STATUS_NOT_FOUND)
+    expect(body(response)).toMatchObject({ code: 'tasks/task-not-found' })
   })
 
   it.fails('rejects an invalid id', async () => {
@@ -319,8 +359,8 @@ describe('GET /tasks/:id', () => {
       .get(`${API.tasks}/not-an-id`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(403)
-    expect(response.body.code).toBe('auth/id-not-valid')
+    expect(response.status).toBe(HTTP_STATUS_FORBIDDEN)
+    expect(body(response)).toMatchObject({ code: 'auth/id-not-valid' })
   })
 })
 
@@ -334,13 +374,17 @@ describe('PATCH /tasks/:id', () => {
       .set('Authorization', authorization)
       .send({ ...taskBody, title: 'New title' })
 
-    expect(response.status).toBe(200)
-    expect(response.body.updatedTask).toMatchObject({
-      _id: task._id.toString(),
-      title: 'New title',
-      timing: '02:30'
+    expect(response.status).toBe(HTTP_STATUS_OK)
+    expect(body(response)).toMatchObject({
+      updatedTask: {
+        _id: task._id.toString(),
+        title: 'New title',
+        timing: '02:30'
+      }
     })
-    expect(response.body.updatedTask.updatedAt).not.toBe('')
+    expect(
+      parseBody(UPDATED_AT_SCHEMA, response).updatedTask.updatedAt
+    ).not.toBe('')
     expect((await Task.findById(task._id))?.title).toBe('New title')
   })
 
@@ -353,8 +397,8 @@ describe('PATCH /tasks/:id', () => {
       .set('Authorization', authorization)
       .send({ ...taskBody, authorId: new mongoose.Types.ObjectId() })
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('tasks/permission-denied')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'tasks/permission-denied' })
   })
 
   it.fails('rejects changing the author with an update operator', async () => {
@@ -381,8 +425,8 @@ describe('PATCH /tasks/:id', () => {
       .set('Authorization', authorization)
       .send(taskBody)
 
-    expect(response.status).toBe(401)
-    expect(response.body.code).toBe('tasks/permission-denied')
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'tasks/permission-denied' })
   })
 })
 
@@ -395,8 +439,8 @@ describe('DELETE /tasks/:id', () => {
       .delete(`${API.tasks}/${task._id.toString()}`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(200)
-    expect(await Task.countDocuments()).toBe(0)
+    expect(response.status).toBe(HTTP_STATUS_OK)
+    expect(await Task.countDocuments()).toBe(NO_DOCUMENTS)
   })
 
   it('does not delete a task of another user', async () => {
@@ -407,8 +451,8 @@ describe('DELETE /tasks/:id', () => {
       .delete(`${API.tasks}/${task._id.toString()}`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(404)
-    expect(response.body.code).toBe('tasks/task-not-found')
-    expect(await Task.countDocuments()).toBe(1)
+    expect(response.status).toBe(HTTP_STATUS_NOT_FOUND)
+    expect(body(response)).toMatchObject({ code: 'tasks/task-not-found' })
+    expect(await Task.countDocuments()).toBe(SINGLE_DOCUMENT)
   })
 })

@@ -1,10 +1,12 @@
 import 'dotenv/config'
 import nodemailer from 'nodemailer'
+import { SMTP_SSL_PORT } from '../constants/index.ts'
+import { logInfo } from './logger.ts'
 
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
   host: 'smtp.gmail.com',
-  port: 465,
+  port: SMTP_SSL_PORT,
   secure: true,
   auth: {
     user: process.env.EMAIL_USER,
@@ -13,7 +15,7 @@ const transporter = nodemailer.createTransport({
 })
 
 void transporter.verify().then(() => {
-  console.log('Ready for send mails')
+  logInfo('Ready for send mails')
 })
 
 export default transporter

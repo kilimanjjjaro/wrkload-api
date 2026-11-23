@@ -1,7 +1,11 @@
 import jwt from 'jsonwebtoken'
 import mongoose from 'mongoose'
 import { User } from '../../src/models/User.ts'
-import { DEFAULT_PASSWORD, ROLES } from '../constants/api.ts'
+import {
+  DEFAULT_PASSWORD,
+  ROLE_PARTNER,
+  TEST_TOKEN_EXPIRES_IN
+} from '../constants/api.ts'
 
 interface CreateUserOptions {
   _id?: string
@@ -22,7 +26,7 @@ export const createUser = async (options: CreateUserOptions = {}) => {
     email: options.email ?? `${id}@wrkload.test`,
     avatar: 'https://wrkload.test/avatar.png',
     password: options.password ?? DEFAULT_PASSWORD,
-    role: options.role ?? ROLES.partner,
+    role: options.role ?? ROLE_PARTNER,
     registeredAt: '2026-01-01T00:00:00-03:00',
     lastActiveAt: options.lastActiveAt ?? '',
     confirmationStatus: options.confirmed ?? true
@@ -35,7 +39,7 @@ export const createUser = async (options: CreateUserOptions = {}) => {
 
 export const signAccessToken = (
   user: { _id: unknown; role: number; email: string },
-  options: jwt.SignOptions = { expiresIn: 60 }
+  options: jwt.SignOptions = { expiresIn: TEST_TOKEN_EXPIRES_IN }
 ) =>
   jwt.sign(
     { uid: user._id, role: user.role, email: user.email },

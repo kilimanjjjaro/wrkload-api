@@ -1,13 +1,13 @@
-import type { Types } from 'mongoose'
-
 export default function rememberPasswordMail({
   id,
   resetPasswordToken
 }: {
-  id: Types.ObjectId
+  id: string
   resetPasswordToken: string
 }) {
-  const frontendUrl = process.env.FRONTEND_URL
+  const {
+    env: { FRONTEND_URL: frontendUrl }
+  } = process
 
   return `
   <!DOCTYPE HTML

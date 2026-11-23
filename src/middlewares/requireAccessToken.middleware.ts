@@ -1,7 +1,8 @@
 import type { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import { env } from '../utils/env.ts'
-import type { TokenPayload } from '../types/tokens.ts'
+import { logError } from '../utils/logger.ts'
+import { readTokenPayload } from '../utils/tokenPayloads.ts'
 
 export const requireAccessToken = (
   req: Request,
@@ -9,16 +10,18 @@ export const requireAccessToken = (
   next: NextFunction
 ) => {
   try {
-    let accessToken = req.headers?.authorization
+    const {
+      headers: { authorization }
+    } = req
 
-    if (!accessToken) throw new Error('Token not found')
+    if (authorization === undefined || authorization === '')
+      throw new Error('Token not found')
 
-    accessToken = accessToken.split(' ')[1]
+    const [, accessToken] = authorization.split(' ')
 
-    const { uid, role, email } = jwt.verify(
-      accessToken,
-      env('ACCESS_KEY')
-    ) as TokenPayload
+    const { uid, role, email } = readTokenPayload(
+      jwt.verify(accessToken, env('ACCESS_KEY'))
+    )
 
     req.uid = uid
     req.role = role
@@ -26,7 +29,7 @@ export const requireAccessToken = (
 
     next()
   } catch (error) {
-    console.error(error)
+    logError(error)
     next(error)
   }
 }
