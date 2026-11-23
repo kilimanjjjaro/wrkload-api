@@ -239,15 +239,32 @@ describe('PATCH /users/:uid', () => {
     }
   )
 
-  it.fails('rejects changing the email or the confirmation', async () => {
+  it('updates only the avatar', async () => {
+    const { user, authorization } = await createUserWithToken()
+
+    const response = await request(app)
+      .patch(`${API.users}/${user._id.toString()}`)
+      .set('Authorization', authorization)
+      .send({ avatar: 'https://wrkload.test/new.png' })
+
+    expect(response.status).toBe(HTTP_STATUS_OK)
+    expect(body(response)).toMatchObject({
+      user: { username: user.username, avatar: 'https://wrkload.test/new.png' }
+    })
+  })
+
+  it('rejects changing the email or the confirmation', async () => {
     const { user, authorization } = await createUserWithToken({
       confirmed: false
     })
 
-    await request(app)
+    const response = await request(app)
       .patch(`${API.users}/${user._id.toString()}`)
       .set('Authorization', authorization)
       .send({ email: 'stolen@wrkload.test', confirmationStatus: true })
+
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'users/permission-denied' })
 
     const updated = await User.findById(user._id)
     expect(updated?.email).toBe(user.email)

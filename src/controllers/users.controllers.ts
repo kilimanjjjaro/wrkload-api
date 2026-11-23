@@ -20,7 +20,7 @@ import {
 } from '../utils/pagination.ts'
 import dayjs from 'dayjs'
 
-const PROTECTED_FIELDS = ['id', '_id', 'password', 'role']
+const UPDATABLE_FIELDS = new Set(['username', 'avatar'])
 
 export const getUsers: RequestHandler = async (req, res, next) => {
   try {
@@ -142,7 +142,7 @@ export const updateUser: RequestHandler<
 
     const reqUser = updatedFields(req.body)
 
-    if (PROTECTED_FIELDS.some((field) => Boolean(reqUser[field])))
+    if (Object.keys(reqUser).some((field) => !UPDATABLE_FIELDS.has(field)))
       throw new Error('Permission denied')
 
     const updatedUser = await User.findOneAndUpdate({ _id: uid }, reqUser, {
