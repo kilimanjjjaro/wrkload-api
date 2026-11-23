@@ -380,7 +380,7 @@ describe('GET /tasks/:id', () => {
     expect(body(response)).toMatchObject({ code: 'tasks/task-not-found' })
   })
 
-  it.fails('rejects an invalid id', async () => {
+  it('rejects an invalid id', async () => {
     const { authorization } = await createUserWithToken()
 
     const response = await request(app)

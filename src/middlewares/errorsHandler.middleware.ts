@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from 'express'
+import mongoose from 'mongoose'
 import {
   HTTP_STATUS_BAD_REQUEST,
   HTTP_STATUS_FORBIDDEN,
@@ -322,6 +323,15 @@ const clientRequestError = (err: unknown): ApiError | undefined => {
   }
 }
 
+const invalidIdError = (err: unknown): ApiError | undefined =>
+  err instanceof mongoose.Error.CastError && err.kind === 'ObjectId'
+    ? {
+        httpStatus: HTTP_STATUS_FORBIDDEN,
+        code: 'auth/id-not-valid',
+        message: 'ID not valid'
+      }
+    : undefined
+
 const errorsHandler = (
   err: unknown,
   req: Request,
@@ -331,6 +341,7 @@ const errorsHandler = (
   const message = err instanceof Error ? err.message : undefined
   const apiError =
     (message === undefined ? undefined : API_ERRORS.get(message)) ??
+    invalidIdError(err) ??
     clientRequestError(err)
 
   // UNTRACKED ERRORS
