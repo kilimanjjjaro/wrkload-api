@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   checks:
-    name: Format and tests
+    name: Format, tests and security audit
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -32,3 +32,6 @@ jobs:
       - run: pnpm format:check
 
       - run: pnpm test
+
+      - name: Security audit (production dependencies)
+        run: pnpm audit --prod --audit-level high
