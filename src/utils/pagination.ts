@@ -17,10 +17,13 @@ export const paginationOptions = (
   }
 }
 
+const escapeRegExp = (text: string) =>
+  text.replace(/[\\^$.*+?\(\)\[\]\{\}\|\/\-]/gv, '\\$&')
+
 export const searchPattern = (search: string | undefined) =>
   search === undefined || search.length === EMPTY_LENGTH
     ? undefined
-    : { $regex: search.replace(/^"|"$/gv, ''), $options: 'i' }
+    : { $regex: escapeRegExp(search.replace(/^"|"$/gv, '')), $options: 'i' }
 
 export const updatedFields = (body: Record<string, unknown>) => {
   const entries = Object.entries(body).filter(([, value]) => Boolean(value))

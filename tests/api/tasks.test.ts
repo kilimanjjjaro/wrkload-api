@@ -247,21 +247,29 @@ describe('GET /tasks', () => {
     ).toEqual(['Landing page'])
   })
 
-  it.fails(
-    'searches the title as text, not as a regular expression',
-    async () => {
-      const { user, authorization } = await createUserWithToken()
-      await createTask(user._id, { title: 'Landing page' })
+  it('searches the title as text, not as a regular expression', async () => {
+    const { user, authorization } = await createUserWithToken()
+    await createTask(user._id, { title: 'Landing page' })
+    await createTask(user._id, { title: 'Landing (v2)' })
 
-      const response = await request(app)
-        .get(API.tasks)
-        .query({ project: 'web', search: 'L.nding' })
-        .set('Authorization', authorization)
+    const regexResponse = await request(app)
+      .get(API.tasks)
+      .query({ project: 'web', search: 'L.nding' })
+      .set('Authorization', authorization)
 
-      expect(response.status).toBe(HTTP_STATUS_OK)
-      expect(body(response)).toHaveProperty('tasks', [])
-    }
-  )
+    expect(regexResponse.status).toBe(HTTP_STATUS_OK)
+    expect(body(regexResponse)).toHaveProperty('tasks', [])
+
+    const textResponse = await request(app)
+      .get(API.tasks)
+      .query({ project: 'web', search: '(v2' })
+      .set('Authorization', authorization)
+
+    expect(textResponse.status).toBe(HTTP_STATUS_OK)
+    expect(
+      parseBody(TASKS_SCHEMA, textResponse).tasks.map(({ title }) => title)
+    ).toEqual(['Landing (v2)'])
+  })
 
   it('returns an empty list without stats', async () => {
     const { authorization } = await createUserWithToken()
