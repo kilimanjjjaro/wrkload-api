@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import type { Dayjs } from 'dayjs'
 import {
   DECIMAL_RADIX,
   MINUTES_PER_HOUR,
@@ -18,31 +19,24 @@ interface ProjectTask extends DeliveredTask {
   project: string
 }
 
-const firstDayOfPastMonth = dayjs()
-  .subtract(PREVIOUS_MONTH_OFFSET, 'month')
-  .startOf('month')
-  .format()
-const lastDayOfPastMonth = dayjs()
-  .subtract(PREVIOUS_MONTH_OFFSET, 'month')
-  .endOf('month')
-  .format()
-const firstDayOfCurrentMonth = dayjs().startOf('month').format()
-const lastDayOfCurrentMonth = dayjs().endOf('month').format()
+const deliveredInMonth = <T extends DeliveredTask>(
+  tasks: T[],
+  month: Dayjs
+) => {
+  const firstDay = month.startOf('month').format()
+  const lastDay = month.endOf('month').format()
 
-const isDeliveredBetween = (task: DeliveredTask, from: string, to: string) => {
-  const formattedDate = dayjs(task.deliveredAt).format()
-  return formattedDate >= from && formattedDate <= to
+  return tasks.filter((task) => {
+    const formattedDate = dayjs(task.deliveredAt).format()
+    return formattedDate >= firstDay && formattedDate <= lastDay
+  })
 }
 
 export const getPastMonthTasks = <T extends DeliveredTask>(tasks: T[]) =>
-  tasks.filter((task) =>
-    isDeliveredBetween(task, firstDayOfPastMonth, lastDayOfPastMonth)
-  )
+  deliveredInMonth(tasks, dayjs().subtract(PREVIOUS_MONTH_OFFSET, 'month'))
 
 export const getCurrentMonthTasks = <T extends DeliveredTask>(tasks: T[]) =>
-  tasks.filter((task) =>
-    isDeliveredBetween(task, firstDayOfCurrentMonth, lastDayOfCurrentMonth)
-  )
+  deliveredInMonth(tasks, dayjs())
 
 export const getTotalTasksTiming = (tasks: TimedTask[]) => {
   let totalMinutes = 0

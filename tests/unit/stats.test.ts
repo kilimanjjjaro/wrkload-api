@@ -52,7 +52,7 @@ describe('stats', () => {
     ])
   })
 
-  it.fails('uses the current month after the month changes', async () => {
+  it('uses the current month after the month changes', async () => {
     vi.useFakeTimers({ toFake: ['Date'], now: TEST_NOW })
     const { getCurrentMonthTasks } = await loadStats()
 
