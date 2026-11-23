@@ -8,6 +8,9 @@ export const ROLES = {
 
 export const DEFAULT_PASSWORD = 'super-secret-password'
 
+export const LEGACY_PASSWORD_HASH =
+  '$2a$10$Nyf4K1Wdk1N9J4vl.C9vT.g46D5nlnE/LoYB.12PzGFe6LnCfTOum'
+
 export const ACCESS_TOKEN_EXPIRES_IN = 60 * 15
 
 export const API = {

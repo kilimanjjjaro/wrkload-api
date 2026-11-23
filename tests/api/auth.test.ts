@@ -7,6 +7,7 @@ import {
   ACCESS_TOKEN_EXPIRES_IN,
   API,
   DEFAULT_PASSWORD,
+  LEGACY_PASSWORD_HASH,
   ROLES,
   TRIAL_ACCOUNT_ID
 } from '../constants/api.ts'
@@ -120,6 +121,17 @@ describe('POST /auth/login', () => {
 
     const updated = await User.findById(user._id)
     expect(updated?.lastActiveAt).not.toBe('')
+  })
+
+  it('accepts a password hashed by a previous bcryptjs version', async () => {
+    const user = await createUser()
+    await User.collection.updateOne(
+      { _id: user._id },
+      { $set: { password: LEGACY_PASSWORD_HASH } }
+    )
+
+    expect((await login(user.email)).status).toBe(200)
+    expect((await login(user.email, 'wrong-password')).status).toBe(403)
   })
 
   it('rejects an unknown email', async () => {
