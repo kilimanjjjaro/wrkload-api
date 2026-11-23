@@ -1,4 +1,4 @@
-export default function rememberPasswordMail ({id, resetPasswordToken}) {
+export default function rememberPasswordMail({ id, resetPasswordToken }) {
   const frontendUrl = process.env.FRONTEND_URL
 
   return `

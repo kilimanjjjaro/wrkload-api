@@ -1,86 +1,91 @@
-import { User } from "../models/User.js";
-import { Project } from "../models/Project.js";
-import { Task } from "../models/Task.js";
-import dayjs from "dayjs";
+import { User } from '../models/User.js'
+import { Project } from '../models/Project.js'
+import { Task } from '../models/Task.js'
+import dayjs from 'dayjs'
 
 export const getUsers = async (req, res, next) => {
   try {
-    if (req.role === 3) throw new Error("Permission denied");
+    if (req.role === 3) throw new Error('Permission denied')
 
-    let users = {};
-    let paginationOptions = {};
-    const page = req.query.page;
-    const limit = req.query.limit;
-    const search = req.query.search;
+    let users = {}
+    let paginationOptions = {}
+    const page = req.query.page
+    const limit = req.query.limit
+    const search = req.query.search
 
     if (limit) {
       paginationOptions = {
-        select: "username role registeredAt lastActiveAt recentlyActive email avatar confirmationToken confirmationStatus",
+        select:
+          'username role registeredAt lastActiveAt recentlyActive email avatar confirmationToken confirmationStatus',
         page: page,
-        limit: limit,
-      };
+        limit: limit
+      }
     } else {
       paginationOptions = {
-        select: "username role registeredAt lastActiveAt recentlyActive email avatar confirmationToken confirmationStatus",
-        pagination: false,
-      };
+        select:
+          'username role registeredAt lastActiveAt recentlyActive email avatar confirmationToken confirmationStatus',
+        pagination: false
+      }
     }
 
     if (search) {
-      const escapedString = search.replace(/^"|"$/g, '');
-      users = await User.paginate({ username: { "$regex": escapedString, "$options": "i" } }, paginationOptions);
+      const escapedString = search.replace(/^"|"$/g, '')
+      users = await User.paginate(
+        { username: { $regex: escapedString, $options: 'i' } },
+        paginationOptions
+      )
     } else {
-      users = await User.paginate({}, paginationOptions);
+      users = await User.paginate({}, paginationOptions)
     }
 
     if (users.docs.length < 1)
       return res.status(200).json({
-        status: "ok",
+        status: 'ok',
         pagination: null,
-        users: [],
-      });
+        users: []
+      })
 
-    const lastHour = dayjs().subtract(1, "hour").format("YYYY-MM-DD HH:mm:ss");
+    const lastHour = dayjs().subtract(1, 'hour').format('YYYY-MM-DD HH:mm:ss')
 
-    users.docs.forEach(user => {
+    users.docs.forEach((user) => {
       if (user.lastActiveAt > lastHour) {
         user.recentlyActive = true
       } else {
         user.recentlyActive = false
       }
-    });
+    })
 
     users = {
-      status: "ok",
+      status: 'ok',
       pagination: {
         totalResults: users.totalDocs,
         resultsPerPage: users.limit,
         prevPage: users.prevPage,
         page: users.page,
-        nextPage: users.nextPage,
+        nextPage: users.nextPage
       },
-      users: users.docs,
-    };
+      users: users.docs
+    }
 
-    res.status(200).json(users);
+    res.status(200).json(users)
   } catch (error) {
-    console.error(error);
-    next(error);
+    console.error(error)
+    next(error)
   }
-};
+}
 
 export const getUser = async (req, res, next) => {
   try {
-    const { uid } = req.params;
-    let user = await User.findById(uid);
+    const { uid } = req.params
+    let user = await User.findById(uid)
 
-    if (!user) throw new Error("User doesn't exist");
+    if (!user) throw new Error("User doesn't exist")
 
     if (!user._id.equals(req.uid) && req.role === 3)
-      throw new Error("Permission denied");
+      throw new Error('Permission denied')
 
     user = {
-      status: "ok",
+      status: 'ok',
       user: {
         _id: user._id,
         username: user.username,
@@ -91,54 +96,56 @@ export const getUser = async (req, res, next) => {
         email: user.email,
         avatar: user.avatar,
         confirmationToken: user.confirmationToken,
-        confirmationStatus: user.confirmationStatus,
-      },
-    };
+        confirmationStatus: user.confirmationStatus
+      }
+    }
 
-    return res.status(200).json(user);
+    return res.status(200).json(user)
   } catch (error) {
-    console.error(error);
-    next(error);
+    console.error(error)
+    next(error)
   }
-};
+}
 
 export const deleteUser = async (req, res, next) => {
   try {
-    const { uid } = req.params;
-    
-    if (uid === '6439b01cf35b6e22570cd842') throw new Error("Trial account detected");
+    const { uid } = req.params
 
-    const user = await User.findOneAndDelete({ _id: uid });
+    if (uid === '6439b01cf35b6e22570cd842')
+      throw new Error('Trial account detected')
 
-    if (!user) throw new Error("User not found");
+    const user = await User.findOneAndDelete({ _id: uid })
 
-    await Task.deleteMany({ authorId: uid });
+    if (!user) throw new Error('User not found')
 
-    await Project.deleteMany({ authorId: uid });
+    await Task.deleteMany({ authorId: uid })
 
-    res.status(200).json({ status: "ok" });
+    await Project.deleteMany({ authorId: uid })
+
+    res.status(200).json({ status: 'ok' })
   } catch (error) {
-    console.error(error);
-    next(error);
+    console.error(error)
+    next(error)
   }
-};
+}
 
 export const updateUser = async (req, res, next) => {
   try {
-    let reqUser;
-    const { uid } = req.params;
-    
-    if (uid === '6439b01cf35b6e22570cd842') throw new Error("Trial account detected");
+    let reqUser
+    const { uid } = req.params
 
-    const user = await User.findById(uid);
+    if (uid === '6439b01cf35b6e22570cd842')
+      throw new Error('Trial account detected')
 
-    if (!user) throw new Error("User not found");
+    const user = await User.findById(uid)
+
+    if (!user) throw new Error('User not found')
 
     for (const key of Object.keys(req.body)) {
       if (req.body[key]) {
         reqUser = Object.assign({}, reqUser, {
-          [key]: req.body[key],
-        });
+          [key]: req.body[key]
+        })
       }
     }
 
@@ -149,23 +156,23 @@ export const updateUser = async (req, res, next) => {
       reqUser.password ||
       reqUser.role
     )
-      throw new Error("Permission denied");
+      throw new Error('Permission denied')
 
     const updatedUser = await User.findOneAndUpdate({ _id: uid }, reqUser, {
-      new: true,
-    });
+      new: true
+    })
 
     const secureUser = {
       _id: updatedUser._id,
       email: updatedUser.email,
       username: updatedUser.username,
       avatar: updatedUser.avatar,
-      role: updatedUser.role,
-    };
+      role: updatedUser.role
+    }
 
-    res.status(200).json({ status: "ok", user: secureUser });
+    res.status(200).json({ status: 'ok', user: secureUser })
   } catch (error) {
-    console.error(error);
-    next(error);
+    console.error(error)
+    next(error)
   }
-};
+}

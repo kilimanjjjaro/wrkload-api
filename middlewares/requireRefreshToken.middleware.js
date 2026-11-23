@@ -1,20 +1,23 @@
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken'
 
 export const requireRefreshToken = (req, res, next) => {
   try {
-    const refreshToken = req.cookies.refreshToken;
+    const refreshToken = req.cookies.refreshToken
 
-    if (!refreshToken) throw new Error("Token not found");
+    if (!refreshToken) throw new Error('Token not found')
 
-    const { uid, role, email } = jwt.verify(refreshToken, process.env.REFRESH_KEY);
+    const { uid, role, email } = jwt.verify(
+      refreshToken,
+      process.env.REFRESH_KEY
+    )
 
-    req.uid = uid;
-    req.role = role;
-    req.email = email;
+    req.uid = uid
+    req.role = role
+    req.email = email
 
-    next();
+    next()
   } catch (error) {
-    console.error(error);
-    next(error);
+    console.error(error)
+    next(error)
   }
-};
+}

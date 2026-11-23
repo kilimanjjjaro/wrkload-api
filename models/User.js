@@ -1,77 +1,77 @@
-import mongoose from "mongoose";
-import bcryptjs from "bcryptjs";
-import mongoosePaginate from "mongoose-paginate-v2";
+import mongoose from 'mongoose'
+import bcryptjs from 'bcryptjs'
+import mongoosePaginate from 'mongoose-paginate-v2'
 
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
-    trim: true,
+    trim: true
   },
   role: {
     type: Number,
     required: true,
-    trim: true,
+    trim: true
   },
   registeredAt: {
     type: String,
-    require: true,
+    require: true
   },
   lastActiveAt: {
     type: String,
     require: true,
-    default: "",
+    default: ''
   },
   recentlyActive: {
     type: Boolean,
     require: true,
-    default: false,
+    default: false
   },
   email: {
     type: String,
     required: true,
     trim: true,
     unique: true,
-    lowercase: true,
+    lowercase: true
   },
   avatar: {
     type: String,
     trim: true,
-    lowercase: true,
+    lowercase: true
   },
   password: {
     type: String,
-    required: true,
+    required: true
   },
   confirmationToken: {
     type: String,
-    default: null,
+    default: null
   },
   confirmationStatus: {
     type: Boolean,
-    default: false,
-  },
-});
+    default: false
+  }
+})
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
-    return next();
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    return next()
   }
 
   try {
-    const salt = await bcryptjs.genSalt(10);
-    this.password = await bcryptjs.hash(this.password, salt);
-    next();
+    const salt = await bcryptjs.genSalt(10)
+    this.password = await bcryptjs.hash(this.password, salt)
+    next()
   } catch (error) {
-    console.error(error);
-    throw new Error("Hash password failed");
+    console.error(error)
+    throw new Error('Hash password failed')
   }
-});
+})
 
-userSchema.plugin(mongoosePaginate);
+userSchema.plugin(mongoosePaginate)
 
 userSchema.methods.comparePassword = async function (candidatePassword) {
-  return await bcryptjs.compare(candidatePassword, this.password);
-};
+  return await bcryptjs.compare(candidatePassword, this.password)
+}
 
-export const User = mongoose.model("User", userSchema);
+export const User = mongoose.model('User', userSchema)

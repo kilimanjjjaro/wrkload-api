@@ -1,22 +1,22 @@
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken'
 
 export const requireAccessToken = (req, res, next) => {
   try {
-    let accessToken = req.headers?.authorization;
+    let accessToken = req.headers?.authorization
 
-    if (!accessToken) throw new Error("Token not found");
+    if (!accessToken) throw new Error('Token not found')
 
-    accessToken = accessToken.split(" ")[1];
+    accessToken = accessToken.split(' ')[1]
 
-    const { uid, role, email } = jwt.verify(accessToken, process.env.ACCESS_KEY);
+    const { uid, role, email } = jwt.verify(accessToken, process.env.ACCESS_KEY)
 
-    req.uid = uid;
-    req.role = role;
-    req.email = email;
+    req.uid = uid
+    req.role = role
+    req.email = email
 
-    next();
+    next()
   } catch (error) {
-    console.error(error);
-    next(error);
+    console.error(error)
+    next(error)
   }
-};
+}

@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from 'express'
 import {
   changePassword,
   confirmAccount,
@@ -8,8 +8,8 @@ import {
   refreshAccessToken,
   register,
   reSendConfirmAccountLink,
-  resetPassword,
-} from "../controllers/auth.controllers.js";
+  resetPassword
+} from '../controllers/auth.controllers.js'
 import {
   changePassDataValidations,
   confirmationTokenValidations,
@@ -17,38 +17,38 @@ import {
   loginDataValidations,
   registryDataValidations,
   resetPassDataValidations,
-  uidParamValidations,
-} from "../middlewares/validateData.middleware.js";
-import { requireRefreshToken } from "../middlewares/requireRefreshToken.middleware.js";
-import { requireAccessToken } from "../middlewares/requireAccessToken.middleware.js";
-const router = Router();
+  uidParamValidations
+} from '../middlewares/validateData.middleware.js'
+import { requireRefreshToken } from '../middlewares/requireRefreshToken.middleware.js'
+import { requireAccessToken } from '../middlewares/requireAccessToken.middleware.js'
+const router = Router()
 
-router.get("/refreshToken", requireRefreshToken, refreshAccessToken);
-router.get("/logout", logout);
-router.post("/register", registryDataValidations, register);
-router.post("/login", loginDataValidations, login);
-router.post("/remember-password", emailValidations, rememberPassword);
+router.get('/refreshToken', requireRefreshToken, refreshAccessToken)
+router.get('/logout', logout)
+router.post('/register', registryDataValidations, register)
+router.post('/login', loginDataValidations, login)
+router.post('/remember-password', emailValidations, rememberPassword)
 router.post(
-  "/resend-confirm-account",
+  '/resend-confirm-account',
   emailValidations,
   reSendConfirmAccountLink
-);
+)
 router.patch(
-  "/change-password",
+  '/change-password',
   requireAccessToken,
   changePassDataValidations,
   changePassword
-);
+)
 router.patch(
-  "/reset-password/:uid/:resetPasswordToken",
+  '/reset-password/:uid/:resetPasswordToken',
   uidParamValidations,
   resetPassDataValidations,
   resetPassword
-);
+)
 router.patch(
-  "/confirm-account/:confirmationToken",
+  '/confirm-account/:confirmationToken',
   confirmationTokenValidations,
   confirmAccount
-);
+)
 
-export default router;
+export default router
