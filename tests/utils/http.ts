@@ -14,3 +14,6 @@ export const parseBody = <T extends z.ZodType>(
 
 export const validationErrorPaths = (response: TestResponse) =>
   parseBody(VALIDATION_ERRORS_SCHEMA, response).error.map(({ path }) => path)
+
+export const validationErrorMessages = (response: TestResponse) =>
+  parseBody(VALIDATION_ERRORS_SCHEMA, response).error.map(({ msg }) => msg)

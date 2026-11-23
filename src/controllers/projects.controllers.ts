@@ -98,7 +98,7 @@ export const getProject: RequestHandler = async (req, res, next) => {
 
     if (project === null) throw new Error('Project not found')
 
-    if (req.role !== ROLE_ADMIN && project.authorId?.equals(req.uid) !== true) {
+    if (req.role !== ROLE_ADMIN && !project.authorId.equals(req.uid)) {
       throw new Error("Can't read other authors projects")
     }
 
@@ -186,7 +186,7 @@ export const updateProject: RequestHandler<
 
     if (project === null) throw new Error('Project not found')
 
-    if (project.authorId?.equals(req.uid) !== true)
+    if (!project.authorId.equals(req.uid))
       throw new Error("Can't update other authors projects")
 
     const reqProject = updatedFields(req.body)
@@ -194,10 +194,30 @@ export const updateProject: RequestHandler<
     if (Object.keys(reqProject).some((field) => !UPDATABLE_FIELDS.has(field)))
       throw new Error("Can't update this project data")
 
+    const { name } = reqProject
+
+    if (typeof name !== 'string')
+      throw new Error("Can't update this project data")
+
+    const newName = capitalize(name)
+
+    const exists = await Project.findOne({
+      _id: { $ne: id },
+      name: newName,
+      authorId: req.uid
+    })
+
+    if (exists !== null) throw new Error('Project already exists')
+
     const updatedProject = await Project.findOneAndUpdate(
       { _id: id },
-      reqProject,
+      { name: newName },
       { returnDocument: 'after' }
+    )
+
+    await Task.updateMany(
+      { project: project.name, authorId: req.uid },
+      { project: newName }
     )
 
     res.status(HTTP_STATUS_OK).json({ status: 'ok', updatedProject })

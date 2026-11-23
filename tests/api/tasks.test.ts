@@ -120,12 +120,34 @@ describe('POST /tasks', () => {
         project: 'Web',
         timing: '02:30',
         deliveredAt: '2026-11-20',
-        description: 'Hero &amp; footer'
+        description: 'Hero & footer'
       }
     })
     expect(await Task.countDocuments({ authorId: user._id })).toBe(
       SINGLE_DOCUMENT
     )
+  })
+
+  it('stores the text as sent', async () => {
+    const { authorization } = await createUserWithToken()
+
+    await request(app)
+      .post(API.tasks)
+      .set('Authorization', authorization)
+      .send({
+        ...taskBody,
+        project: 'R&D "<Team>"',
+        title: "Fix <b> & ship it's"
+      })
+
+    const response = await request(app)
+      .get(API.tasks)
+      .query({ project: 'R&D "<Team>"' })
+      .set('Authorization', authorization)
+
+    expect(
+      parseBody(TASKS_SCHEMA, response).tasks.map(({ title }) => title)
+    ).toEqual(["Fix <b> & ship it's"])
   })
 
   it('validates the fields', async () => {
@@ -407,7 +429,8 @@ describe('PATCH /tasks/:id', () => {
       updatedTask: {
         _id: task._id.toString(),
         title: 'New title',
-        timing: '02:30'
+        timing: '02:30',
+        deliveredAt: '2026-11-20'
       }
     })
     expect(
@@ -441,7 +464,7 @@ describe('PATCH /tasks/:id', () => {
 
     expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
     expect(body(response)).toMatchObject({ code: 'tasks/permission-denied' })
-    expect((await Task.findById(task._id))?.authorId?.toString()).toBe(
+    expect((await Task.findById(task._id))?.authorId.toString()).toBe(
       user._id.toString()
     )
   })
