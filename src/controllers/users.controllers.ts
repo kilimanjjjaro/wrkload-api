@@ -28,7 +28,10 @@ export const getUsers: RequestHandler = async (req, res, next) => {
 
     const username = searchPattern(queryText(req.query.search))
     const users = await User.paginate(
-      username === undefined ? {} : { username },
+      {
+        ...(username === undefined ? {} : { username }),
+        ...(req.role === ROLE_ADMIN ? {} : { _id: req.uid })
+      },
       paginationOptions(
         'username role registeredAt lastActiveAt recentlyActive email avatar confirmationStatus',
         listQuery(req.query)

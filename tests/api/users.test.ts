@@ -98,7 +98,7 @@ describe('GET /users', () => {
     expect(response.status).toBe(HTTP_STATUS_OK)
   })
 
-  it.fails('lists only the trial account to the trial account', async () => {
+  it('lists only the trial account to the trial account', async () => {
     await createUser({ username: 'Alice' })
     const { authorization } = await createUserWithToken({
       _id: TRIAL_ACCOUNT_ID,
