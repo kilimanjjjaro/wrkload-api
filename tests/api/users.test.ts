@@ -98,6 +98,24 @@ describe('GET /users', () => {
     expect(response.status).toBe(HTTP_STATUS_OK)
   })
 
+  it.fails('lists only the trial account to the trial account', async () => {
+    await createUser({ username: 'Alice' })
+    const { authorization } = await createUserWithToken({
+      _id: TRIAL_ACCOUNT_ID,
+      username: 'Trial',
+      role: ROLE_TRIAL
+    })
+
+    const response = await request(app)
+      .get(API.users)
+      .set('Authorization', authorization)
+
+    expect(response.status).toBe(HTTP_STATUS_OK)
+    expect(
+      parseBody(USERS_SCHEMA, response).users.map(({ username }) => username)
+    ).toEqual(['Trial'])
+  })
+
   it('searches and paginates the users', async () => {
     const { authorization } = await createUserWithToken({ role: ROLE_ADMIN })
     await createUser({ username: 'kili one' })
