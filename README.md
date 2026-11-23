@@ -47,6 +47,7 @@ wrkload API is an easy-to-use REST API developed to be implemented as backend by
 ## Built With
 
 - [Node.js](https://github.com/nodejs/node)
+- [TypeScript](https://github.com/microsoft/TypeScript)
 - [Express.js](https://github.com/expressjs/express)
 - [Express validator](https://github.com/express-validator/express-validator)
 - [Mongoose](https://github.com/Automattic/mongoose)
@@ -78,9 +79,14 @@ Open [http://localhost:5000](http://localhost:5000) with your browser.
 
 ```console
 $ pnpm format:check  # Prettier (pnpm format fixes the files)
+$ pnpm typecheck     # TypeScript
+$ pnpm lint          # ESLint
 $ pnpm test          # API and unit tests (Vitest)
 $ pnpm test:all      # Everything CI runs
 ```
+
+The API is written in TypeScript and Node.js runs the `src` files directly
+with type stripping, so there is no build step.
 
 The API tests call every route with supertest against a MongoDB in memory
 (mongodb-memory-server downloads the binary on install) and mock the mail
