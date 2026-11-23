@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import jwt from 'jsonwebtoken'
 import mongoose from 'mongoose'
 import request from 'supertest'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import app from '../../src/app.ts'
 import { Task } from '../../src/models/Task.ts'
 import { User } from '../../src/models/User.ts'
@@ -18,6 +18,7 @@ import {
   HTTP_STATUS_BAD_REQUEST,
   HTTP_STATUS_CREATED,
   HTTP_STATUS_FORBIDDEN,
+  HTTP_STATUS_INTERNAL_SERVER_ERROR,
   HTTP_STATUS_NOT_FOUND,
   HTTP_STATUS_OK,
   HTTP_STATUS_UNAUTHORIZED,
@@ -347,6 +348,25 @@ describe('GET /tasks/:id', () => {
       .set('Authorization', authorization)
 
     expect(response.status).toBe(HTTP_STATUS_OK)
+  })
+
+  it('hides the details of unexpected errors', async () => {
+    const { user, authorization } = await createUserWithToken()
+    const task = await createTask(user._id)
+    vi.spyOn(Task, 'findById').mockImplementation(() => {
+      throw new Error('database exploded')
+    })
+
+    const response = await request(app)
+      .get(`${API.tasks}/${task._id.toString()}`)
+      .set('Authorization', authorization)
+
+    expect(response.status).toBe(HTTP_STATUS_INTERNAL_SERVER_ERROR)
+    expect(response.body).toEqual({
+      status: 'error',
+      code: 'server/unhandled-error',
+      message: 'Internal server error'
+    })
   })
 
   it('returns 404 for a missing task', async () => {

@@ -1,10 +1,12 @@
 import type { NextFunction, Request, Response } from 'express'
 import {
+  HTTP_STATUS_BAD_REQUEST,
   HTTP_STATUS_FORBIDDEN,
   HTTP_STATUS_INTERNAL_SERVER_ERROR,
   HTTP_STATUS_NOT_FOUND,
   HTTP_STATUS_UNAUTHORIZED
 } from '../constants/index.ts'
+import { logError } from '../utils/logger.ts'
 
 interface ApiError {
   httpStatus: number
@@ -290,6 +292,36 @@ const API_ERRORS = new Map<string, ApiError>([
   ]
 ])
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+
+const clientRequestError = (err: unknown): ApiError | undefined => {
+  if (!isRecord(err) || err.expose !== true) return undefined
+
+  const { status, type, message } = err
+
+  if (
+    typeof status !== 'number' ||
+    status < HTTP_STATUS_BAD_REQUEST ||
+    status >= HTTP_STATUS_INTERNAL_SERVER_ERROR
+  )
+    return undefined
+
+  if (type === 'entity.parse.failed') {
+    return {
+      httpStatus: status,
+      code: 'request/invalid-json',
+      message: 'Invalid JSON body'
+    }
+  }
+
+  return {
+    httpStatus: status,
+    code: 'request/invalid-body',
+    message: typeof message === 'string' ? message : 'Invalid request body'
+  }
+}
+
 const errorsHandler = (
   err: unknown,
   req: Request,
@@ -297,14 +329,17 @@ const errorsHandler = (
   next: NextFunction
 ) => {
   const message = err instanceof Error ? err.message : undefined
-  const apiError = message === undefined ? undefined : API_ERRORS.get(message)
+  const apiError =
+    (message === undefined ? undefined : API_ERRORS.get(message)) ??
+    clientRequestError(err)
 
   // UNTRACKED ERRORS
   if (apiError === undefined) {
+    logError(err)
     res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).json({
       status: 'error',
       code: 'server/unhandled-error',
-      message
+      message: 'Internal server error'
     })
     return
   }
