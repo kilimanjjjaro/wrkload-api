@@ -263,6 +263,33 @@ describe('GET /projects/:id', () => {
 })
 
 describe('PATCH /projects/:id', () => {
+  it('moves the tasks of a renamed project to the new name', async () => {
+    const { user, authorization } = await createUserWithToken()
+    const project = await createProject(user._id, 'Web')
+    await createTask(user._id, { project: 'Web' })
+    await createTask(user._id, { project: 'Web' })
+    await createTask(new mongoose.Types.ObjectId(), { project: 'Web' })
+
+    const renameResponse = await request(app)
+      .patch(`${API.projects}/${project._id.toString()}`)
+      .set('Authorization', authorization)
+      .send({ name: 'mobile app' })
+
+    expect(renameResponse.status).toBe(HTTP_STATUS_OK)
+    expect(body(renameResponse)).toHaveProperty(
+      'updatedProject.name',
+      'Mobile App'
+    )
+
+    const tasksResponse = await request(app)
+      .get(API.tasks)
+      .query({ project: 'mobile app' })
+      .set('Authorization', authorization)
+
+    expect(body(tasksResponse)).toHaveProperty('tasks.length', TWO_DOCUMENTS)
+    expect(await Task.countDocuments({ project: 'Web' })).toBe(SINGLE_DOCUMENT)
+  })
+
   it('renames a project of the user', async () => {
     const { user, authorization } = await createUserWithToken()
     const project = await createProject(user._id)

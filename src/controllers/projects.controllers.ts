@@ -194,10 +194,20 @@ export const updateProject: RequestHandler<
     if (Object.keys(reqProject).some((field) => !UPDATABLE_FIELDS.has(field)))
       throw new Error("Can't update this project data")
 
+    const { name } = reqProject
+
+    if (typeof name !== 'string')
+      throw new Error("Can't update this project data")
+
     const updatedProject = await Project.findOneAndUpdate(
       { _id: id },
-      reqProject,
+      { name: capitalize(name) },
       { returnDocument: 'after' }
+    )
+
+    await Task.updateMany(
+      { project: project.name, authorId: req.uid },
+      { project: capitalize(name) }
     )
 
     res.status(HTTP_STATUS_OK).json({ status: 'ok', updatedProject })
