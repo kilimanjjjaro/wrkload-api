@@ -67,6 +67,7 @@ describe('GET /users', () => {
     )
     expect(users).toEqual({ admin: false, active: true, inactive: false })
     expect(body(response)).not.toHaveProperty('users.0.password')
+    expect(body(response)).not.toHaveProperty('users.0.confirmationToken')
   })
 
   it.fails(
@@ -152,6 +153,7 @@ describe('GET /users/:uid', () => {
       }
     })
     expect(body(response)).not.toHaveProperty('user.password')
+    expect(body(response)).not.toHaveProperty('user.confirmationToken')
   })
 
   it('rejects another user for a partner', async () => {

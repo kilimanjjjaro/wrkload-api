@@ -30,7 +30,7 @@ export const getUsers: RequestHandler = async (req, res, next) => {
     const users = await User.paginate(
       username === undefined ? {} : { username },
       paginationOptions(
-        'username role registeredAt lastActiveAt recentlyActive email avatar confirmationToken confirmationStatus',
+        'username role registeredAt lastActiveAt recentlyActive email avatar confirmationStatus',
         listQuery(req.query)
       )
     )
@@ -90,7 +90,6 @@ export const getUser: RequestHandler = async (req, res, next) => {
         recentlyActive: user.recentlyActive,
         email: user.email,
         avatar: user.avatar,
-        confirmationToken: user.confirmationToken,
         confirmationStatus: user.confirmationStatus
       }
     })
