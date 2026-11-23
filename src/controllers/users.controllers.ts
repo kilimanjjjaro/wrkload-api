@@ -5,6 +5,7 @@ import { Task } from '../models/Task.ts'
 import {
   EMPTY_LENGTH,
   HTTP_STATUS_OK,
+  ROLE_ADMIN,
   RECENT_ACTIVITY_HOURS,
   ROLE_PARTNER,
   TRIAL_ACCOUNT_ID
@@ -104,6 +105,9 @@ export const deleteUser: RequestHandler = async (req, res, next) => {
     const uid = routeParam(req.params.uid)
 
     if (uid === TRIAL_ACCOUNT_ID) throw new Error('Trial account detected')
+
+    if (req.role !== ROLE_ADMIN && req.uid?.toString() !== uid)
+      throw new Error('Permission denied')
 
     const user = await User.findOneAndDelete({ _id: uid })
 

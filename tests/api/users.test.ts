@@ -304,17 +304,32 @@ describe('DELETE /users/:uid', () => {
     )
   })
 
-  it.fails('rejects a partner deleting another user', async () => {
-    const { authorization } = await createUserWithToken()
-    const other = await createUser()
+  it('lets a user delete their own account', async () => {
+    const { user, authorization } = await createUserWithToken()
 
     const response = await request(app)
-      .delete(`${API.users}/${other._id.toString()}`)
+      .delete(`${API.users}/${user._id.toString()}`)
       .set('Authorization', authorization)
 
-    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
-    expect(await User.findById(other._id)).not.toBeNull()
+    expect(response.status).toBe(HTTP_STATUS_OK)
+    expect(await User.findById(user._id)).toBeNull()
   })
+
+  it.each([ROLE_PARTNER, ROLE_TRIAL])(
+    'rejects role %i deleting another user',
+    async (role) => {
+      const { authorization } = await createUserWithToken({ role })
+      const other = await createUser()
+
+      const response = await request(app)
+        .delete(`${API.users}/${other._id.toString()}`)
+        .set('Authorization', authorization)
+
+      expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+      expect(body(response)).toMatchObject({ code: 'users/permission-denied' })
+      expect(await User.findById(other._id)).not.toBeNull()
+    }
+  )
 
   it('does not delete the trial account', async () => {
     const { authorization } = await createUserWithToken({ role: ROLE_ADMIN })
