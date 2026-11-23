@@ -70,23 +70,20 @@ describe('GET /users', () => {
     expect(body(response)).not.toHaveProperty('users.0.confirmationToken')
   })
 
-  it.fails(
-    'does not flag a user active more than an hour ago today',
-    async () => {
-      vi.useFakeTimers({ toFake: ['Date'], now: TEST_AFTERNOON })
-      const { authorization } = await createUserWithToken({ role: ROLE_ADMIN })
-      await createUser({
-        username: 'inactive',
-        lastActiveAt: dayjs().subtract(HOURS_ACTIVE_EARLIER, 'hour').format()
-      })
+  it('does not flag a user active more than an hour ago today', async () => {
+    vi.useFakeTimers({ toFake: ['Date'], now: TEST_AFTERNOON })
+    const { authorization } = await createUserWithToken({ role: ROLE_ADMIN })
+    await createUser({
+      username: 'inactive',
+      lastActiveAt: dayjs().subtract(HOURS_ACTIVE_EARLIER, 'hour').format()
+    })
 
-      const response = await request(app)
-        .get(`${API.users}?search=inactive`)
-        .set('Authorization', authorization)
+    const response = await request(app)
+      .get(`${API.users}?search=inactive`)
+      .set('Authorization', authorization)
 
-      expect(body(response)).toHaveProperty('users.0.recentlyActive', false)
-    }
-  )
+    expect(body(response)).toHaveProperty('users.0.recentlyActive', false)
+  })
 
   it('lets the trial account list the users', async () => {
     const { authorization } = await createUserWithToken({

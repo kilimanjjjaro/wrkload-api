@@ -44,12 +44,10 @@ export const getUsers: RequestHandler = async (req, res, next) => {
       return
     }
 
-    const lastHour = dayjs()
-      .subtract(RECENT_ACTIVITY_HOURS, 'hour')
-      .format('YYYY-MM-DD HH:mm:ss')
+    const lastHour = dayjs().subtract(RECENT_ACTIVITY_HOURS, 'hour')
 
     for (const user of users.docs) {
-      user.recentlyActive = user.lastActiveAt > lastHour
+      user.recentlyActive = dayjs(user.lastActiveAt).isAfter(lastHour)
     }
 
     res.status(HTTP_STATUS_OK).json({
