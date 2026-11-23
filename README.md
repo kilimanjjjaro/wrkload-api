@@ -62,27 +62,29 @@ wrkload API is an easy-to-use REST API developed to be implemented as backend by
 
 ## Quick Start
 
-The quickest way to run this server on your localhost is execute the following commands:
-
-Install dependencies
-
-```console
-$ npm install
-```
-
-Start the server in watch mode
+Requirements: Node.js 26 (pinned with Volta) and pnpm 11. pnpm runs the
+project scripts with the Node.js version declared in `devEngines`. Copy
+`.env.example` to `.env` and fill in the [environment variables](#environment-variables).
 
 ```console
-$ npm run dev
-```
-
-Start the server with node
-
-```console
-$ npm run start
+$ pnpm install
+$ pnpm dev     # Start the server in watch mode
+$ pnpm start   # Start the server
 ```
 
 Open [http://localhost:5000](http://localhost:5000) with your browser.
+
+### Checks
+
+```console
+$ pnpm format:check  # Prettier (pnpm format fixes the files)
+$ pnpm test          # API and unit tests (Vitest)
+$ pnpm test:all      # Everything CI runs
+```
+
+The API tests call every route with supertest against a MongoDB in memory
+(mongodb-memory-server downloads the binary on install) and mock the mail
+transporter. Known bugs are covered with `it.fails`.
 
 <br>
 
