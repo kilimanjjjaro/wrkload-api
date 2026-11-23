@@ -275,6 +275,24 @@ describe('PATCH /projects/:id', () => {
     expect(body(response)).toMatchObject({ code: 'tasks/permission-denied' })
   })
 
+  it('rejects changing the author with an update operator', async () => {
+    const { user, authorization } = await createUserWithToken()
+    const project = await createProject(user._id)
+
+    const response = await request(app)
+      .patch(`${API.projects}/${project._id.toString()}`)
+      .set('Authorization', authorization)
+      .send({
+        name: 'Mobile',
+        $set: { authorId: new mongoose.Types.ObjectId() }
+      })
+
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect((await Project.findById(project._id))?.authorId?.toString()).toBe(
+      user._id.toString()
+    )
+  })
+
   it('rejects a project of another user', async () => {
     const { authorization } = await createUserWithToken()
     const project = await createProject(new mongoose.Types.ObjectId())

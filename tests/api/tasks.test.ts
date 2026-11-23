@@ -401,16 +401,18 @@ describe('PATCH /tasks/:id', () => {
     expect(body(response)).toMatchObject({ code: 'tasks/permission-denied' })
   })
 
-  it.fails('rejects changing the author with an update operator', async () => {
+  it('rejects changing the author with an update operator', async () => {
     const { user, authorization } = await createUserWithToken()
     const task = await createTask(user._id)
     const otherId = new mongoose.Types.ObjectId()
 
-    await request(app)
+    const response = await request(app)
       .patch(`${API.tasks}/${task._id.toString()}`)
       .set('Authorization', authorization)
       .send({ ...taskBody, $set: { authorId: otherId } })
 
+    expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
+    expect(body(response)).toMatchObject({ code: 'tasks/permission-denied' })
     expect((await Task.findById(task._id))?.authorId?.toString()).toBe(
       user._id.toString()
     )

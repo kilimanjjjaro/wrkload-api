@@ -21,7 +21,7 @@ import {
 import { getBestProjectOfPastMonth } from '../utils/stats.ts'
 import { capitalize } from './tasks.controllers.ts'
 
-const READ_ONLY_FIELDS = ['authorId', 'id', '_id', 'createdAt']
+const UPDATABLE_FIELDS = new Set(['name'])
 
 export const getProjects: RequestHandler = async (req, res, next) => {
   try {
@@ -187,7 +187,7 @@ export const updateProject: RequestHandler<
 
     const reqProject = updatedFields(req.body)
 
-    if (READ_ONLY_FIELDS.some((field) => Boolean(reqProject[field])))
+    if (Object.keys(reqProject).some((field) => !UPDATABLE_FIELDS.has(field)))
       throw new Error("Can't update this data")
 
     const updatedProject = await Project.findOneAndUpdate(

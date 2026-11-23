@@ -26,7 +26,13 @@ import {
   isPerformanceBetter
 } from '../utils/stats.ts'
 
-const READ_ONLY_FIELDS = ['authorId', 'id', '_id', 'createdAt', 'updatedAt']
+const UPDATABLE_FIELDS = new Set([
+  'title',
+  'project',
+  'timing',
+  'deliveredAt',
+  'description'
+])
 
 export const capitalize = (string: string) =>
   string
@@ -203,7 +209,7 @@ export const updateTask: RequestHandler<
 
     const reqTask = updatedFields(req.body)
 
-    if (READ_ONLY_FIELDS.some((field) => Boolean(reqTask[field])))
+    if (Object.keys(reqTask).some((field) => !UPDATABLE_FIELDS.has(field)))
       throw new Error("Can't update this data")
 
     reqTask.updatedAt = dayjs().format()
