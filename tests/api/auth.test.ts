@@ -21,7 +21,12 @@ import {
   TRIAL_ACCOUNT_ID
 } from '../constants/api.ts'
 import { ACCESS_TOKEN_SCHEMA } from '../constants/schemas.ts'
-import { body, parseBody, validationErrorPaths } from '../utils/http.ts'
+import {
+  body,
+  parseBody,
+  validationErrorMessages,
+  validationErrorPaths
+} from '../utils/http.ts'
 
 const NEW_PASSWORD = 'another-secret-password'
 
@@ -92,6 +97,12 @@ describe('POST /auth/register', () => {
       'email',
       'avatar',
       'password'
+    ])
+    expect(validationErrorMessages(response)).toEqual([
+      'Username are required',
+      'Incorrect email format',
+      'Avatar are required',
+      'Password must have a minimum of 8 characters'
     ])
     expect(await User.countDocuments()).toBe(NO_DOCUMENTS)
   })

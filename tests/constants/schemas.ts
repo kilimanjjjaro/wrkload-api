@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const VALIDATION_ERRORS_SCHEMA = z.object({
-  error: z.array(z.object({ path: z.string() }))
+  error: z.array(z.object({ path: z.string(), msg: z.string() }))
 })
 
 export const ACCESS_TOKEN_SCHEMA = z.object({ accessToken: z.string() })

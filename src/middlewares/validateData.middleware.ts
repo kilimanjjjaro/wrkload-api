@@ -26,8 +26,7 @@ export const registryDataValidations = [
     .trim()
     .notEmpty()
     .withMessage('Username are required')
-    .escape()
-    .withMessage('Invalid username format'),
+    .escape(),
   check('registeredAt').trim().escape(),
   check('lastActiveAt').trim().escape(),
   check('email')
@@ -61,8 +60,7 @@ export const updateDataValidations = [
     .trim()
     .notEmpty()
     .withMessage('Username are required')
-    .escape()
-    .withMessage('Invalid username format'),
+    .escape(),
   check('avatar')
     .optional()
     .trim()
@@ -153,13 +151,7 @@ export const taskDataValidations = [
 ]
 
 export const idParamValidations = [
-  param('id')
-    .trim()
-    .notEmpty()
-    .withMessage('ID are required')
-    .bail()
-    .escape()
-    .withMessage('Invalid ID param format'),
+  param('id').trim().notEmpty().withMessage('ID are required').bail().escape(),
   manageValidationErrors
 ]
 
@@ -169,8 +161,7 @@ export const uidParamValidations = [
     .notEmpty()
     .withMessage('User ID are required')
     .bail()
-    .escape()
-    .withMessage('Invalid user ID param format'),
+    .escape(),
   manageValidationErrors
 ]
 
@@ -180,8 +171,7 @@ export const confirmationTokenValidations = [
     .notEmpty()
     .withMessage('Confirmation token are required')
     .bail()
-    .escape()
-    .withMessage('Invalid confirmation token param format'),
+    .escape(),
   manageValidationErrors
 ]
 
@@ -191,8 +181,7 @@ export const resetPassDataValidations = [
     .notEmpty()
     .withMessage('Reset password token are required')
     .bail()
-    .escape()
-    .withMessage('Invalid reset password token param format'),
+    .escape(),
   check('newPassword')
     .trim()
     .notEmpty()
