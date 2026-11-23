@@ -192,7 +192,7 @@ export const updateProject: RequestHandler<
     const reqProject = updatedFields(req.body)
 
     if (Object.keys(reqProject).some((field) => !UPDATABLE_FIELDS.has(field)))
-      throw new Error("Can't update this data")
+      throw new Error("Can't update this project data")
 
     const updatedProject = await Project.findOneAndUpdate(
       { _id: id },

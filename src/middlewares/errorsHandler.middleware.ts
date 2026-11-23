@@ -266,6 +266,14 @@ const API_ERRORS = new Map<string, ApiError>([
     }
   ],
   [
+    "Can't update this project data",
+    {
+      httpStatus: HTTP_STATUS_UNAUTHORIZED,
+      code: 'projects/permission-denied',
+      message: "Can't update this data"
+    }
+  ],
+  [
     'Project already exists',
     {
       httpStatus: HTTP_STATUS_FORBIDDEN,

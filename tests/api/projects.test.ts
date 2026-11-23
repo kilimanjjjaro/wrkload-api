@@ -291,7 +291,7 @@ describe('PATCH /projects/:id', () => {
       .send({ name: 'Mobile', authorId: new mongoose.Types.ObjectId() })
 
     expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
-    expect(body(response)).toMatchObject({ code: 'tasks/permission-denied' })
+    expect(body(response)).toMatchObject({ code: 'projects/permission-denied' })
   })
 
   it('rejects changing the author with an update operator', async () => {
