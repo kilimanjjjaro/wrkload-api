@@ -120,12 +120,34 @@ describe('POST /tasks', () => {
         project: 'Web',
         timing: '02:30',
         deliveredAt: '2026-11-20',
-        description: 'Hero &amp; footer'
+        description: 'Hero & footer'
       }
     })
     expect(await Task.countDocuments({ authorId: user._id })).toBe(
       SINGLE_DOCUMENT
     )
+  })
+
+  it('stores the text as sent', async () => {
+    const { authorization } = await createUserWithToken()
+
+    await request(app)
+      .post(API.tasks)
+      .set('Authorization', authorization)
+      .send({
+        ...taskBody,
+        project: 'R&D "<Team>"',
+        title: "Fix <b> & ship it's"
+      })
+
+    const response = await request(app)
+      .get(API.tasks)
+      .query({ project: 'R&D "<Team>"' })
+      .set('Authorization', authorization)
+
+    expect(
+      parseBody(TASKS_SCHEMA, response).tasks.map(({ title }) => title)
+    ).toEqual(["Fix <b> & ship it's"])
   })
 
   it('validates the fields', async () => {

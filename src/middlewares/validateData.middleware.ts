@@ -22,13 +22,9 @@ export const manageValidationErrors = (
 }
 
 export const registryDataValidations = [
-  check('username')
-    .trim()
-    .notEmpty()
-    .withMessage('Username are required')
-    .escape(),
-  check('registeredAt').trim().escape(),
-  check('lastActiveAt').trim().escape(),
+  check('username').trim().notEmpty().withMessage('Username are required'),
+  check('registeredAt').trim(),
+  check('lastActiveAt').trim(),
   check('email')
     .trim()
     .notEmpty()
@@ -59,8 +55,7 @@ export const updateDataValidations = [
     .optional()
     .trim()
     .notEmpty()
-    .withMessage('Username are required')
-    .escape(),
+    .withMessage('Username are required'),
   check('avatar')
     .optional()
     .trim()
@@ -129,15 +124,11 @@ export const emailValidations = [
 ]
 
 export const taskDataValidations = [
-  check('title').trim().notEmpty().withMessage('Title are required').escape(),
-  check('project')
-    .trim()
-    .notEmpty()
-    .withMessage('Project are required')
-    .escape(),
-  check('createdAt').trim().escape(),
-  check('updatedAt').trim().escape(),
-  check('timing').trim().notEmpty().withMessage('Timing are required').escape(),
+  check('title').trim().notEmpty().withMessage('Title are required'),
+  check('project').trim().notEmpty().withMessage('Project are required'),
+  check('createdAt').trim(),
+  check('updatedAt').trim(),
+  check('timing').trim().notEmpty().withMessage('Timing are required'),
   check('deliveredAt')
     .trim()
     .notEmpty()
@@ -146,7 +137,7 @@ export const taskDataValidations = [
     .isISO8601()
     .withMessage('Invalid date format. ISO8601 required')
     .bail(),
-  check('description').trim().escape(),
+  check('description').trim(),
   manageValidationErrors
 ]
 
@@ -197,7 +188,6 @@ export const tasksParamsValidations = [
     .exists()
     .withMessage('Project parameter are required')
     .trim()
-    .escape()
     .notEmpty()
     .withMessage('Project parameter cannot be empty'),
   query('page').trim().escape().default(DEFAULT_PAGE),
@@ -219,6 +209,6 @@ export const usersParamsValidations = [
 ]
 
 export const projectDataValidations = [
-  check('name').trim().notEmpty().withMessage('Name are required').escape(),
+  check('name').trim().notEmpty().withMessage('Name are required'),
   manageValidationErrors
 ]
