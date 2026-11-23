@@ -303,8 +303,8 @@ describe('PATCH /users/:uid', () => {
     expect(updated?.confirmationStatus).toBe(false)
   })
 
-  it('rejects another user', async () => {
-    const { authorization } = await createUserWithToken({ role: ROLE_ADMIN })
+  it('rejects another user for a partner', async () => {
+    const { authorization } = await createUserWithToken()
     const other = await createUser()
 
     const response = await request(app)
@@ -314,6 +314,23 @@ describe('PATCH /users/:uid', () => {
 
     expect(response.status).toBe(HTTP_STATUS_UNAUTHORIZED)
     expect(body(response)).toMatchObject({ code: 'users/permission-denied' })
+  })
+
+  it('lets an admin update another user', async () => {
+    const { authorization } = await createUserWithToken({ role: ROLE_ADMIN })
+    const other = await createUser()
+
+    const response = await request(app)
+      .patch(`${API.users}/${other._id.toString()}`)
+      .set('Authorization', authorization)
+      .send({ username: 'New name' })
+
+    expect(response.status).toBe(HTTP_STATUS_OK)
+    expect(body(response)).toMatchObject({
+      status: 'ok',
+      user: { username: 'New name' }
+    })
+    expect((await User.findById(other._id))?.username).toBe('New name')
   })
 
   it('rejects the trial account', async () => {
