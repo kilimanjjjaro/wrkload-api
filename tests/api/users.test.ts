@@ -13,8 +13,8 @@ import {
   DAYS_ACTIVE_BEFORE,
   FIRST_PAGE,
   HOURS_ACTIVE_EARLIER,
+  HTTP_STATUS_BAD_REQUEST,
   HTTP_STATUS_FORBIDDEN,
-  HTTP_STATUS_INTERNAL_SERVER_ERROR,
   HTTP_STATUS_NOT_FOUND,
   HTTP_STATUS_OK,
   HTTP_STATUS_UNAUTHORIZED,
@@ -30,7 +30,7 @@ import {
   TWO_DOCUMENTS
 } from '../constants/api.ts'
 import { USERS_SCHEMA } from '../constants/schemas.ts'
-import { body, parseBody } from '../utils/http.ts'
+import { body, parseBody, validationErrorPaths } from '../utils/http.ts'
 
 afterEach(() => {
   vi.useRealTimers()
@@ -210,16 +210,31 @@ describe('PATCH /users/:uid', () => {
     })
   })
 
-  it('fails without fields to update', async () => {
+  it.each([
+    [{ username: '' }, 'username'],
+    [{ avatar: 'not a url' }, 'avatar']
+  ])('validates %o', async (changes, path) => {
     const { user, authorization } = await createUserWithToken()
 
     const response = await request(app)
       .patch(`${API.users}/${user._id.toString()}`)
       .set('Authorization', authorization)
-      .send({ username: '' })
+      .send(changes)
 
-    expect(response.status).toBe(HTTP_STATUS_INTERNAL_SERVER_ERROR)
-    expect(body(response)).toMatchObject({ code: 'server/unhandled-error' })
+    expect(response.status).toBe(HTTP_STATUS_BAD_REQUEST)
+    expect(validationErrorPaths(response)).toEqual([path])
+  })
+
+  it('rejects an update without fields', async () => {
+    const { user, authorization } = await createUserWithToken()
+
+    const response = await request(app)
+      .patch(`${API.users}/${user._id.toString()}`)
+      .set('Authorization', authorization)
+      .send({})
+
+    expect(response.status).toBe(HTTP_STATUS_BAD_REQUEST)
+    expect(body(response)).toMatchObject({ code: 'request/nothing-to-update' })
   })
 
   it.each([{ password: 'new-password' }, { role: ROLE_ADMIN }])(

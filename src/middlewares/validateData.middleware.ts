@@ -57,18 +57,21 @@ export const registryDataValidations = [
 
 export const updateDataValidations = [
   check('username')
+    .optional()
     .trim()
     .notEmpty()
     .withMessage('Username are required')
     .escape()
     .withMessage('Invalid username format'),
   check('avatar')
+    .optional()
     .trim()
     .notEmpty()
     .withMessage('Avatar are required')
     .bail()
     .isURL({ require_tld: false })
-    .withMessage('Invalid URL avatar')
+    .withMessage('Invalid URL avatar'),
+  manageValidationErrors
 ]
 
 export const loginDataValidations = [

@@ -274,6 +274,15 @@ const API_ERRORS = new Map<string, ApiError>([
     }
   ],
 
+  [
+    'Nothing to update',
+    {
+      httpStatus: HTTP_STATUS_BAD_REQUEST,
+      code: 'request/nothing-to-update',
+      message: 'Nothing to update'
+    }
+  ],
+
   // TRIAL ACCOUNT ERRORS
   [
     'Trial account detected',
