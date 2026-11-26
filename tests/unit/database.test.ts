@@ -18,7 +18,7 @@ describe('database', () => {
     expect(connect).toHaveBeenCalledWith(DATABASE_URL)
   })
 
-  it.fails('stops the startup when the connection fails', async () => {
+  it('stops the startup when the connection fails', async () => {
     const error = new Error('bad auth : Authentication failed.')
     vi.spyOn(mongoose, 'connect').mockRejectedValue(error)
     vi.spyOn(console, 'error').mockImplementation(() => undefined)
