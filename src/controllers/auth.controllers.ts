@@ -63,12 +63,17 @@ export const register: RequestHandler<
 
     await user.save()
 
-    await transporter.sendMail({
-      from: MAIL_FROM,
-      to: user.email,
-      subject: 'Confirm your account',
-      html: confirmAccountMail(user.confirmationToken)
-    })
+    try {
+      await transporter.sendMail({
+        from: MAIL_FROM,
+        to: user.email,
+        subject: 'Confirm your account',
+        html: confirmAccountMail(user.confirmationToken)
+      })
+    } catch (error) {
+      await user.deleteOne()
+      throw error
+    }
 
     res.status(HTTP_STATUS_CREATED).json({ status: 'ok' })
   } catch (error) {

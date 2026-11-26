@@ -88,26 +88,23 @@ describe('POST /auth/register', () => {
     expect(sendMail).not.toHaveBeenCalled()
   })
 
-  it.fails(
-    'lets the user register again when the confirmation mail fails',
-    async () => {
-      sendMail.mockRejectedValueOnce(new Error('Mail delivery failed'))
+  it('lets the user register again when the confirmation mail fails', async () => {
+    sendMail.mockRejectedValueOnce(new Error('Mail delivery failed'))
 
-      const failed = await request(app)
-        .post(`${API.auth}/register`)
-        .send(registerBody)
+    const failed = await request(app)
+      .post(`${API.auth}/register`)
+      .send(registerBody)
 
-      expect(failed.status).toBe(HTTP_STATUS_INTERNAL_SERVER_ERROR)
-      expect(await User.countDocuments()).toBe(NO_DOCUMENTS)
+    expect(failed.status).toBe(HTTP_STATUS_INTERNAL_SERVER_ERROR)
+    expect(await User.countDocuments()).toBe(NO_DOCUMENTS)
 
-      const retried = await request(app)
-        .post(`${API.auth}/register`)
-        .send(registerBody)
+    const retried = await request(app)
+      .post(`${API.auth}/register`)
+      .send(registerBody)
 
-      expect(retried.status).toBe(HTTP_STATUS_CREATED)
-      expect(await User.countDocuments()).toBe(SINGLE_DOCUMENT)
-    }
-  )
+    expect(retried.status).toBe(HTTP_STATUS_CREATED)
+    expect(await User.countDocuments()).toBe(SINGLE_DOCUMENT)
+  })
 
   it('validates the fields', async () => {
     const response = await request(app)
