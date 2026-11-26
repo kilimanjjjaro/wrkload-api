@@ -2,7 +2,6 @@ import mongoose from 'mongoose'
 import bcryptjs from 'bcryptjs'
 import mongoosePaginate from 'mongoose-paginate-v2'
 import { PASSWORD_SALT_ROUNDS } from '../constants/index.ts'
-import { logError } from '../utils/logger.ts'
 
 interface UserMethods {
   comparePassword: (candidatePassword: string) => Promise<boolean>
@@ -71,7 +70,6 @@ userSchema.pre('save', async function () {
     const salt = await bcryptjs.genSalt(PASSWORD_SALT_ROUNDS)
     this.password = await bcryptjs.hash(this.password, salt)
   } catch (error) {
-    logError(error)
     throw new Error('Hash password failed', { cause: error })
   }
 })

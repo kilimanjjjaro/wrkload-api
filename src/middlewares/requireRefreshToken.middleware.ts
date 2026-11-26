@@ -1,7 +1,6 @@
 import type { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import { env } from '../utils/env.ts'
-import { logError } from '../utils/logger.ts'
 import { readTokenPayload } from '../utils/tokenPayloads.ts'
 
 export const requireRefreshToken = (
@@ -26,7 +25,6 @@ export const requireRefreshToken = (
 
     next()
   } catch (error) {
-    logError(error)
     next(error)
   }
 }

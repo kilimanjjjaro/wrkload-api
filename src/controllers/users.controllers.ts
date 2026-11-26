@@ -12,7 +12,6 @@ import {
 } from '../constants/index.ts'
 import type { RouteParams, UpdateBody } from '../types/requests.ts'
 import { listQuery, queryText, routeParam } from '../utils/requests.ts'
-import { logError } from '../utils/logger.ts'
 import {
   paginationOptions,
   searchPattern,
@@ -65,7 +64,6 @@ export const getUsers: RequestHandler = async (req, res, next) => {
       users: users.docs
     })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }
@@ -95,7 +93,6 @@ export const getUser: RequestHandler = async (req, res, next) => {
       }
     })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }
@@ -119,7 +116,6 @@ export const deleteUser: RequestHandler = async (req, res, next) => {
 
     res.status(HTTP_STATUS_OK).json({ status: 'ok' })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }
@@ -162,7 +158,6 @@ export const updateUser: RequestHandler<
 
     res.status(HTTP_STATUS_OK).json({ status: 'ok', user: secureUser })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }

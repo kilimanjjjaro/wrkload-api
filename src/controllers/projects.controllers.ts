@@ -12,7 +12,6 @@ import {
 } from '../constants/index.ts'
 import type { ProjectBody, RouteParams, UpdateBody } from '../types/requests.ts'
 import { listQuery, queryText, routeParam } from '../utils/requests.ts'
-import { logError } from '../utils/logger.ts'
 import {
   paginationOptions,
   searchPattern,
@@ -86,7 +85,6 @@ export const getProjects: RequestHandler = async (req, res, next) => {
       }
     })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }
@@ -113,7 +111,6 @@ export const getProject: RequestHandler = async (req, res, next) => {
       }
     })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }
@@ -145,7 +142,6 @@ export const createProject: RequestHandler<
 
     res.status(HTTP_STATUS_CREATED).json({ status: 'ok', newProject })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }
@@ -167,7 +163,6 @@ export const deleteProject: RequestHandler = async (req, res, next) => {
 
     res.status(HTTP_STATUS_OK).json({ status: 'ok' })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }
@@ -222,7 +217,6 @@ export const updateProject: RequestHandler<
 
     res.status(HTTP_STATUS_OK).json({ status: 'ok', updatedProject })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }

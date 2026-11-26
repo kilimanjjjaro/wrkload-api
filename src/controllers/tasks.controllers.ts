@@ -13,7 +13,6 @@ import {
 } from '../constants/index.ts'
 import type { RouteParams, TaskBody, UpdateBody } from '../types/requests.ts'
 import { listQuery, queryText, routeParam } from '../utils/requests.ts'
-import { logError } from '../utils/logger.ts'
 import {
   paginationOptions,
   searchPattern,
@@ -106,7 +105,6 @@ export const getTasks: RequestHandler = async (req, res, next) => {
       }
     })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }
@@ -137,7 +135,6 @@ export const getTask: RequestHandler = async (req, res, next) => {
       }
     })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }
@@ -168,7 +165,6 @@ export const createTask: RequestHandler<
 
     res.status(HTTP_STATUS_CREATED).json({ status: 'ok', newTask })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }
@@ -185,7 +181,6 @@ export const deleteTask: RequestHandler = async (req, res, next) => {
 
     res.status(HTTP_STATUS_OK).json({ status: 'ok' })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }
@@ -223,7 +218,6 @@ export const updateTask: RequestHandler<
 
     res.status(HTTP_STATUS_OK).json({ status: 'ok', updatedTask })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }
