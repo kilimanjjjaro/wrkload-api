@@ -4,6 +4,7 @@ export const HTTP_STATUS_BAD_REQUEST = 400
 export const HTTP_STATUS_UNAUTHORIZED = 401
 export const HTTP_STATUS_FORBIDDEN = 403
 export const HTTP_STATUS_NOT_FOUND = 404
+export const HTTP_STATUS_TOO_MANY_REQUESTS = 429
 export const HTTP_STATUS_INTERNAL_SERVER_ERROR = 500
 
 export const ROLE_ADMIN = 1
@@ -12,6 +13,12 @@ export const ROLE_PARTNER = 3
 export const TRIAL_ACCOUNT_ID = '6439b01cf35b6e22570cd842'
 
 export const DEFAULT_PORT = 5000
+export const TRUSTED_PROXY_HOPS = 1
+
+export const MAIL_RATE_LIMIT = 5
+export const MAIL_RATE_LIMIT_WINDOW_MS = 3_600_000
+export const LOGIN_RATE_LIMIT = 10
+export const LOGIN_RATE_LIMIT_WINDOW_MS = 900_000
 
 export const PASSWORD_SALT_ROUNDS = 10
 export const PASSWORD_MIN_LENGTH = 8

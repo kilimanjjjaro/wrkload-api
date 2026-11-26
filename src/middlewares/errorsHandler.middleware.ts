@@ -5,6 +5,7 @@ import {
   HTTP_STATUS_FORBIDDEN,
   HTTP_STATUS_INTERNAL_SERVER_ERROR,
   HTTP_STATUS_NOT_FOUND,
+  HTTP_STATUS_TOO_MANY_REQUESTS,
   HTTP_STATUS_UNAUTHORIZED
 } from '../constants/index.ts'
 import { logError } from '../utils/logger.ts'
@@ -288,6 +289,14 @@ const API_ERRORS = new Map<string, ApiError>([
       httpStatus: HTTP_STATUS_BAD_REQUEST,
       code: 'request/nothing-to-update',
       message: 'Nothing to update'
+    }
+  ],
+  [
+    'Too many requests',
+    {
+      httpStatus: HTTP_STATUS_TOO_MANY_REQUESTS,
+      code: 'request/too-many-requests',
+      message: 'Too many requests, try again later'
     }
   ],
 

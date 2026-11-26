@@ -33,6 +33,7 @@ wrkload API is an easy-to-use REST API developed to be implemented as backend by
 - Refresh tokens are used **only for generate new access tokens**, not for authorization. This is why they **expire after 30 days**, to ensure that user doesn't have to login every 15 minutes.
 - The refresh tokens are set on the client from the server as HttpOnly and secure cookies. They can only be accessed through the browser via HTTPS requests, not with Javascript.
 - `Confirmation of accounts` and `reset passwords` by email with **unique**, **one-time use** and **expiration times** links.
+- `Rate limited auth routes`. Each client IP can make **5 requests per hour** to the routes that send mails (register, resend confirmation and remember password) and **10 failed logins every 15 minutes**. Over the limit the API answers `429` with the `request/too-many-requests` code.
 - `Responses filtered` based on user role.
 - `Paginated APIs` with detailed responses, including number of **items per page**, **items in total**, **number of current**, **previous** and **next page**.
 - `User role system`, this opens the way for a lot of frontend-side implementations, like querying registered users, non-sensitive user data, types of uploaded projects, tasks by users, create role permissions, etc.

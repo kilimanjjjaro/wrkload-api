@@ -7,8 +7,11 @@ import usersRouter from './routes/users.routes.ts'
 import dummyRouter from './routes/dummy.routes.ts'
 import projectsRouter from './routes/projects.routes.ts'
 import errorsHandler from './middlewares/errorsHandler.middleware.ts'
+import { TRUSTED_PROXY_HOPS } from './constants/index.ts'
 
 const app = express()
+
+app.set('trust proxy', TRUSTED_PROXY_HOPS)
 
 const whiteList = [process.env.FRONTEND_URL]
 
