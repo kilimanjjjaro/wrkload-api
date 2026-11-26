@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import './config/requiredEnv.ts'
 import './config/database.ts'
 import app from './app.ts'
 import { DEFAULT_PORT } from './constants/index.ts'
