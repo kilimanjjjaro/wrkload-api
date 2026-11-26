@@ -68,6 +68,9 @@ describe('POST /auth/register', () => {
     expect(await user?.comparePassword(DEFAULT_PASSWORD)).toBe(true)
 
     const mail = lastSentMail()
+    expect(mail.html).toContain(
+      `${process.env.FRONTEND_URL}/images/mail-logo.png`
+    )
     expect(mail.to).toBe('kili@wrkload.test')
     expect(mail.subject).toBe('Confirm your account')
 
@@ -310,6 +313,9 @@ describe('POST /auth/resend-confirm-account', () => {
 
     const updated = await User.findById(user._id)
     const mail = lastSentMail()
+    expect(mail.html).toContain(
+      `${process.env.FRONTEND_URL}/images/mail-logo.png`
+    )
     expect(mail.to).toBe(user.email)
     expect(findLink(mail.html, 'confirm-account').pathname).toBe(
       `/confirm-account/${updated?.confirmationToken}`
@@ -442,6 +448,9 @@ describe('password reset', () => {
     expect(rememberResponse.status).toBe(HTTP_STATUS_OK)
 
     const mail = lastSentMail()
+    expect(mail.html).toContain(
+      `${process.env.FRONTEND_URL}/images/mail-logo.png`
+    )
     expect(mail.to).toBe(user.email)
     expect(mail.subject).toBe('Reset your password')
 

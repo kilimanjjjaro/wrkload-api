@@ -201,7 +201,7 @@ export default function rememberPasswordMail({
                                   <td style="padding-right: 0px;padding-left: 0px;" align="center">
                                     <a href="${frontendUrl}" target="_blank">
                                       <img align="center" border="0"
-                                        src="https://wrkload.vercel.app/images/mail-logo.png" alt="" title=""
+                                        src="${frontendUrl}/images/mail-logo.png" alt="" title=""
                                         style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 100%;max-width: 180px;"
                                         width="180" />
                                     </a>
