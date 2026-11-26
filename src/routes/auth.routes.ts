@@ -21,15 +21,25 @@ import {
 } from '../middlewares/validateData.middleware.ts'
 import { requireRefreshToken } from '../middlewares/requireRefreshToken.middleware.ts'
 import { requireAccessToken } from '../middlewares/requireAccessToken.middleware.ts'
+import {
+  loginRateLimit,
+  mailRateLimit
+} from '../middlewares/rateLimit.middleware.ts'
 const router = Router()
 
 router.get('/refreshToken', requireRefreshToken, refreshAccessToken)
 router.get('/logout', logout)
-router.post('/register', registryDataValidations, register)
-router.post('/login', loginDataValidations, login)
-router.post('/remember-password', emailValidations, rememberPassword)
+router.post('/register', mailRateLimit, registryDataValidations, register)
+router.post('/login', loginRateLimit, loginDataValidations, login)
+router.post(
+  '/remember-password',
+  mailRateLimit,
+  emailValidations,
+  rememberPassword
+)
 router.post(
   '/resend-confirm-account',
+  mailRateLimit,
   emailValidations,
   reSendConfirmAccountLink
 )

@@ -10,6 +10,10 @@ export {
 
 export const HTTP_STATUS_NO_CONTENT = 204
 export const HTTP_STATUS_UNPROCESSABLE_CONTENT = 422
+export const HTTP_STATUS_TOO_MANY_REQUESTS = 429
+
+export const MAIL_RATE_LIMIT = 5
+export const LOGIN_RATE_LIMIT = 10
 
 export const TRIAL_ACCOUNT_ID = '6439b01cf35b6e22570cd842'
 
