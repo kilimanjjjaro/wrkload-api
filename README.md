@@ -2,7 +2,7 @@
 
 wrkload API is an easy-to-use REST API developed to be implemented as backend by an app. Gives the possibility to a user to keep organized and documented the time he was working on his tasks.
 
-[API](https://p01--wrkload-api--v2pcvphx98sm.code.run)
+[API](https://wrkload-api.kilimanjjjaro.com)
 
 <br>
 
