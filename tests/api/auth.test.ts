@@ -12,8 +12,8 @@ import {
   HTTP_STATUS_BAD_REQUEST,
   HTTP_STATUS_CREATED,
   HTTP_STATUS_FORBIDDEN,
-  HTTP_STATUS_INTERNAL_SERVER_ERROR,
   HTTP_STATUS_OK,
+  HTTP_STATUS_SERVICE_UNAVAILABLE,
   HTTP_STATUS_UNAUTHORIZED,
   LEGACY_PASSWORD_HASH,
   NO_DOCUMENTS,
@@ -95,7 +95,8 @@ describe('POST /auth/register', () => {
       .post(`${API.auth}/register`)
       .send(registerBody)
 
-    expect(failed.status).toBe(HTTP_STATUS_INTERNAL_SERVER_ERROR)
+    expect(failed.status).toBe(HTTP_STATUS_SERVICE_UNAVAILABLE)
+    expect(body(failed)).toMatchObject({ code: 'mail/delivery-failed' })
     expect(await User.countDocuments()).toBe(NO_DOCUMENTS)
 
     const retried = await request(app)
@@ -493,5 +494,37 @@ describe('password reset', () => {
     expect(response.status).toBe(HTTP_STATUS_BAD_REQUEST)
     const [firstPath] = validationErrorPaths(response)
     expect(firstPath).toBe('newPassword')
+  })
+})
+
+describe('mail delivery failures', () => {
+  it.each([
+    {
+      route: '/resend-confirm-account',
+      send: async () => {
+        const user = await createUser({ confirmed: false })
+        return { email: user.email }
+      }
+    },
+    {
+      route: '/remember-password',
+      send: async () => {
+        const user = await createUser()
+        return { email: user.email }
+      }
+    }
+  ])('answers $route with the mail delivery error', async ({ route, send }) => {
+    sendMail.mockRejectedValueOnce(new Error('Mail delivery failed'))
+
+    const response = await request(app)
+      .post(`${API.auth}${route}`)
+      .send(await send())
+
+    expect(response.status).toBe(HTTP_STATUS_SERVICE_UNAVAILABLE)
+    expect(body(response)).toEqual({
+      status: 'error',
+      code: 'mail/delivery-failed',
+      message: 'The mail could not be sent, try again later'
+    })
   })
 })
