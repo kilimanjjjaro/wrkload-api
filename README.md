@@ -92,6 +92,17 @@ The API tests call every route with supertest against a MongoDB in memory
 (mongodb-memory-server downloads the binary on install) and mock the mail
 transporter.
 
+### Docker
+
+The `Dockerfile` installs only the production dependencies with the pinned
+Node.js and pnpm versions and runs the server on port 5000. It is the image
+the API is deployed with.
+
+```console
+$ docker build -t wrkload-api .
+$ docker run --env-file .env -p 5000:5000 wrkload-api
+```
+
 <br>
 
 ## API References
