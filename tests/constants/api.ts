@@ -9,6 +9,7 @@ export {
 } from '../../src/constants/index.ts'
 
 export const HTTP_STATUS_NO_CONTENT = 204
+export const HTTP_STATUS_UNPROCESSABLE_CONTENT = 422
 
 export const TRIAL_ACCOUNT_ID = '6439b01cf35b6e22570cd842'
 
@@ -59,5 +60,4 @@ export const TEST_NEXT_MONTH = new Date('2026-12-02T12:00:00')
 export const PAST_MONTH_HOURS = 1
 export const CURRENT_MONTH_HOURS = 4
 
-export const SMTP_SSL_PORT = 465
 export const SINGLE_CALL = 1

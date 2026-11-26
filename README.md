@@ -56,7 +56,7 @@ wrkload API is an easy-to-use REST API developed to be implemented as backend by
 - [cookie-parser](https://github.com/expressjs/cookie-parser)
 - [cors](https://github.com/expressjs/cors)
 - [dotenv](https://github.com/motdotla/dotenv)
-- [Nodemailer](https://github.com/nodemailer/nodemailer)
+- [Resend](https://github.com/resend/resend-node)
 - [day.js](https://github.com/iamkun/dayjs/)
 
 <br>
@@ -759,17 +759,16 @@ Send at least one of them. Any other field answers `users/permission-denied`.
 
 To run this server, you must create an .env file in the root of your project with the following variables. Remember to also set these on your hosting when you go to production mode:
 
-| Key                        | Type     | Description                                           |
-| -------------------------- | -------- | ----------------------------------------------------- |
-| `DATABASE`                 | `string` | Link to your MongoDB connection.                      |
-| `ACCESS_KEY`               | `string` | Secret key to sign your access tokens.                |
-| `REFRESH_KEY`              | `string` | Secret key to sign your refresh tokens.               |
-| `CONFIRMATION_ACCOUNT_KEY` | `string` | Secret key to sign your confirmation account tokens.  |
-| `RESET_PASSWORD_KEY`       | `string` | Secret key to sign your reset password tokens.        |
-| `EMAIL_USER`               | `string` | Email account to be used with nodemailer.             |
-| `EMAIL_PASS`               | `string` | Password of email account to be used with nodemailer. |
-| `FRONTEND_URL`             | `string` | Link to client side, e.g.: http://localhost:7000      |
-| `BACKEND_URL`              | `string` | Link to server side, e.g.: http://localhost:5000      |
+| Key                        | Type     | Description                                          |
+| -------------------------- | -------- | ---------------------------------------------------- |
+| `DATABASE`                 | `string` | Link to your MongoDB connection.                     |
+| `ACCESS_KEY`               | `string` | Secret key to sign your access tokens.               |
+| `REFRESH_KEY`              | `string` | Secret key to sign your refresh tokens.              |
+| `CONFIRMATION_ACCOUNT_KEY` | `string` | Secret key to sign your confirmation account tokens. |
+| `RESET_PASSWORD_KEY`       | `string` | Secret key to sign your reset password tokens.       |
+| `RESEND_API_KEY`           | `string` | Resend API key used to send the mails.               |
+| `FRONTEND_URL`             | `string` | Link to client side, e.g.: http://localhost:7000     |
+| `BACKEND_URL`              | `string` | Link to server side, e.g.: http://localhost:5000     |
 
 To generate base64 secret keys you can use [_GeneratePlus_](https://generate.plus/en/base64).
 

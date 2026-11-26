@@ -1,85 +1,80 @@
-import type Nodemailer from 'nodemailer'
-import { describe, expect, it, vi } from 'vitest'
-import { SINGLE_CALL, SMTP_SSL_PORT } from '../constants/api.ts'
-import { STREAMED_MAIL_SCHEMA } from '../constants/schemas.ts'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import {
+  HTTP_STATUS_UNPROCESSABLE_CONTENT,
+  SINGLE_CALL
+} from '../constants/api.ts'
 
-const { createTransport, verify } = vi.hoisted(() => ({
-  createTransport: vi.fn(),
-  verify: vi.fn()
-}))
-
-vi.mock('nodemailer', async (importOriginal) => {
-  const actual = await importOriginal<{ default: typeof Nodemailer }>()
-
-  createTransport.mockImplementation(() => {
-    const transport = actual.default.createTransport({
-      streamTransport: true,
-      buffer: true
-    })
-    transport.verify = verify.mockResolvedValue(true)
-    return transport
-  })
-
-  return { default: { ...actual.default, createTransport } }
+const { Resend, send } = vi.hoisted(() => {
+  const send = vi.fn()
+  const Resend = vi.fn(
+    class {
+      emails = { send }
+    }
+  )
+  return { Resend, send }
 })
 
-vi.stubEnv('EMAIL_USER', 'wrkload@gmail.test')
-vi.stubEnv('EMAIL_PASS', 'app-password')
+vi.mock('resend', () => ({ Resend }))
 
 const { default: transporter } = await import('../../src/utils/transporter.ts')
 
-const transportCalls = [...createTransport.mock.calls]
-const verifyCalls = [...verify.mock.calls]
+const MAIL = {
+  from: '"wrkload" <wrkload@kilimanjjjaro.com>',
+  to: 'kili@wrkload.test',
+  subject: 'Confirm your account',
+  html: '<a href="https://wrkload.test/confirm-account/token">Confirm</a>'
+}
 
 describe('transporter', () => {
-  it('sends the mails through gmail and verifies the connection', () => {
-    expect(transportCalls).toEqual([
-      [
-        {
-          service: 'Gmail',
-          host: 'smtp.gmail.com',
-          port: SMTP_SSL_PORT,
-          secure: true,
-          auth: { user: 'wrkload@gmail.test', pass: 'app-password' }
-        }
-      ]
-    ])
-    expect(verifyCalls).toHaveLength(SINGLE_CALL)
+  beforeEach(() => {
+    vi.stubEnv('RESEND_API_KEY', 're_test_key')
   })
 
-  it('logs a failed connection check instead of crashing', async () => {
-    const error = new Error('Invalid login')
-    verify.mockRejectedValueOnce(error)
-    const consoleError = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => undefined)
+  it('loads without creating the resend client', () => {
+    expect(Resend).not.toHaveBeenCalled()
+  })
 
+  it('sends the html mails the controllers build through resend', async () => {
+    send.mockResolvedValueOnce({
+      data: { id: 'mail-id' },
+      error: null,
+      headers: null
+    })
+
+    await expect(transporter.sendMail(MAIL)).resolves.toEqual({
+      id: 'mail-id'
+    })
+    expect(Resend).toHaveBeenCalledWith('re_test_key')
+    expect(send).toHaveBeenCalledTimes(SINGLE_CALL)
+    expect(send).toHaveBeenCalledWith(MAIL)
+  })
+
+  it('reuses the same resend client for every mail', async () => {
+    send.mockResolvedValue({
+      data: { id: 'mail-id' },
+      error: null,
+      headers: null
+    })
     vi.resetModules()
-    await import('../../src/utils/transporter.ts')
+    const { default: freshTransporter } =
+      await import('../../src/utils/transporter.ts')
 
-    await vi.waitFor(() => {
-      expect(consoleError).toHaveBeenCalledWith(error)
-    })
+    await freshTransporter.sendMail(MAIL)
+    await freshTransporter.sendMail(MAIL)
+
+    expect(Resend).toHaveBeenCalledTimes(SINGLE_CALL)
   })
 
-  it('builds the html mails the controllers send', async () => {
-    const info = await transporter.sendMail({
-      from: '"wrkload" <wrkload@kilimanjjjaro.com>',
-      to: 'kili@wrkload.test',
-      subject: 'Confirm your account',
-      html: '<a href="https://wrkload.test/confirm-account/token">Confirm</a>'
-    })
+  it('fails when resend rejects the mail', async () => {
+    const error = {
+      name: 'invalid_from_address',
+      message: 'Invalid `from` field',
+      statusCode: HTTP_STATUS_UNPROCESSABLE_CONTENT
+    }
+    send.mockResolvedValueOnce({ data: null, error, headers: null })
 
-    expect(info.envelope).toEqual({
-      from: 'wrkload@kilimanjjjaro.com',
-      to: ['kili@wrkload.test']
-    })
-
-    const message = STREAMED_MAIL_SCHEMA.parse(info).message.toString()
-    expect(message).toContain('From: wrkload <wrkload@kilimanjjjaro.com>')
-    expect(message).toContain('To: kili@wrkload.test')
-    expect(message).toContain('Subject: Confirm your account')
-    expect(message).toContain('Content-Type: text/html; charset=utf-8')
-    expect(message).toContain('https://wrkload.test/confirm-account/token')
+    await expect(transporter.sendMail(MAIL)).rejects.toThrow(
+      expect.objectContaining({ message: 'Mail delivery failed', cause: error })
+    )
   })
 })

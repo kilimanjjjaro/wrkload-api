@@ -28,7 +28,7 @@
     "jsonwebtoken": "9.0.3",
     "mongoose": "9.12.3",
     "mongoose-paginate-v2": "1.9.5",
-    "nodemailer": "10.6.1"
+    "resend": "6.39.0"
   },
   "devDependencies": {
     "@types/cookie-parser": "1.4.10",
