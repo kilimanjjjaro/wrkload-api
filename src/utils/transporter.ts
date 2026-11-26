@@ -1,24 +1,30 @@
 import 'dotenv/config'
-import nodemailer from 'nodemailer'
-import { SMTP_SSL_PORT } from '../constants/index.ts'
-import { logError, logInfo } from './logger.ts'
+import { Resend } from 'resend'
+import { env } from './env.ts'
 
-const transporter = nodemailer.createTransport({
-  service: 'Gmail',
-  host: 'smtp.gmail.com',
-  port: SMTP_SSL_PORT,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+interface Mail {
+  from: string
+  to: string
+  subject: string
+  html: string
+}
+
+let resend: Resend | null = null
+
+const client = () => {
+  resend ??= new Resend(env('RESEND_API_KEY'))
+  return resend
+}
+
+const transporter = {
+  sendMail: async (mail: Mail) => {
+    const { data, error } = await client().emails.send(mail)
+
+    if (error !== null)
+      throw new Error('Mail delivery failed', { cause: error })
+
+    return data
   }
-})
-
-transporter
-  .verify()
-  .then(() => {
-    logInfo('Ready for send mails')
-  })
-  .catch(logError)
+}
 
 export default transporter

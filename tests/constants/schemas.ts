@@ -37,5 +37,3 @@ export const UPDATED_AT_SCHEMA = z.object({
 export const NEW_PROJECT_SCHEMA = z.object({ newProject: NEW_DOCUMENT_SCHEMA })
 
 export const NEW_TASK_SCHEMA = z.object({ newTask: NEW_DOCUMENT_SCHEMA })
-
-export const STREAMED_MAIL_SCHEMA = z.object({ message: z.instanceof(Buffer) })

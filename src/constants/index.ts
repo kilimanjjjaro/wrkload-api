@@ -13,8 +13,6 @@ export const TRIAL_ACCOUNT_ID = '6439b01cf35b6e22570cd842'
 
 export const DEFAULT_PORT = 5000
 
-export const SMTP_SSL_PORT = 465
-
 export const PASSWORD_SALT_ROUNDS = 10
 export const PASSWORD_MIN_LENGTH = 8
 
