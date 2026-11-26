@@ -39,3 +39,12 @@ jobs:
 
       - name: Security audit (production dependencies)
         run: pnpm audit --prod --audit-level high
+
+  docker:
+    name: Docker image
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - run: docker build -t wrkload-api .
