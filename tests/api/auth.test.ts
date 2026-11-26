@@ -12,12 +12,14 @@ import {
   HTTP_STATUS_BAD_REQUEST,
   HTTP_STATUS_CREATED,
   HTTP_STATUS_FORBIDDEN,
+  HTTP_STATUS_INTERNAL_SERVER_ERROR,
   HTTP_STATUS_OK,
   HTTP_STATUS_UNAUTHORIZED,
   LEGACY_PASSWORD_HASH,
   NO_DOCUMENTS,
   ROLE_PARTNER,
   ROLE_TRIAL,
+  SINGLE_DOCUMENT,
   TRIAL_ACCOUNT_ID
 } from '../constants/api.ts'
 import { ACCESS_TOKEN_SCHEMA } from '../constants/schemas.ts'
@@ -85,6 +87,27 @@ describe('POST /auth/register', () => {
     expect(body(response)).toMatchObject({ code: 'auth/email-already-exists' })
     expect(sendMail).not.toHaveBeenCalled()
   })
+
+  it.fails(
+    'lets the user register again when the confirmation mail fails',
+    async () => {
+      sendMail.mockRejectedValueOnce(new Error('Mail delivery failed'))
+
+      const failed = await request(app)
+        .post(`${API.auth}/register`)
+        .send(registerBody)
+
+      expect(failed.status).toBe(HTTP_STATUS_INTERNAL_SERVER_ERROR)
+      expect(await User.countDocuments()).toBe(NO_DOCUMENTS)
+
+      const retried = await request(app)
+        .post(`${API.auth}/register`)
+        .send(registerBody)
+
+      expect(retried.status).toBe(HTTP_STATUS_CREATED)
+      expect(await User.countDocuments()).toBe(SINGLE_DOCUMENT)
+    }
+  )
 
   it('validates the fields', async () => {
     const response = await request(app)
