@@ -390,6 +390,8 @@ const errorsHandler = (
     return
   }
 
+  if (apiError.httpStatus >= HTTP_STATUS_INTERNAL_SERVER_ERROR) logError(err)
+
   res.status(apiError.httpStatus).json({
     status: 'error',
     code: apiError.code,

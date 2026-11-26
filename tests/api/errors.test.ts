@@ -18,7 +18,7 @@ const spyConsoleError = () =>
   vi.spyOn(console, 'error').mockImplementation(() => undefined)
 
 describe('error logs', () => {
-  it.fails('does not log the errors caused by the client', async () => {
+  it('does not log the errors caused by the client', async () => {
     const consoleError = spyConsoleError()
 
     const login = await request(app)
@@ -31,7 +31,7 @@ describe('error logs', () => {
     expect(consoleError).not.toHaveBeenCalled()
   })
 
-  it.fails('logs an unexpected error once', async () => {
+  it('logs an unexpected error once', async () => {
     const error = new Error('Database exploded')
     vi.spyOn(User, 'findOne').mockRejectedValueOnce(error)
     const consoleError = spyConsoleError()

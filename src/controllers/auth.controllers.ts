@@ -29,7 +29,6 @@ import type {
 } from '../types/requests.ts'
 import { routeParam } from '../utils/requests.ts'
 import { env } from '../utils/env.ts'
-import { logError } from '../utils/logger.ts'
 import {
   readConfirmationTokenPayload,
   readResetPasswordTokenPayload
@@ -77,7 +76,6 @@ export const register: RequestHandler<
 
     res.status(HTTP_STATUS_CREATED).json({ status: 'ok' })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }
@@ -125,7 +123,6 @@ export const login: RequestHandler<RouteParams, unknown, LoginBody> = async (
       .status(HTTP_STATUS_OK)
       .json({ status: 'ok', user: secureUser, accessToken, expiresIn })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }
@@ -142,7 +139,6 @@ export const refreshAccessToken: RequestHandler = (req, res, next) => {
       .status(HTTP_STATUS_CREATED)
       .json({ status: 'ok', accessToken, expiresIn })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }
@@ -173,7 +169,6 @@ export const confirmAccount: RequestHandler = async (req, res, next) => {
 
     res.status(HTTP_STATUS_CREATED).json({ status: 'ok' })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }
@@ -206,7 +201,6 @@ export const reSendConfirmAccountLink: RequestHandler<
 
     res.status(HTTP_STATUS_CREATED).json({ status: 'ok' })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }
@@ -242,7 +236,6 @@ export const changePassword: RequestHandler<
 
     res.status(HTTP_STATUS_CREATED).json({ status: 'ok' })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }
@@ -280,7 +273,6 @@ export const rememberPassword: RequestHandler<
 
     res.status(HTTP_STATUS_OK).json({ status: 'ok' })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }
@@ -321,7 +313,6 @@ export const resetPassword: RequestHandler<
 
     res.status(HTTP_STATUS_CREATED).json({ status: 'ok' })
   } catch (error) {
-    logError(error)
     next(error)
   }
 }
