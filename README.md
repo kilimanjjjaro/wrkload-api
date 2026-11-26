@@ -770,6 +770,9 @@ To run this server, you must create an .env file in the root of your project wit
 | `RESEND_API_KEY`           | `string` | Resend API key used to send the mails.               |
 | `FRONTEND_URL`             | `string` | Link to client side, e.g.: http://localhost:7000     |
 
+The server refuses to start when any of them is missing or empty, and when it
+cannot connect to the database. `PORT` is optional and defaults to `5000`.
+
 To generate base64 secret keys you can use [_GeneratePlus_](https://generate.plus/en/base64).
 
 <br>
