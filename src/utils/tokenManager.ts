@@ -46,7 +46,7 @@ export const refreshTokenGenerator = (
     })
 
     res.cookie('refreshToken', refreshToken, {
-      sameSite: isProduction ? 'none' : 'lax',
+      sameSite: 'lax',
       httpOnly: isProduction,
       secure: isProduction,
       expires: new Date(Date.now() + expiresIn * MS_PER_SECOND)

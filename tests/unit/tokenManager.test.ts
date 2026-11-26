@@ -70,7 +70,7 @@ describe('refreshTokenGenerator', () => {
     expect(options.expires).toBeInstanceOf(Date)
   })
 
-  it('sets a secure cookie in production', () => {
+  it('sets a secure same-site cookie in production', () => {
     vi.stubEnv('NODE_ENV', 'production')
     const res = cookieSetter()
 
@@ -78,7 +78,7 @@ describe('refreshTokenGenerator', () => {
 
     const [, , options] = lastCookie(res)
     expect(options).toMatchObject({
-      sameSite: 'none',
+      sameSite: 'lax',
       httpOnly: true,
       secure: true
     })
