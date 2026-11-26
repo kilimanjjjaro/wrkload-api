@@ -768,7 +768,6 @@ To run this server, you must create an .env file in the root of your project wit
 | `RESET_PASSWORD_KEY`       | `string` | Secret key to sign your reset password tokens.       |
 | `RESEND_API_KEY`           | `string` | Resend API key used to send the mails.               |
 | `FRONTEND_URL`             | `string` | Link to client side, e.g.: http://localhost:7000     |
-| `BACKEND_URL`              | `string` | Link to server side, e.g.: http://localhost:5000     |
 
 To generate base64 secret keys you can use [_GeneratePlus_](https://generate.plus/en/base64).
 
