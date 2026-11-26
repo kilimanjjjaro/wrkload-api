@@ -104,6 +104,13 @@ $ docker build -t wrkload-api .
 $ docker run --env-file .env -p 5000:5000 wrkload-api
 ```
 
+### Health check
+
+`GET /health` answers `200` with `{ "status": "ok", "database": "connected" }`
+while the database is connected and `503` with
+`{ "status": "error", "database": "disconnected" }` otherwise. Point the
+hosting health checks to it so the service restarts when it stops answering.
+
 <br>
 
 ## API References

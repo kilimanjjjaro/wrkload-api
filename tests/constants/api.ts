@@ -38,7 +38,8 @@ export const API = {
   tasks: '/api/v1/tasks',
   projects: '/api/v1/projects',
   users: '/api/v1/users',
-  dummy: '/api/v1/dummy'
+  dummy: '/api/v1/dummy',
+  health: '/health'
 } as const
 
 export const FIRST_VERSION = 0

@@ -7,6 +7,7 @@ import usersRouter from './routes/users.routes.ts'
 import dummyRouter from './routes/dummy.routes.ts'
 import projectsRouter from './routes/projects.routes.ts'
 import errorsHandler from './middlewares/errorsHandler.middleware.ts'
+import { health } from './controllers/health.controllers.ts'
 import { TRUSTED_PROXY_HOPS } from './constants/index.ts'
 
 const app = express()
@@ -32,6 +33,7 @@ app.use(
 app.use(express.json())
 app.use(cookieParser())
 
+app.get('/health', health)
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/tasks', tasksRouter)
 app.use('/api/v1/users', usersRouter)
